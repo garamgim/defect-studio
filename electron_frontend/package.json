@@ -15,7 +15,6 @@
     "@tanstack/react-query-devtools": "^5.53.1",
     "antd": "^5.20.3",
     "axios": "^1.7.7",
-    "canvas": "^2.11.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.53.0",
@@ -27,6 +26,7 @@
     "use-image": "^1.1.1"
   },
   "devDependencies": {
+    "@types/electron": "^1.6.10",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "@typescript-eslint/eslint-plugin": "^7.1.1",

@@ -1,31 +1,26 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from 'antd';
 import { FormatPainterOutlined } from '@ant-design/icons';
-// import { useFabric } from '../../../contexts/FabricContext';
-import InpaintingModal from '../masking/InpaintingModal';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
+import InpaintingModal from '../masking/MaskingModal';
 import UploadImagePlusMask from '../parameters/UploadImagePlusMask';
 
 const CleanupSidebar: React.FC = () => {
-  // const { canvasDownloadUrl, maskingResult, setMaskingResult } = useFabric();
+  // Redux 상태에서 이미지 가져오기
+  const stageImage = useSelector((state: RootState) => state.masking.stageImage);
+  const canvasImage = useSelector((state: RootState) => state.masking.canvasImage);
+  const combinedImage = useSelector((state: RootState) => state.masking.combinedImage);
 
   const [showModal, setShowModal] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('manual');
-
-  // 탭 변경 시 MaskingResult 리셋
-  // useEffect(() => {
-  //   setMaskingResult(null);
-  // }, [setMaskingResult]);
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const img = new Image();
       img.onload = () => {
-        // const ratio = img.width / img.height;
-        // const newWidth = ratio > 1 ? 512 : 512 * ratio;
-        // const newHeight = ratio > 1 ? 512 / ratio : 512;
-
         setImageSrc(reader.result as string);
       };
       img.src = reader.result as string;
@@ -33,20 +28,25 @@ const CleanupSidebar: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
-  // const handleDownloadImage = (url: string | null, filename: string) => {
-  //   if (url) {
-  //     const link = document.createElement('a');
-  //     link.href = url;
-  //     link.download = filename;
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     document.body.removeChild(link);
-  //   }
-  // };
+  // Function to handle the image download
+  const handleDownloadImage = (url: string | null, filename: string) => {
+    if (url) {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
 
-  // const handleDownloadCanvasImage = () => {
-  //   handleDownloadImage(canvasDownloadUrl, 'canvas.png');
-  // };
+  const handleDownloadStageImage = () => {
+    handleDownloadImage(stageImage, 'stage_image.png'); // stageImage 다운로드
+  };
+
+  const handleDownloadCanvasImage = () => {
+    handleDownloadImage(canvasImage, 'canvas_image.png'); // canvasImage 다운로드
+  };
 
   const handleCloseModal = () => {
     setShowModal(false); // 모달 닫기
@@ -59,7 +59,6 @@ const CleanupSidebar: React.FC = () => {
         <UploadImagePlusMask
           handleImageUpload={handleImageUpload}
           imagePreview={imageSrc}
-          // inpaintingResult={maskingResult}
           setActiveTab={setActiveTab}
         />
 
@@ -78,26 +77,31 @@ const CleanupSidebar: React.FC = () => {
             )}
 
             {/* 인페인팅 결과 및 다운로드 */}
-            {/* {activeTab === 'manual' && maskingResult && (
-              <div className="relative w-full pb-[61.8%] border border-dashed border-gray-300 rounded-lg mt-4 flex items-center justify-center">
-                <img
-                  src={maskingResult}
-                  alt="Inpainting Result"
-                  className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
-                />
-                <Button type="default" onClick={handleDownloadCanvasImage} className="w-full mt-2">
+            {combinedImage && (
+              <div className="w-full border border-dashed border-gray-300 rounded-lg mt-4 flex flex-col items-center">
+                <img src={combinedImage} alt="Inpainting Result" className="w-full h-full object-cover rounded-lg" />
+              </div>
+            )}
+
+            <div className="mt-4 flex flex-col space-y-2">
+              {stageImage && (
+                <Button type="default" onClick={handleDownloadStageImage} className="w-full">
+                  Download Stage Image
+                </Button>
+              )}
+
+              {canvasImage && (
+                <Button type="default" onClick={handleDownloadCanvasImage} className="w-full">
                   Download Canvas Image
                 </Button>
-              </div>
-            )} */}
+              )}
+            </div>
           </div>
         )}
       </div>
 
       {/* Inpainting 모달 창 - 모달 상태에 따라 렌더링 */}
-      {showModal && imageSrc && (
-        <InpaintingModal imageSrc={imageSrc} onClose={handleCloseModal} /> // 모달 닫기 함수 전달
-      )}
+      {showModal && imageSrc && <InpaintingModal imageSrc={imageSrc} onClose={handleCloseModal} />}
     </div>
   );
 };

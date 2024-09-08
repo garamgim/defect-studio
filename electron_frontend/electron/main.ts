@@ -20,9 +20,9 @@ function createWindow() {
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     autoHideMenuBar: true, // 메뉴 바 숨기기
     webPreferences: {
-      preload: path.join(__dirname, 'preload.mjs'),
-      nodeIntegration: false, // Node.js 통합 비활성화
-      contextIsolation: true  // 메인 프로세스와 렌더러 프로세스 격리
+      preload: path.join(MAIN_DIST, 'preload.mjs'), // preload 경로 수정
+      contextIsolation: true, // context isolation을 추가하여 보안 강화
+      nodeIntegration: false // nodeIntegration을 꺼서 보안 강화
     }
   });
 
@@ -72,7 +72,7 @@ function createWindow() {
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);
   } else {
-    win.loadFile(path.join(RENDERER_DIST, 'index.html'));
+    win.loadFile(path.join(RENDERER_DIST, '../dist/index.html'));
   }
 }
 
@@ -85,6 +85,8 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
+  // On OS X it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }

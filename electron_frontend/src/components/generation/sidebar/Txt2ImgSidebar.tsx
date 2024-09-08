@@ -1,39 +1,51 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../store/store";
-import Model from "../parameters/Model";
-import ImageDimensions from "../parameters/ImageDimensions";
-import GeneralSettings from "../parameters/GeneralSettings";
-import SamplingSettings from "../parameters/SamplingSettings";
-import BatchSettings from "../parameters/BatchSettings";
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
+import {
+  setWidth,
+  setHeight,
+  setGuidanceScale,
+  setSamplingSteps,
+  setSeed,
+  setIsRandomSeed,
+  setModel,
+  setSamplingMethod,
+  setBatchCount,
+  setBatchSize
+} from '../../../store/slices/generation/txtToImgSlice';
+import Model from '../parameters/Model';
+import ImageDimensions from '../parameters/ImageDimensions';
+import GeneralSettings from '../parameters/GeneralSettings';
+import SamplingSettings from '../parameters/SamplingSettings';
+import BatchSettings from '../parameters/BatchSettings';
 
 const Sidebar = () => {
-  const level = useSelector((state: RootState) => state.level) as
-    | "Basic"
-    | "Advanced";
-  const [width, setWidth] = useState(512);
-  const [height, setHeight] = useState(512);
-  const [guidanceScale, setGuidanceScale] = useState(7.5);
-  const [samplingSteps, setSamplingSteps] = useState(50);
-  const [seed, setSeed] = useState("-1");
-  const [isRandomSeed, setIsRandomSeed] = useState(false);
-  const [model, setModel] = useState("Stable Diffusion v1-5");
-  const [samplingMethod, setSamplingMethod] = useState("DPM++ 2M");
-  const [batchCount, setBatchCount] = useState("1");
-  const [batchSize, setBatchSize] = useState("1");
+  const dispatch = useDispatch();
+  const {
+    width,
+    height,
+    guidanceScale,
+    samplingSteps,
+    seed,
+    isRandomSeed,
+    model,
+    samplingMethod,
+    batchCount,
+    batchSize
+  } = useSelector((state: RootState) => state.txtToImg); // txtToImg 상태 가져오기
+  const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
   const handleRandomSeedChange = () => {
-    setIsRandomSeed(!isRandomSeed);
-    setSeed(!isRandomSeed ? "-1" : "");
+    dispatch(setIsRandomSeed(!isRandomSeed));
+    dispatch(setSeed(!isRandomSeed ? '-1' : ''));
   };
 
   return (
     <div className="w-full lg:w-72 h-full fixed-height mr-6">
       <div className="w-full lg:w-72 h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* 모델 */}
-        <Model model={model} setModel={setModel} />
+        <Model model={model} setModel={(value: string) => dispatch(setModel(value))} />
 
-        {level === "Advanced" && (
+        {level === 'Advanced' && (
           <>
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
@@ -41,8 +53,8 @@ const Sidebar = () => {
             <ImageDimensions
               width={width}
               height={height}
-              setWidth={setWidth}
-              setHeight={setHeight}
+              setWidth={(value: number) => dispatch(setWidth(value))}
+              setHeight={(value: number) => dispatch(setHeight(value))}
             />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
@@ -51,8 +63,8 @@ const Sidebar = () => {
             <SamplingSettings
               samplingMethod={samplingMethod}
               samplingSteps={samplingSteps}
-              setSamplingSteps={setSamplingSteps}
-              setSamplingMethod={setSamplingMethod}
+              setSamplingSteps={(value: number) => dispatch(setSamplingSteps(value))}
+              setSamplingMethod={(value: string) => dispatch(setSamplingMethod(value))}
             />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
@@ -60,9 +72,9 @@ const Sidebar = () => {
             {/* 일반 세팅 */}
             <GeneralSettings
               guidanceScale={guidanceScale}
-              setGuidanceScale={setGuidanceScale}
+              setGuidanceScale={(value: number) => dispatch(setGuidanceScale(value))}
               seed={seed}
-              setSeed={setSeed}
+              setSeed={(value: string) => dispatch(setSeed(value))}
               isRandomSeed={isRandomSeed}
               handleRandomSeedChange={handleRandomSeedChange}
             />
@@ -73,8 +85,8 @@ const Sidebar = () => {
             <BatchSettings
               batchCount={batchCount}
               batchSize={batchSize}
-              setBatchCount={setBatchCount}
-              setBatchSize={setBatchSize}
+              setBatchCount={(value: string) => dispatch(setBatchCount(value))}
+              setBatchSize={(value: string) => dispatch(setBatchSize(value))}
             />
           </>
         )}

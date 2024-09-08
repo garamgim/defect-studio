@@ -19,7 +19,6 @@ function AppContent() {
       <Navbar />
       <div className="pt-[60px]">
         <Routes>
-          {/* <Route path="/" element={<Home />} /> */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
@@ -82,7 +81,7 @@ function App() {
   return (
     <Provider store={store}>
       {/* <FabricProvider> */}
-      <AppContent />
+        <AppContent />
       {/* </FabricProvider> */}
     </Provider>
   );

@@ -1,35 +1,31 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../store/store";
-import Model from "../parameters/Model";
-import UploadImage from "../parameters/UploadImage";
-import GeneralSettings from "../parameters/GeneralSettings";
-import ImageDimensions from "../parameters/ImageDimensions";
-import SamplingSettings from "../parameters/SamplingSettings";
-import BatchSettings from "../parameters/BatchSettings";
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
+import Model from '../parameters/Model';
+import UploadImage from '../parameters/UploadImage';
+import GeneralSettings from '../parameters/GeneralSettings';
+import ImageDimensions from '../parameters/ImageDimensions';
+import SamplingSettings from '../parameters/SamplingSettings';
+import BatchSettings from '../parameters/BatchSettings';
 
 const Img2ImgSidebar = () => {
-  const level = useSelector((state: RootState) => state.level) as
-    | "Basic"
-    | "Advanced";
+  const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
   const [width, setWidth] = useState(512);
   const [height, setHeight] = useState(512);
   const [guidanceScale, setGuidanceScale] = useState(7.5);
   const [samplingSteps, setSamplingSteps] = useState(50);
-  const [seed, setSeed] = useState("-1");
+  const [seed, setSeed] = useState('-1');
   const [isRandomSeed, setIsRandomSeed] = useState(false);
-  const [samplingMethod, setSamplingMethod] = useState("DPM++ 2M");
+  const [samplingMethod, setSamplingMethod] = useState('DPM++ 2M');
   const [, setUploadedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | ArrayBuffer | null>(
-    null
-  );
-  const [model, setModel] = useState("Stable Diffusion v1-5");
-  const [batchCount, setBatchCount] = useState("1");
-  const [batchSize, setBatchSize] = useState("1");
+  const [imagePreview, setImagePreview] = useState<string | ArrayBuffer | null>(null);
+  const [model, setModel] = useState('Stable Diffusion v1-5');
+  const [batchCount, setBatchCount] = useState('1');
+  const [batchSize, setBatchSize] = useState('1');
 
   const handleRandomSeedChange = () => {
     setIsRandomSeed(!isRandomSeed);
-    setSeed(!isRandomSeed ? "-1" : "");
+    setSeed(!isRandomSeed ? '-1' : '');
   };
 
   const handleImageUpload = (file: File) => {
@@ -50,22 +46,14 @@ const Img2ImgSidebar = () => {
         <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
         {/* 이미지 업로드 */}
-        <UploadImage
-          handleImageUpload={handleImageUpload}
-          imagePreview={imagePreview}
-        />
+        <UploadImage handleImageUpload={handleImageUpload} imagePreview={imagePreview} />
 
-        {level === "Advanced" && (
+        {level === 'Advanced' && (
           <>
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 이미지 크기 */}
-            <ImageDimensions
-              width={width}
-              height={height}
-              setWidth={setWidth}
-              setHeight={setHeight}
-            />
+            <ImageDimensions width={width} height={height} setWidth={setWidth} setHeight={setHeight} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
