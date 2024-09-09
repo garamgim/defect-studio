@@ -1,6 +1,7 @@
-import { app, BrowserWindow, Menu, MenuItemConstructorOptions } from 'electron';
+import { app, BrowserWindow, Menu, MenuItemConstructorOptions,ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -91,5 +92,21 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+
+ipcMain.handle('get-files-in-folder', async (event, folderPath) => {
+  try {
+    const files = fs.readdirSync(folderPath);
+    const imageFiles = files.filter((file) => {
+      const ext = path.extname(file).toLowerCase();
+      return ['.jpg', '.jpeg', '.png', '.gif'].includes(ext);
+    });
+    return imageFiles;
+  } catch (error) {
+    console.error('Error reading folder:', error);
+    return [];
+  }
+});
+
 
 app.whenReady().then(createWindow);
