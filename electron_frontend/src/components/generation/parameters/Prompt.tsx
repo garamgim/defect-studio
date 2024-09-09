@@ -1,24 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useLocation } from 'react-router-dom'; 
+import { RootState } from '../../../store/store';
+import {
+  setPrompt,
+  setNegativePrompt,
+  appendToPrompt,
+  resetPromptState,
+  setIsNegativePrompt
+} from '../../../store/slices/generation/promptSlice';
+import { Input, Checkbox, Button, Modal, Tooltip } from 'antd';
 import { RiSparkling2Fill } from 'react-icons/ri';
 import { MdImageSearch } from 'react-icons/md';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../store/store';
-import { Input, Checkbox, Button, Modal, Tooltip } from 'antd';
 
 const { TextArea } = Input;
 
 const Prompt = () => {
-  const [negativePrompt, setNegativePrompt] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [promptText, setPromptText] = useState('');
+  const dispatch = useDispatch();
+  const { clipData, prompt, negativePrompt, isNegativePrompt } = useSelector((state: RootState) => state.prompt);
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
+  const location = useLocation();
 
-  const dummyData =
-    'a man riding a horse on a planet, britsh propaganda poster, 2001 a space odissey, heraldry, pop surrealism, reddit vexilology, digital science diction realism, tres detaille, moon mission, imperial portrait, nationalist';
-  const phrases = dummyData.split(', ');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const phrases = clipData.split(', ');
+
+  // 탭 전환 감지 및 상태 리셋
+  useEffect(() => {
+    // 특정 탭(경로)에 진입할 때 상태를 리셋
+    dispatch(resetPromptState());
+  }, [location.pathname, dispatch]); // 경로가 변경될 때마다 실행
 
   const handlePhraseClick = (phrase: string) => {
-    setPromptText((prev) => (prev ? `${prev}, ${phrase}` : phrase));
+    dispatch(appendToPrompt(phrase));
   };
 
   const handleModalOk = () => {
@@ -30,7 +44,15 @@ const Prompt = () => {
   };
 
   const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setPromptText(e.target.value);
+    dispatch(setPrompt(e.target.value));
+  };
+
+  const handleNegativePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    dispatch(setNegativePrompt(e.target.value));
+  };
+
+  const handleNegativePromptToggle = () => {
+    dispatch(setIsNegativePrompt(!isNegativePrompt));
   };
 
   return (
@@ -42,8 +64,8 @@ const Prompt = () => {
 
         {level === 'Advanced' && (
           <Checkbox
-            checked={negativePrompt}
-            onChange={() => setNegativePrompt(!negativePrompt)}
+            checked={isNegativePrompt}
+            onChange={handleNegativePromptToggle}
             className="text-[14px] text-left text-[#464646]"
           >
             Add Negative Prompt
@@ -56,10 +78,10 @@ const Prompt = () => {
           rows={4}
           className="pr-10"
           placeholder="Enter your prompt here..."
-          value={promptText}
+          value={prompt}
           onChange={handlePromptChange}
         />
-        {window.location.pathname !== '/generation/text-to-image' && (
+        {location.pathname !== '/generation/text-to-image' && (
           <Tooltip title="Uploaded image is converted to a text description to assist in prompt creation.">
             <Button
               type="link"
@@ -71,10 +93,16 @@ const Prompt = () => {
         )}
       </div>
 
-      {level === 'Advanced' && negativePrompt && (
+      {level === 'Advanced' && isNegativePrompt && (
         <>
           <p className="text-sm text-left text-[#222] mb-2 dark:text-gray-300">Negative Prompt</p>
-          <TextArea rows={4} className="mb-4" placeholder="Enter your negative prompt here..." />
+          <TextArea
+            rows={4}
+            className="mb-4"
+            placeholder="Enter your negative prompt here..."
+            value={negativePrompt}
+            onChange={handleNegativePromptChange}
+          />
         </>
       )}
 
@@ -89,7 +117,7 @@ const Prompt = () => {
           {phrases.map((phrase, index) => (
             <Button
               key={index}
-              type={promptText.includes(phrase) ? 'primary' : 'default'}
+              type={prompt.includes(phrase) ? 'primary' : 'default'}
               onClick={() => handlePhraseClick(phrase)}
             >
               {phrase}

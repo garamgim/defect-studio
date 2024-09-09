@@ -14,7 +14,12 @@ function createWindow() {
     autoHideMenuBar: true,
     // 메뉴 바 숨기기
     webPreferences: {
-      preload: path.join(__dirname, "preload.mjs")
+      preload: path.join(MAIN_DIST, "preload.mjs"),
+      // preload 경로 수정
+      contextIsolation: true,
+      // context isolation을 추가하여 보안 강화
+      nodeIntegration: false
+      // nodeIntegration을 꺼서 보안 강화
     }
   });
   const menuTemplate = [
@@ -62,7 +67,7 @@ function createWindow() {
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);
   } else {
-    win.loadFile(path.join(RENDERER_DIST, "index.html"));
+    win.loadFile(path.join(RENDERER_DIST, "../dist/index.html"));
   }
 }
 app.on("window-all-closed", () => {

@@ -1,4 +1,4 @@
-import Sidebar from "../sidebar/CleanupSidebar";
+import Sidebar from '../sidebar/CleanupSidebar';
 
 const Cleanup = () => {
   return (

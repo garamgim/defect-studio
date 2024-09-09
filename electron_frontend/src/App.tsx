@@ -9,8 +9,7 @@ import Model from './pages/Model';
 import Tokens from './pages/Tokens';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import { FabricProvider } from './contexts/FabricContext';
-import PrivateRoute from './components/routing/PrivateRoute';
+// import PrivateRoute from './components/routing/PrivateRoute';
 import Settings from './pages/Settings';
 
 function AppContent() {
@@ -19,7 +18,6 @@ function AppContent() {
       <Navbar />
       <div className="pt-[60px]">
         <Routes>
-          {/* <Route path="/" element={<Home />} /> */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
@@ -27,49 +25,49 @@ function AppContent() {
           <Route
             path="/"
             element={
-              <PrivateRoute>
-                <Home />
-              </PrivateRoute>
+              // <PrivateRoute>
+              <Home />
+              // </PrivateRoute>
             }
           />
           <Route
             path="/generation/*"
             element={
-              <PrivateRoute>
-                <Generation />
-              </PrivateRoute>
+              // <PrivateRoute>
+              <Generation />
+              // </PrivateRoute>
             }
           />
           <Route
             path="/training"
             element={
-              <PrivateRoute>
-                <Training />
-              </PrivateRoute>
+              // <PrivateRoute>
+              <Training />
+              // </PrivateRoute>
             }
           />
           <Route
             path="/model"
             element={
-              <PrivateRoute>
-                <Model />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/tokens"
-            element={
-              <PrivateRoute>
-                <Tokens />
-              </PrivateRoute>
+              // <PrivateRoute>
+              <Model />
+              // </PrivateRoute>
             }
           />
           <Route
             path="/settings"
             element={
-              <PrivateRoute>
+              // <PrivateRoute>
                 <Settings />
-              </PrivateRoute>
+              // </PrivateRoute>
+            }
+          />
+          <Route
+            path="/tokens"
+            element={
+              // <PrivateRoute>
+                <Tokens />
+              // </PrivateRoute>
             }
           />
         </Routes>
@@ -81,9 +79,7 @@ function AppContent() {
 function App() {
   return (
     <Provider store={store}>
-      <FabricProvider>
-        <AppContent />
-      </FabricProvider>
+      <AppContent />
     </Provider>
   );
 }

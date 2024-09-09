@@ -1,48 +1,26 @@
-import { useState, useEffect } from "react";
-import { Button } from "antd";
-import { FormatPainterOutlined } from "@ant-design/icons";
-import { useFabric } from "../../../contexts/FabricContext";
-import InpaintingModal from "../masking/InpaintingModal";
-import UploadImagePlusMask from "../parameters/UploadImagePlusMask";
+import React, { useState } from 'react';
+import { Button } from 'antd';
+import { FormatPainterOutlined } from '@ant-design/icons';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
+import InpaintingModal from '../masking/MaskingModal';
+import UploadImagePlusMask from '../parameters/UploadImagePlusMask';
 
 const CleanupSidebar: React.FC = () => {
-  const {
-    imageDownloadUrl,
-    canvasDownloadUrl,
-    maskingResult,
-    setMaskingResult,
-  } = useFabric();
+  // Redux 상태에서 이미지 가져오기
+  const stageImage = useSelector((state: RootState) => state.masking.stageImage);
+  const canvasImage = useSelector((state: RootState) => state.masking.canvasImage);
+  const combinedImage = useSelector((state: RootState) => state.masking.combinedImage);
 
   const [showModal, setShowModal] = useState(false);
-  const [, setHeight] = useState(512);
-  const [, setWidth] = useState(512);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-
-  const [activeTab, setActiveTab] = useState<string>("manual");
-
-  // 탭 들어가면 MaskingResult 리셋되야함
-  useEffect(() => {
-    setMaskingResult(null);
-  }, [setMaskingResult]);
+  const [activeTab, setActiveTab] = useState<string>('manual');
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const img = new Image();
       img.onload = () => {
-        let newWidth = img.width;
-        let newHeight = img.height;
-
-        if (img.width > img.height) {
-          newWidth = 512;
-          newHeight = (img.height / img.width) * 512;
-        } else {
-          newHeight = 512;
-          newWidth = (img.width / img.height) * 512;
-        }
-
-        setWidth(newWidth);
-        setHeight(newHeight);
         setImageSrc(reader.result as string);
       };
       img.src = reader.result as string;
@@ -52,7 +30,7 @@ const CleanupSidebar: React.FC = () => {
 
   const handleDownloadImage = (url: string | null, filename: string) => {
     if (url) {
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = url;
       link.download = filename;
       document.body.appendChild(link);
@@ -61,12 +39,16 @@ const CleanupSidebar: React.FC = () => {
     }
   };
 
-  const handleDownloadCanvasImage = () => {
-    handleDownloadImage(canvasDownloadUrl, "canvas.png");
+  const handleDownloadStageImage = () => {
+    handleDownloadImage(stageImage, 'stage_image.png'); // stageImage 다운로드
   };
 
-  const handleDownloadBackgroundImage = () => {
-    handleDownloadImage(imageDownloadUrl, "image.png");
+  const handleDownloadCanvasImage = () => {
+    handleDownloadImage(canvasImage, 'canvas_image.png'); // canvasImage 다운로드
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false); // 모달 닫기
   };
 
   return (
@@ -76,65 +58,49 @@ const CleanupSidebar: React.FC = () => {
         <UploadImagePlusMask
           handleImageUpload={handleImageUpload}
           imagePreview={imageSrc}
-          inpaintingResult={maskingResult}
-          handleDownloadImage={handleDownloadImage}
           setActiveTab={setActiveTab}
         />
 
         {imageSrc && (
           <div className="px-6 pb-10">
-            {/* Start Masking 버튼 (배치 모드가 아닐 때만 보임) */}
-            {activeTab === "manual" && (
+            {/* Start Masking 버튼 */}
+            {activeTab === 'manual' && (
               <Button
                 type="primary"
                 icon={<FormatPainterOutlined />}
-                onClick={() => setShowModal(true)}
+                onClick={() => setShowModal(true)} // 버튼 클릭 시 모달 열기
                 className="w-full mt-2"
               >
                 Start Masking
               </Button>
             )}
 
-            {/* 인페인팅 작업 결과 이미지 표시 및 다운로드 버튼 */}
-            {activeTab === "manual" && maskingResult && (
-              <div className="relative w-full pb-[61.8%] border border-dashed border-gray-300 rounded-lg mt-4 flex items-center justify-center">
-                <img
-                  src={maskingResult}
-                  alt="Inpainting Result"
-                  className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
-                />
-
-                {/* 다운로드 버튼 - 테스트용!!! */}
-                <div className="mt-2 flex gap-2 flex-col">
-                  <Button
-                    type="default"
-                    onClick={handleDownloadCanvasImage}
-                    className="w-full"
-                  >
-                    Download Canvas Image
-                  </Button>
-
-                  <Button
-                    type="default"
-                    onClick={handleDownloadBackgroundImage}
-                    className="w-full"
-                  >
-                    Download Background Image
-                  </Button>
-                </div>
+            {/* 인페인팅 결과 및 다운로드 */}
+            {combinedImage && (
+              <div className="w-full border border-dashed border-gray-300 rounded-lg mt-4 flex flex-col items-center">
+                <img src={combinedImage} alt="Inpainting Result" className="w-full h-full object-cover rounded-lg" />
               </div>
             )}
+
+            <div className="mt-4 flex flex-col space-y-2">
+              {stageImage && (
+                <Button type="default" onClick={handleDownloadStageImage} className="w-full">
+                  Download Stage Image
+                </Button>
+              )}
+
+              {canvasImage && (
+                <Button type="default" onClick={handleDownloadCanvasImage} className="w-full">
+                  Download Canvas Image
+                </Button>
+              )}
+            </div>
           </div>
         )}
       </div>
 
-      {/* Inpainting 모달 창 */}
-      {showModal && imageSrc && (
-        <InpaintingModal
-          imageSrc={imageSrc}
-          onClose={() => setShowModal(false)}
-        />
-      )}
+      {/* ㅡMasking 모달 창 */}
+      {showModal && imageSrc && <InpaintingModal imageSrc={imageSrc} onClose={handleCloseModal} />}
     </div>
   );
 };

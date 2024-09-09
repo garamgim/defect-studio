@@ -2,7 +2,7 @@
 export default {
   content: [
     "./index.html",
-    "./preload.js",
+    "./preload.mjs",
     "./src/**/*.{js,ts,jsx,tsx}",
     "./src/renderer/**/*.html",
   ],

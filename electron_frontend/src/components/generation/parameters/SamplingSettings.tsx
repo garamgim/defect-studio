@@ -1,18 +1,17 @@
-import { Dispatch, SetStateAction } from "react";
-import { Form, Select, Slider, Row, Col, InputNumber } from "antd";
+import { Form, Select, Slider, Row, Col, InputNumber } from 'antd';
 
 interface SamplingSettingsProps {
   samplingMethod: string;
-  setSamplingMethod: Dispatch<SetStateAction<string>>;
+  setSamplingMethod: (value: string) => void;
   samplingSteps: number;
-  setSamplingSteps: Dispatch<SetStateAction<number>>;
+  setSamplingSteps: (value: number) => void;
 }
 
 const SamplingSettings = ({
   samplingMethod,
   samplingSteps,
   setSamplingMethod,
-  setSamplingSteps,
+  setSamplingSteps
 }: SamplingSettingsProps) => {
   const handleSamplingStepsChange = (value: number | null) => {
     if (value !== null) {
@@ -22,18 +21,16 @@ const SamplingSettings = ({
 
   return (
     <div className="p-6">
-      <p className="text-[14px] font-semibold text-[#222] mb-3 dark:text-gray-300">
-        Sampling Settings
-      </p>
+      <p className="text-[14px] font-semibold text-[#222] mb-3 dark:text-gray-300">Sampling Settings</p>
       <Form layout="vertical" className="space-y-5">
         <Form.Item label="Sampling method">
           <Select
             value={samplingMethod}
-            onChange={setSamplingMethod}
+            onChange={(value) => setSamplingMethod(value)}
             options={[
-              { value: "DPM++ 2M", label: "DPM++ 2M" },
-              { value: "Euler a", label: "Euler a" },
-              { value: "LMS", label: "LMS" },
+              { value: 'DPM++ 2M', label: 'DPM++ 2M' },
+              { value: 'Euler a', label: 'Euler a' },
+              { value: 'LMS', label: 'LMS' }
             ]}
             placeholder="Select a sampling method"
           />

@@ -1,5 +1,5 @@
-import Sidebar from "../sidebar/InpaintingSidebar";
-import Prompt from "../parameters/Prompt";
+import Sidebar from '../sidebar/InpaintingSidebar';
+import Prompt from '../parameters/Prompt';
 
 const Inpainting = () => {
   return (
