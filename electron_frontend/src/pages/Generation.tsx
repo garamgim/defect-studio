@@ -3,12 +3,11 @@ import { Routes, Route, Link } from 'react-router-dom';
 import { Button, Modal } from 'antd';
 import TextToImage from '../components/generation/layouts/TextToImage';
 import ImageToImage from '../components/generation/layouts/ImageToImage';
-// import Inpainting from '../components/generation/layouts/Inpainting';
+import Inpainting from '../components/generation/layouts/Inpainting';
 import RemoveBackground from '../components/generation/layouts/RemoveBackground';
 import Cleanup from '../components/generation/layouts/Cleanup';
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from 'react-icons/ai';
-import { FaImage, FaMagic, FaEraser, FaTrash } from 'react-icons/fa';
-// FaPaintBrush,
+import { FaImage, FaMagic, FaPaintBrush, FaEraser, FaTrash } from 'react-icons/fa';
 import PresetContent from '../components/generation/presets/PresetContent';
 
 const Generation = () => {
@@ -63,13 +62,13 @@ const Generation = () => {
               <FaMagic className="w-[20px] h-[20px] dark:text-slate-400" />
               <span className="text-[12px] mt-1 dark:text-slate-400">Img2Img</span>
             </Link>
-            {/* <Link
+            <Link
               to="inpainting"
               className="flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
             >
               <FaPaintBrush className="w-[20px] h-[20px] dark:text-slate-400" />
               <span className="text-[12px] mt-1 dark:text-slate-400">Inpaint</span>
-            </Link> */}
+            </Link>
             <Link
               to="remove-background"
               className="flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
@@ -108,7 +107,7 @@ const Generation = () => {
         <Routes>
           <Route path="text-to-image" element={<TextToImage />} />
           <Route path="image-to-image" element={<ImageToImage />} />
-          {/* <Route path="inpainting" element={<Inpainting />} /> */}
+          <Route path="inpainting" element={<Inpainting />} />
           <Route path="remove-background" element={<RemoveBackground />} />
           <Route path="cleanup" element={<Cleanup />} />
         </Routes>

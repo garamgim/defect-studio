@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from 'antd';
 import { FormatPainterOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';

@@ -25,49 +25,49 @@ function AppContent() {
           <Route
             path="/"
             element={
-              <PrivateRoute>
-                <Home />
-              </PrivateRoute>
+              // <PrivateRoute>
+              <Home />
+              // </PrivateRoute>
             }
           />
           <Route
             path="/generation/*"
             element={
-              <PrivateRoute>
-                <Generation />
-              </PrivateRoute>
+              // <PrivateRoute>
+              <Generation />
+              // </PrivateRoute>
             }
           />
           <Route
             path="/training"
             element={
-              <PrivateRoute>
-                <Training />
-              </PrivateRoute>
+              // <PrivateRoute>
+              <Training />
+              // </PrivateRoute>
             }
           />
           <Route
             path="/model"
             element={
-              <PrivateRoute>
-                <Model />
-              </PrivateRoute>
+              // <PrivateRoute>
+              <Model />
+              // </PrivateRoute>
             }
           />
           <Route
             path="/settings"
             element={
-              <PrivateRoute>
-                <Settings />
-              </PrivateRoute>
+              // <PrivateRoute>
+              <Settings />
+              // </PrivateRoute>
             }
           />
           <Route
             path="/docs"
             element={
-              <PrivateRoute>
-                <Docs />
-              </PrivateRoute>
+              // <PrivateRoute>
+              <Docs />
+              // </PrivateRoute>
             }
           />
         </Routes>

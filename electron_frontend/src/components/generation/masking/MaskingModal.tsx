@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Button, Slider, InputNumber, Tooltip } from 'antd';
 import { GrSelect } from 'react-icons/gr';
 import { VscDebugRestart } from 'react-icons/vsc';

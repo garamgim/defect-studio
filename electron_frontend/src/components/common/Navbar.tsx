@@ -15,7 +15,8 @@ const Navbar = () => {
   const mode = useSelector((state: RootState) => state.theme.mode);
 
   // 로그인 여부 확인 (로컬 스토리지에서 토큰 확인)
-  const isLoggedIn = !!localStorage.getItem('accessToken');
+  const isLoggedIn = true;
+  // const isLoggedIn = !!localStorage.getItem('accessToken');
 
   const selectLevel = (selectedLevel: LevelState) => {
     dispatch(setLevel(selectedLevel));
@@ -36,11 +37,11 @@ const Navbar = () => {
       key: 'image-to-image',
       onClick: () => navigateTo('/generation/image-to-image')
     },
-    // {
-    //   label: 'Inpainting',
-    //   key: 'inpainting',
-    //   onClick: () => navigateTo('/generation/inpainting')
-    // },
+    {
+      label: 'Inpainting',
+      key: 'inpainting',
+      onClick: () => navigateTo('/generation/inpainting')
+    },
     {
       label: 'Remove Background',
       key: 'remove-bg',
