@@ -1,6 +1,6 @@
 import { Form, Input, Button, Select, message } from "antd";
 import { signUpFormType } from "../types/user";
-import { signupHTTP } from "../util/signupHTTP";
+import { signupHTTP } from "../api/signupHTTP";
 import { useNavigate } from "react-router-dom";
 
 const initialValues: signUpFormType = {

@@ -6,11 +6,11 @@ import Home from './pages/Home';
 import Generation from './pages/Generation';
 import Training from './pages/Training';
 import Model from './pages/Model';
-import Settings from './pages/Settings';
-import Docs from './pages/Docs';
+import Tokens from './pages/Tokens';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import PrivateRoute from './components/routing/PrivateRoute';
+// import PrivateRoute from './components/routing/PrivateRoute';
+import Settings from './pages/Settings';
 
 function AppContent() {
   return (
@@ -58,15 +58,15 @@ function AppContent() {
             path="/settings"
             element={
               // <PrivateRoute>
-              <Settings />
+                <Settings />
               // </PrivateRoute>
             }
           />
           <Route
-            path="/docs"
+            path="/tokens"
             element={
               // <PrivateRoute>
-              <Docs />
+                <Tokens />
               // </PrivateRoute>
             }
           />

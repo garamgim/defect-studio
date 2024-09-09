@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { login } from '../../api/user';
+import { login, upDateMyInfo } from '../../api/user';
 import { useState } from 'react';
 import { message } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +19,7 @@ const onSubmit = async (
     const response = await login(data);
     console.log(response);
     message.success('Login successful');
+    await upDateMyInfo();
     setErrorMessage(''); // 에러 메시지 초기화
     navigate('/'); // 홈 화면 이동
   } catch (error) {

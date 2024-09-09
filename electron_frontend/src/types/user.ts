@@ -8,11 +8,6 @@ export interface signUpFormType {
   department_id: number;
 }
 
-export type userInfo = Omit<signUpFormType, 'password'> & {
-  isLogined: boolean;
-  token: string;
-};
-
 export interface loginData {
   username: string;
   password: string;
