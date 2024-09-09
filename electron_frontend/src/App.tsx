@@ -10,7 +10,6 @@ import Settings from './pages/Settings';
 import Docs from './pages/Docs';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-// import { FabricProvider } from './contexts/FabricContext';
 import PrivateRoute from './components/routing/PrivateRoute';
 
 function AppContent() {
@@ -80,9 +79,7 @@ function AppContent() {
 function App() {
   return (
     <Provider store={store}>
-      {/* <FabricProvider> */}
-        <AppContent />
-      {/* </FabricProvider> */}
+      <AppContent />
     </Provider>
   );
 }

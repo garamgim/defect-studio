@@ -28,7 +28,6 @@ const CleanupSidebar: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
-  // Function to handle the image download
   const handleDownloadImage = (url: string | null, filename: string) => {
     if (url) {
       const link = document.createElement('a');
@@ -100,7 +99,7 @@ const CleanupSidebar: React.FC = () => {
         )}
       </div>
 
-      {/* Inpainting 모달 창 - 모달 상태에 따라 렌더링 */}
+      {/* ㅡMasking 모달 창 */}
       {showModal && imageSrc && <InpaintingModal imageSrc={imageSrc} onClose={handleCloseModal} />}
     </div>
   );
