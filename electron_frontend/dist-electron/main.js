@@ -1,6 +1,7 @@
-import { app, BrowserWindow, Menu } from "electron";
+import { app, BrowserWindow, ipcMain, Menu } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import fs from "fs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 process.env.APP_ROOT = path.join(__dirname, "..");
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
@@ -79,6 +80,19 @@ app.on("window-all-closed", () => {
 app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
+  }
+});
+ipcMain.handle("get-files-in-folder", async (_, folderPath) => {
+  try {
+    const files = fs.readdirSync(folderPath);
+    const imageFiles = files.filter((file) => {
+      const ext = path.extname(file).toLowerCase();
+      return [".jpg", ".jpeg", ".png", ".gif"].includes(ext);
+    });
+    return imageFiles;
+  } catch (error) {
+    console.error("Error reading folder:", error);
+    return [];
   }
 });
 app.whenReady().then(createWindow);

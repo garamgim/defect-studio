@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface TxtToImgState {
+interface InpaintingState {
   model: string;
   prompt: string;
   negativePrompt: string;
@@ -8,17 +8,21 @@ interface TxtToImgState {
   height: number;
   samplingSteps: number;
   guidanceScale: number;
+  strength: number;
   seed: number;
-  isRandomSeed: boolean;
+  isRandomSeed: boolean; // 랜덤 시드 체크박스 상태
   batchCount: number;
   batchSize: number;
+  isNegativePrompt: boolean; // 네거티브 프롬프트 체크박스 상태
+  initImageList: File[];
+  maskImageList: File[];
+  initInputPath: string;
+  maskInputPath: string;
   outputPath: string;
-  isNegativePrompt: boolean; 
-  imageUrls: string[]; // 생성된 이미지 URL 리스트
-  samplingMethod: string;
+  imageUrls: string[];
 }
 
-const initialState: TxtToImgState = {
+const initialState: InpaintingState = {
   model: 'CompVis/stable-diffusion-v1-4',
   prompt: '',
   negativePrompt: '',
@@ -26,18 +30,22 @@ const initialState: TxtToImgState = {
   height: 512,
   samplingSteps: 50,
   guidanceScale: 7.5,
+  strength: 0.75,
   seed: -1,
-  isRandomSeed: false,
+  isRandomSeed: false, // 랜덤 시드 체크박스 기본값
   batchCount: 1,
   batchSize: 1,
-  outputPath: '',
-  isNegativePrompt: false, 
-  imageUrls: [], 
-  samplingMethod: ''
+  isNegativePrompt: false, // 네거티브 프롬프트 체크박스 기본값
+  initImageList: [],
+  maskImageList: [],
+  initInputPath: '',
+  maskInputPath: '',
+  outputPath: '/output',
+  imageUrls: []
 };
 
-const txtToImgSlice = createSlice({
-  name: 'txtToImg',
+const inpaintingSlice = createSlice({
+  name: 'inpainting',
   initialState,
   reducers: {
     setModel: (state, action: PayloadAction<string>) => {
@@ -61,13 +69,16 @@ const txtToImgSlice = createSlice({
     setGuidanceScale: (state, action: PayloadAction<number>) => {
       state.guidanceScale = action.payload;
     },
+    setStrength: (state, action: PayloadAction<number>) => {
+      state.strength = action.payload;
+    },
     setSeed: (state, action: PayloadAction<number>) => {
       state.seed = action.payload;
     },
     setIsRandomSeed: (state, action: PayloadAction<boolean>) => {
       state.isRandomSeed = action.payload;
       if (state.isRandomSeed) {
-        state.seed = -1; // 랜덤 시드가 활성화되면 시드를 -1로 설정
+        state.seed = -1; // 랜덤 시드 활성화 시 seed를 -1로 설정
       }
     },
     setBatchCount: (state, action: PayloadAction<number>) => {
@@ -76,21 +87,30 @@ const txtToImgSlice = createSlice({
     setBatchSize: (state, action: PayloadAction<number>) => {
       state.batchSize = action.payload;
     },
-    setOutputPath: (state, action: PayloadAction<string>) => {
-      state.outputPath = action.payload;
-    },
     setIsNegativePrompt: (state, action: PayloadAction<boolean>) => {
       state.isNegativePrompt = action.payload;
       if (!state.isNegativePrompt) {
         state.negativePrompt = ''; // 네거티브 프롬프트 비활성화 시 초기화
       }
     },
-    setImageUrls: (state, action: PayloadAction<string[]>) => {
-      state.imageUrls = action.payload;
+    setInitImageList: (state, action: PayloadAction<File[]>) => {
+      state.initImageList = action.payload;
     },
-    setSamplingMethod: (state, action: PayloadAction<string>) => {
+    setMaskImageList: (state, action: PayloadAction<File[]>) => {
+      state.maskImageList = action.payload;
+    },
+    setInitInputPath: (state, action: PayloadAction<string>) => {
+      state.initInputPath = action.payload;
+    },
+    setMaskInputPath: (state, action: PayloadAction<string>) => {
+      state.maskInputPath = action.payload;
+    },
+    setOutputPath: (state, action: PayloadAction<string>) => {
       state.outputPath = action.payload;
     },
+    setImageUrls: (state, action: PayloadAction<string[]>) => {
+      state.imageUrls = action.payload;
+    }
   }
 });
 
@@ -102,14 +122,18 @@ export const {
   setHeight,
   setSamplingSteps,
   setGuidanceScale,
+  setStrength,
   setSeed,
   setIsRandomSeed,
   setBatchCount,
   setBatchSize,
-  setOutputPath,
   setIsNegativePrompt,
-  setImageUrls,
-  setSamplingMethod,
-} = txtToImgSlice.actions;
+  setInitImageList,
+  setMaskImageList,
+  setInitInputPath,
+  setMaskInputPath,
+  setOutputPath,
+  setImageUrls
+} = inpaintingSlice.actions;
 
-export default txtToImgSlice.reducer;
+export default inpaintingSlice.reducer;

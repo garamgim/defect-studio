@@ -1,7 +1,7 @@
-import Sidebar from "../sidebar/Txt2ImgSidebar";
-import Prompt from "../parameters/Prompt";
+import Sidebar from '../sidebar/InpaintingSidebar';
+import Prompt from '../params/PromptParams';
 
-const TextToImage = () => {
+const Inpainting = () => {
   return (
     <div className="flex h-[calc(100vh-60px)] pt-4 pb-6">
       {/* 사이드바 */}
@@ -11,6 +11,7 @@ const TextToImage = () => {
 
       {/* 메인 컨텐츠 */}
       <div className="flex-1 flex flex-col justify-end px-8 w-full">
+        <div className="border border-red h-full mb-8"></div>
         <div className="mt-auto w-full">
           <Prompt />
         </div>
@@ -19,4 +20,4 @@ const TextToImage = () => {
   );
 };
 
-export default TextToImage;
+export default Inpainting;

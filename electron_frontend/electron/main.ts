@@ -94,7 +94,7 @@ app.on('activate', () => {
 });
 
 
-ipcMain.handle('get-files-in-folder', async (event, folderPath) => {
+ipcMain.handle('get-files-in-folder', async (_, folderPath) => {
   try {
     const files = fs.readdirSync(folderPath);
     const imageFiles = files.filter((file) => {

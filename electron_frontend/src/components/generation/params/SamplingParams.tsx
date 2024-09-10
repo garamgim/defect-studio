@@ -1,18 +1,18 @@
 import { Form, Select, Slider, Row, Col, InputNumber } from 'antd';
 
-interface SamplingSettingsProps {
+interface SamplingParamsProps {
   samplingMethod: string;
   setSamplingMethod: (value: string) => void;
   samplingSteps: number;
   setSamplingSteps: (value: number) => void;
 }
 
-const SamplingSettings = ({
+const SamplingParams = ({
   samplingMethod,
   samplingSteps,
   setSamplingMethod,
   setSamplingSteps
-}: SamplingSettingsProps) => {
+}: SamplingParamsProps) => {
   const handleSamplingStepsChange = (value: number | null) => {
     if (value !== null) {
       setSamplingSteps(value);
@@ -63,4 +63,4 @@ const SamplingSettings = ({
   );
 };
 
-export default SamplingSettings;
+export default SamplingParams;

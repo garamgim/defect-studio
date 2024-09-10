@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import { Button, Modal } from 'antd';
-import TextToImage from '../components/generation/layouts/TextToImage';
-import ImageToImage from '../components/generation/layouts/ImageToImage';
-import Inpainting from '../components/generation/layouts/Inpainting';
-import RemoveBackground from '../components/generation/layouts/RemoveBackground';
-import Cleanup from '../components/generation/layouts/Cleanup';
+import TextToImage from '../components/generation/layouts/Txt2ImgLayout';
+import ImageToImage from '../components/generation/layouts/Img2ImgLayout';
+import Inpainting from '../components/generation/layouts/InpaintingLayout';
+import RemoveBackground from '../components/generation/layouts/RemoveBgLayout';
+import Cleanup from '../components/generation/layouts/CleanupLayout';
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from 'react-icons/ai';
 import { FaImage, FaMagic, FaPaintBrush, FaEraser, FaTrash } from 'react-icons/fa';
 import PresetContent from '../components/generation/presets/PresetContent';

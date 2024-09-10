@@ -9,7 +9,9 @@ const Cleanup = () => {
       </div>
 
       {/* 메인 컨텐츠 */}
-      <div className="flex-1 flex flex-col justify-end px-8 w-full"></div>
+      <div className="flex-1 flex flex-col justify-end px-8 w-full">
+        <div className="border border-red h-full"></div>
+      </div>
     </div>
   );
 };

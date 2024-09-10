@@ -4,12 +4,13 @@ import store from './store/store';
 import Navbar from './components/common/Navbar';
 import Home from './pages/Home';
 import Generation from './pages/Generation';
+import Test from './pages/Test';
 import Training from './pages/Training';
 import Model from './pages/Model';
 import Tokens from './pages/Tokens';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-// import PrivateRoute from './components/routing/PrivateRoute';
+import PrivateRoute from './components/routing/PrivateRoute';
 import Settings from './pages/Settings';
 
 function AppContent() {
@@ -25,17 +26,25 @@ function AppContent() {
           <Route
             path="/"
             element={
-              // <PrivateRoute>
-              <Home />
-              // </PrivateRoute>
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
             }
           />
           <Route
             path="/generation/*"
             element={
-              // <PrivateRoute>
-              <Generation />
-              // </PrivateRoute>
+              <PrivateRoute>
+                <Generation />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/test/*"
+            element={
+              <PrivateRoute>
+                <Test />
+              </PrivateRoute>
             }
           />
           <Route
@@ -58,7 +67,7 @@ function AppContent() {
             path="/settings"
             element={
               // <PrivateRoute>
-                <Settings />
+              <Settings />
               // </PrivateRoute>
             }
           />
@@ -66,7 +75,7 @@ function AppContent() {
             path="/tokens"
             element={
               // <PrivateRoute>
-                <Tokens />
+              <Tokens />
               // </PrivateRoute>
             }
           />

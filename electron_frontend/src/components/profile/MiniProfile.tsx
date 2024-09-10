@@ -9,7 +9,7 @@ interface miniProfilePropsType {
   member_pk: number;
 }
 
-const MiniProfile = ({ nickname, department_name, email, member_pk }: miniProfilePropsType) => {
+const MiniProfile = ({ nickname, department_name, email }: miniProfilePropsType) => {
   const navigate = useNavigate();
   useEffect(() => {
     const testfunc = async () => {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import UploadImage from '../parameters/UploadImage';
+import UploadImage from '../params/UploadImgParams';
 
 const RemoveBgSidebar = () => {
   const [, setUploadedImage] = useState<File | null>(null);

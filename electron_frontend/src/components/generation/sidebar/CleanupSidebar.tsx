@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from 'antd';
 import { FormatPainterOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import InpaintingModal from '../masking/MaskingModal';
-import UploadImagePlusMask from '../parameters/UploadImagePlusMask';
+import UploadImagePlusMask from '../params/UploadImgWithMaskingParams';
 
 const CleanupSidebar: React.FC = () => {
   // Redux 상태에서 이미지 가져오기

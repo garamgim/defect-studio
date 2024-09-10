@@ -1,43 +1,49 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface TxtToImgState {
+interface ImgToImgState {
   model: string;
   prompt: string;
   negativePrompt: string;
   width: number;
   height: number;
   samplingSteps: number;
+  samplingMethod: string;
   guidanceScale: number;
+  strength: number;
   seed: number;
   isRandomSeed: boolean;
   batchCount: number;
   batchSize: number;
+  images: File[]; // 초기 이미지 배열
+  inputPath: string;
   outputPath: string;
-  isNegativePrompt: boolean; 
-  imageUrls: string[]; // 생성된 이미지 URL 리스트
-  samplingMethod: string;
+  isNegativePrompt: boolean;
+  imageUrls: string[]; // 생성된 이미지 배열
 }
 
-const initialState: TxtToImgState = {
+const initialState: ImgToImgState = {
   model: 'CompVis/stable-diffusion-v1-4',
   prompt: '',
   negativePrompt: '',
   width: 512,
   height: 512,
   samplingSteps: 50,
+  samplingMethod: '',
   guidanceScale: 7.5,
+  strength: 0.75,
   seed: -1,
-  isRandomSeed: false,
+  isRandomSeed: false, // 기본값: 랜덤 시드 비활성화
   batchCount: 1,
   batchSize: 1,
+  images: [],
+  inputPath: '',
   outputPath: '',
-  isNegativePrompt: false, 
-  imageUrls: [], 
-  samplingMethod: ''
+  isNegativePrompt: false, // 기본값: 네거티브 프롬프트 비활성화
+  imageUrls: []
 };
 
-const txtToImgSlice = createSlice({
-  name: 'txtToImg',
+const imgToImgSlice = createSlice({
+  name: 'imgToImg',
   initialState,
   reducers: {
     setModel: (state, action: PayloadAction<string>) => {
@@ -61,13 +67,22 @@ const txtToImgSlice = createSlice({
     setGuidanceScale: (state, action: PayloadAction<number>) => {
       state.guidanceScale = action.payload;
     },
+    setStrength: (state, action: PayloadAction<number>) => {
+      state.strength = action.payload;
+    },
     setSeed: (state, action: PayloadAction<number>) => {
       state.seed = action.payload;
     },
     setIsRandomSeed: (state, action: PayloadAction<boolean>) => {
       state.isRandomSeed = action.payload;
       if (state.isRandomSeed) {
-        state.seed = -1; // 랜덤 시드가 활성화되면 시드를 -1로 설정
+        state.seed = -1; // 랜덤 시드 활성화 시 seed를 -1로 설정
+      }
+    },
+    setIsNegativePrompt: (state, action: PayloadAction<boolean>) => {
+      state.isNegativePrompt = action.payload;
+      if (!state.isNegativePrompt) {
+        state.negativePrompt = ''; // 비활성화 시 네거티브 프롬프트 초기화
       }
     },
     setBatchCount: (state, action: PayloadAction<number>) => {
@@ -76,21 +91,21 @@ const txtToImgSlice = createSlice({
     setBatchSize: (state, action: PayloadAction<number>) => {
       state.batchSize = action.payload;
     },
+    setImages: (state, action: PayloadAction<File[]>) => {
+      state.images = action.payload;
+    },
+    setInputPath: (state, action: PayloadAction<string>) => {
+      state.inputPath = action.payload;
+    },
     setOutputPath: (state, action: PayloadAction<string>) => {
       state.outputPath = action.payload;
-    },
-    setIsNegativePrompt: (state, action: PayloadAction<boolean>) => {
-      state.isNegativePrompt = action.payload;
-      if (!state.isNegativePrompt) {
-        state.negativePrompt = ''; // 네거티브 프롬프트 비활성화 시 초기화
-      }
     },
     setImageUrls: (state, action: PayloadAction<string[]>) => {
       state.imageUrls = action.payload;
     },
     setSamplingMethod: (state, action: PayloadAction<string>) => {
-      state.outputPath = action.payload;
-    },
+      state.samplingMethod = action.payload;
+    }
   }
 });
 
@@ -101,15 +116,18 @@ export const {
   setWidth,
   setHeight,
   setSamplingSteps,
+  setSamplingMethod,
   setGuidanceScale,
+  setStrength,
   setSeed,
   setIsRandomSeed,
+  setIsNegativePrompt,
   setBatchCount,
   setBatchSize,
+  setImages,
+  setInputPath,
   setOutputPath,
-  setIsNegativePrompt,
-  setImageUrls,
-  setSamplingMethod,
-} = txtToImgSlice.actions;
+  setImageUrls
+} = imgToImgSlice.actions;
 
-export default txtToImgSlice.reducer;
+export default imgToImgSlice.reducer;

@@ -1,13 +1,13 @@
 import { Slider, InputNumber, Row, Col, Form } from 'antd';
 
-interface ImageDimensionsProps {
+interface ImageDimensionParamsProps {
   width: number;
   height: number;
   setWidth: (value: number) => void;
   setHeight: (value: number) => void;
 }
 
-const ImageDimensions = ({ width, height, setWidth, setHeight }: ImageDimensionsProps) => {
+const ImageDimensionParams = ({ width, height, setWidth, setHeight }: ImageDimensionParamsProps) => {
   const handleWidthChange = (value: number | null) => {
     if (value !== null) setWidth(value);
   };
@@ -26,6 +26,7 @@ const ImageDimensions = ({ width, height, setWidth, setHeight }: ImageDimensions
               <Slider
                 min={128}
                 max={2048}
+                step={8}
                 value={width}
                 onChange={(value) => setWidth(value)}
                 tooltip={{ open: undefined }}
@@ -43,6 +44,7 @@ const ImageDimensions = ({ width, height, setWidth, setHeight }: ImageDimensions
               <Slider
                 min={128}
                 max={2048}
+                step={8}
                 value={height}
                 onChange={(value) => setHeight(value)}
                 tooltip={{ open: undefined }}
@@ -58,4 +60,4 @@ const ImageDimensions = ({ width, height, setWidth, setHeight }: ImageDimensions
   );
 };
 
-export default ImageDimensions;
+export default ImageDimensionParams;

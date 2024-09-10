@@ -3,13 +3,13 @@ import { Button } from 'antd';
 import { FormatPainterOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import Model from '../parameters/Model';
+import Model from '../params/ModelParam';
 import InpaintingModal from '../masking/MaskingModal';
-import SamplingSettings from '../parameters/SamplingSettings';
-import ImageDimensions from '../parameters/ImageDimensions';
-import GeneralSettings from '../parameters/GeneralSettings';
-import BatchSettings from '../parameters/BatchSettings';
-import UploadImagePlusMask from '../parameters/UploadImagePlusMask';
+import SamplingSettings from '../params/SamplingParams';
+import ImageDimensions from '../params/ImgDimensionParams';
+import GeneralSettings from '../params/SeedParam';
+import BatchSettings from '../params/BatchParams';
+import UploadImagePlusMask from '../params/UploadImgWithMaskingParams';
 
 const InpaintingSidebar: React.FC = () => {
   // Redux 상태에서 이미지 가져오기
