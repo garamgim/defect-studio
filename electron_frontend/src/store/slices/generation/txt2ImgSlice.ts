@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface TxtToImgState {
+interface Txt2ImgState {
   model: string;
+  scheduler: string;
   prompt: string;
   negativePrompt: string;
   width: number;
@@ -13,13 +14,13 @@ interface TxtToImgState {
   batchCount: number;
   batchSize: number;
   outputPath: string;
-  isNegativePrompt: boolean; 
-  imageUrls: string[]; // 생성된 이미지 URL 리스트
-  samplingMethod: string;
+  isNegativePrompt: boolean;
+  outputImgUrls: string[]; // 생성된 이미지 URL 리스트
 }
 
-const initialState: TxtToImgState = {
+const initialState: Txt2ImgState = {
   model: 'CompVis/stable-diffusion-v1-4',
+  scheduler: 'DPM++ 2M',
   prompt: '',
   negativePrompt: '',
   width: 512,
@@ -31,17 +32,19 @@ const initialState: TxtToImgState = {
   batchCount: 1,
   batchSize: 1,
   outputPath: '',
-  isNegativePrompt: false, 
-  imageUrls: [], 
-  samplingMethod: ''
+  isNegativePrompt: false,
+  outputImgUrls: []
 };
 
-const txtToImgSlice = createSlice({
-  name: 'txtToImg',
+const txt2ImgSlice = createSlice({
+  name: 'txt2Img',
   initialState,
   reducers: {
     setModel: (state, action: PayloadAction<string>) => {
       state.model = action.payload;
+    },
+    setScheduler: (state, action: PayloadAction<string>) => {
+      state.scheduler = action.payload;
     },
     setPrompt: (state, action: PayloadAction<string>) => {
       state.prompt = action.payload;
@@ -67,7 +70,7 @@ const txtToImgSlice = createSlice({
     setIsRandomSeed: (state, action: PayloadAction<boolean>) => {
       state.isRandomSeed = action.payload;
       if (state.isRandomSeed) {
-        state.seed = -1; // 랜덤 시드가 활성화되면 시드를 -1로 설정
+        state.seed = -1;
       }
     },
     setBatchCount: (state, action: PayloadAction<number>) => {
@@ -85,17 +88,15 @@ const txtToImgSlice = createSlice({
         state.negativePrompt = ''; // 네거티브 프롬프트 비활성화 시 초기화
       }
     },
-    setImageUrls: (state, action: PayloadAction<string[]>) => {
-      state.imageUrls = action.payload;
-    },
-    setSamplingMethod: (state, action: PayloadAction<string>) => {
-      state.outputPath = action.payload;
-    },
+    setOutputImgUrls: (state, action: PayloadAction<string[]>) => {
+      state.outputImgUrls = action.payload;
+    }
   }
 });
 
 export const {
   setModel,
+  setScheduler,
   setPrompt,
   setNegativePrompt,
   setWidth,
@@ -108,8 +109,7 @@ export const {
   setBatchSize,
   setOutputPath,
   setIsNegativePrompt,
-  setImageUrls,
-  setSamplingMethod,
-} = txtToImgSlice.actions;
+  setOutputImgUrls
+} = txt2ImgSlice.actions;
 
-export default txtToImgSlice.reducer;
+export default txt2ImgSlice.reducer;

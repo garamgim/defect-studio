@@ -1,10 +1,11 @@
 import axiosInstance from '../api/token/axiosInstance';
 
 // text-to-image 변환 함수
-export async function postTxtToImgGeneration(
+export async function postTxt2ImgGeneration(
   gpu_env: string,
   data: {
     model: string;
+    scheduler: string;
     prompt: string;
     negative_prompt: string;
     width: number;
@@ -18,43 +19,35 @@ export async function postTxtToImgGeneration(
   }
 ) {
   try {
-    // FormData 생성
     const formData = new FormData();
 
-    // 객체의 키와 값을 순회하여 FormData에 추가
     Object.entries(data).forEach(([key, value]) => {
       formData.append(key, typeof value === 'number' ? String(value) : value);
     });
 
-    // POST 요청 전송
     const response = await axiosInstance.post(`generation/txt-to-img/${gpu_env}`, formData, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
     });
 
-    // 응답 데이터 출력
-    console.log('Response status:', response.status);
-    console.log('Response data:', response.data.image_list);
-
-    // 응답 데이터가 배열이라면 image_list 배열을 반환
-    if (response.status === 201 && Array.isArray(response.data.image_list)) {
-      return response.data.image_list; // image_list 배열을 반환
+    if (response.status === 201) {
+      return response.data.image_list; // image_list 배열 반환
     } else {
-      throw new Error('Failed to generate text-to-img');
+      throw new Error('Failed to generate text-to-image');
     }
   } catch (error) {
     console.error(error);
-    throw new Error('Failed to generate text-to-img');
+    throw new Error('Failed to generate text-to-image');
   }
 }
 
-
 // image-to-image 변환 함수
-export async function postImgToImgGeneration(
+export async function postImg2ImgGeneration(
   gpu_env: string,
   data: {
     model: string;
+    scheduler: string;
     prompt: string;
     negative_prompt: string;
     width: number;
@@ -71,34 +64,37 @@ export async function postImgToImgGeneration(
   }
 ) {
   try {
-    // FormData 생성
     const formData = new FormData();
 
-    // 객체의 키와 값을 순회하여 FormData에 추가
     Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, typeof value === 'number' ? String(value) : value);
+      if (Array.isArray(value)) {
+        value.forEach((file) => {
+          formData.append(key, file); 
+        });
+      } else {
+        formData.append(key, typeof value === 'number' ? String(value) : value);
+      }
     });
 
-    // POST 요청 전송
     const response = await axiosInstance.post(`generation/img-to-img/${gpu_env}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     });
 
-    // 응답 데이터 출력
     console.log('Response status:', response.status);
     console.log('Response data:', response.data.image_list);
 
-    // 응답 데이터가 배열이라면 image_list 배열을 반환
-    if (response.status === 201 && Array.isArray(response.data.image_list)) {
-      return response.data.image_list; // image_list 배열을 반환
+    if (response.status === 201) {
+      return response.data.image_list; // image_list 배열 반환
     } else {
-      throw new Error('Failed to generate text-to-img');
+      throw new Error('Failed to generate image-to-image');
     }
   } catch (error) {
     console.error(error);
-    throw new Error('Failed to generate text-to-img');
+    throw new Error('Failed to generate image-to-image');
   }
 }
 
+
+// Clip 함수(image -> text)

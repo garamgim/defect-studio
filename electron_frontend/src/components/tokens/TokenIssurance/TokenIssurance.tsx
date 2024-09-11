@@ -1,6 +1,6 @@
 import SearchDepartments from "./SearchDepartments";
 import TokenIssueInput from "./TokenIssueInput";
-import { convertDateToString } from "../../../util/covertDateToString";
+import { convertDateToString } from "../../../utils/covertDateToString";
 import { useState } from "react";
 
 //토큰 발행시 필요한 요청

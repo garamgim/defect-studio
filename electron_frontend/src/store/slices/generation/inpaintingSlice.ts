@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface InpaintingState {
   model: string;
+  scheduler: string;
   prompt: string;
   negativePrompt: string;
   width: number;
@@ -10,20 +11,22 @@ interface InpaintingState {
   guidanceScale: number;
   strength: number;
   seed: number;
-  isRandomSeed: boolean; // 랜덤 시드 체크박스 상태
+  isRandomSeed: boolean;
   batchCount: number;
   batchSize: number;
-  isNegativePrompt: boolean; // 네거티브 프롬프트 체크박스 상태
-  initImageList: File[];
-  maskImageList: File[];
+  isNegativePrompt: boolean;
+  initImageList: string[];
+  maskImageList: string[];
   initInputPath: string;
   maskInputPath: string;
   outputPath: string;
-  imageUrls: string[];
+  outputImgUrls: string[];
+  clipResult: string;
 }
 
 const initialState: InpaintingState = {
   model: 'CompVis/stable-diffusion-v1-4',
+  scheduler: 'DPM++ 2M',
   prompt: '',
   negativePrompt: '',
   width: 512,
@@ -32,16 +35,17 @@ const initialState: InpaintingState = {
   guidanceScale: 7.5,
   strength: 0.75,
   seed: -1,
-  isRandomSeed: false, // 랜덤 시드 체크박스 기본값
+  isRandomSeed: false,
   batchCount: 1,
   batchSize: 1,
-  isNegativePrompt: false, // 네거티브 프롬프트 체크박스 기본값
+  isNegativePrompt: false,
   initImageList: [],
   maskImageList: [],
   initInputPath: '',
   maskInputPath: '',
-  outputPath: '/output',
-  imageUrls: []
+  outputPath: '',
+  outputImgUrls: [],
+  clipResult: ''
 };
 
 const inpaintingSlice = createSlice({
@@ -50,6 +54,9 @@ const inpaintingSlice = createSlice({
   reducers: {
     setModel: (state, action: PayloadAction<string>) => {
       state.model = action.payload;
+    },
+    setScheduler: (state, action: PayloadAction<string>) => {
+      state.scheduler = action.payload;
     },
     setPrompt: (state, action: PayloadAction<string>) => {
       state.prompt = action.payload;
@@ -78,7 +85,7 @@ const inpaintingSlice = createSlice({
     setIsRandomSeed: (state, action: PayloadAction<boolean>) => {
       state.isRandomSeed = action.payload;
       if (state.isRandomSeed) {
-        state.seed = -1; // 랜덤 시드 활성화 시 seed를 -1로 설정
+        state.seed = -1;
       }
     },
     setBatchCount: (state, action: PayloadAction<number>) => {
@@ -93,10 +100,10 @@ const inpaintingSlice = createSlice({
         state.negativePrompt = ''; // 네거티브 프롬프트 비활성화 시 초기화
       }
     },
-    setInitImageList: (state, action: PayloadAction<File[]>) => {
+    setInitImageList: (state, action: PayloadAction<string[]>) => {
       state.initImageList = action.payload;
     },
-    setMaskImageList: (state, action: PayloadAction<File[]>) => {
+    setMaskImageList: (state, action: PayloadAction<string[]>) => {
       state.maskImageList = action.payload;
     },
     setInitInputPath: (state, action: PayloadAction<string>) => {
@@ -108,14 +115,18 @@ const inpaintingSlice = createSlice({
     setOutputPath: (state, action: PayloadAction<string>) => {
       state.outputPath = action.payload;
     },
-    setImageUrls: (state, action: PayloadAction<string[]>) => {
-      state.imageUrls = action.payload;
+    setOutputImgUrls: (state, action: PayloadAction<string[]>) => {
+      state.outputImgUrls = action.payload;
+    },
+    setClipResult: (state, action: PayloadAction<string>) => {
+      state.clipResult = action.payload;
     }
   }
 });
 
 export const {
   setModel,
+  setScheduler,
   setPrompt,
   setNegativePrompt,
   setWidth,
@@ -133,7 +144,8 @@ export const {
   setInitInputPath,
   setMaskInputPath,
   setOutputPath,
-  setImageUrls
+  setOutputImgUrls,
+  setClipResult
 } = inpaintingSlice.actions;
 
 export default inpaintingSlice.reducer;

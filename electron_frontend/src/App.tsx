@@ -4,7 +4,6 @@ import store from './store/store';
 import Navbar from './components/common/Navbar';
 import Home from './pages/Home';
 import Generation from './pages/Generation';
-import Test from './pages/Test';
 import Training from './pages/Training';
 import Model from './pages/Model';
 import Tokens from './pages/Tokens';
@@ -40,43 +39,35 @@ function AppContent() {
             }
           />
           <Route
-            path="/test/*"
-            element={
-              <PrivateRoute>
-                <Test />
-              </PrivateRoute>
-            }
-          />
-          <Route
             path="/training"
             element={
-              // <PrivateRoute>
-              <Training />
-              // </PrivateRoute>
+              <PrivateRoute>
+                <Training />
+              </PrivateRoute>
             }
           />
           <Route
             path="/model"
             element={
-              // <PrivateRoute>
-              <Model />
-              // </PrivateRoute>
+              <PrivateRoute>
+                <Model />
+              </PrivateRoute>
             }
           />
           <Route
             path="/settings"
             element={
-              // <PrivateRoute>
-              <Settings />
-              // </PrivateRoute>
+              <PrivateRoute>
+                <Settings />
+              </PrivateRoute>
             }
           />
           <Route
             path="/tokens"
             element={
-              // <PrivateRoute>
-              <Tokens />
-              // </PrivateRoute>
+              <PrivateRoute>
+                <Tokens />
+              </PrivateRoute>
             }
           />
         </Routes>

@@ -1,34 +1,35 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface ImgToImgState {
+interface Img2ImgState {
   model: string;
+  scheduler: string;
   prompt: string;
   negativePrompt: string;
   width: number;
   height: number;
   samplingSteps: number;
-  samplingMethod: string;
   guidanceScale: number;
   strength: number;
   seed: number;
   isRandomSeed: boolean;
   batchCount: number;
   batchSize: number;
-  images: File[]; // 초기 이미지 배열
+  images: string[]; // 초기 이미지 배열
   inputPath: string;
   outputPath: string;
   isNegativePrompt: boolean;
-  imageUrls: string[]; // 생성된 이미지 배열
+  outputImgUrls: string[]; // 생성된 이미지 배열
+  clipResult: string;
 }
 
-const initialState: ImgToImgState = {
+const initialState: Img2ImgState = {
   model: 'CompVis/stable-diffusion-v1-4',
+  scheduler: 'DPM++ 2M',
   prompt: '',
   negativePrompt: '',
   width: 512,
   height: 512,
   samplingSteps: 50,
-  samplingMethod: '',
   guidanceScale: 7.5,
   strength: 0.75,
   seed: -1,
@@ -39,15 +40,19 @@ const initialState: ImgToImgState = {
   inputPath: '',
   outputPath: '',
   isNegativePrompt: false, // 기본값: 네거티브 프롬프트 비활성화
-  imageUrls: []
+  outputImgUrls: [],
+  clipResult: ''
 };
 
-const imgToImgSlice = createSlice({
-  name: 'imgToImg',
+const img2ImgSlice = createSlice({
+  name: 'img2Img',
   initialState,
   reducers: {
     setModel: (state, action: PayloadAction<string>) => {
       state.model = action.payload;
+    },
+    setScheduler: (state, action: PayloadAction<string>) => {
+      state.scheduler = action.payload;
     },
     setPrompt: (state, action: PayloadAction<string>) => {
       state.prompt = action.payload;
@@ -76,13 +81,13 @@ const imgToImgSlice = createSlice({
     setIsRandomSeed: (state, action: PayloadAction<boolean>) => {
       state.isRandomSeed = action.payload;
       if (state.isRandomSeed) {
-        state.seed = -1; // 랜덤 시드 활성화 시 seed를 -1로 설정
+        state.seed = -1;
       }
     },
     setIsNegativePrompt: (state, action: PayloadAction<boolean>) => {
       state.isNegativePrompt = action.payload;
       if (!state.isNegativePrompt) {
-        state.negativePrompt = ''; // 비활성화 시 네거티브 프롬프트 초기화
+        state.negativePrompt = ''; // 네거티브 프롬프트 비활성화 시 초기화
       }
     },
     setBatchCount: (state, action: PayloadAction<number>) => {
@@ -91,7 +96,7 @@ const imgToImgSlice = createSlice({
     setBatchSize: (state, action: PayloadAction<number>) => {
       state.batchSize = action.payload;
     },
-    setImages: (state, action: PayloadAction<File[]>) => {
+    setImages: (state, action: PayloadAction<string[]>) => {
       state.images = action.payload;
     },
     setInputPath: (state, action: PayloadAction<string>) => {
@@ -100,23 +105,23 @@ const imgToImgSlice = createSlice({
     setOutputPath: (state, action: PayloadAction<string>) => {
       state.outputPath = action.payload;
     },
-    setImageUrls: (state, action: PayloadAction<string[]>) => {
-      state.imageUrls = action.payload;
+    setOutputImgUrls: (state, action: PayloadAction<string[]>) => {
+      state.outputImgUrls = action.payload;
     },
-    setSamplingMethod: (state, action: PayloadAction<string>) => {
-      state.samplingMethod = action.payload;
+    setClipResult: (state, action: PayloadAction<string>) => {
+      state.clipResult = action.payload;
     }
   }
 });
 
 export const {
   setModel,
+  setScheduler,
   setPrompt,
   setNegativePrompt,
   setWidth,
   setHeight,
   setSamplingSteps,
-  setSamplingMethod,
   setGuidanceScale,
   setStrength,
   setSeed,
@@ -127,7 +132,8 @@ export const {
   setImages,
   setInputPath,
   setOutputPath,
-  setImageUrls
-} = imgToImgSlice.actions;
+  setOutputImgUrls,
+  setClipResult
+} = img2ImgSlice.actions;
 
-export default imgToImgSlice.reducer;
+export default img2ImgSlice.reducer;

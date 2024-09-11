@@ -2,27 +2,28 @@ import { Button } from 'antd';
 import { RiSparkling2Fill } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { postTxtToImgGeneration } from '../../api/generation';
+import { postTxt2ImgGeneration, postImg2ImgGeneration } from '../../api/generation';
 import { RootState } from '../../store/store';
-import { setImageUrls as setTxtToImgImageUrls } from '../../store/slices/generation/txtToImgSlice';
-// import { setImageUrls as setImgToImgImageUrls } from '../../store/slices/generation/imgToImgSlice';
-// import { setImageUrls as setInpaintingImageUrls } from '../../store/slices/generation/inSlice';
+import { setOutputImgUrls as setTxt2ImgoutputImgUrls } from '../../store/slices/generation/txt2ImgSlice';
+import { setOutputImgUrls as setImg2ImgoutputImgUrls } from '../../store/slices/generation/img2ImgSlice';
+import { convertStringToFile } from '../../utils/convertStringToFile';
+// import { setOutputImgUrls as setInpaintingoutputImgUrls from '../../store/slices/generation/inpaintingSlice';
 
 // 경로에 따른 슬라이스 액션 매핑
 const sliceActions = {
   '/generation/text-to-image': {
-    generate: postTxtToImgGeneration,
-    setImageUrls: setTxtToImgImageUrls,
-    selectState: (state: RootState) => state.txtToImg
+    generate: postTxt2ImgGeneration,
+    setOutputImgUrls: setTxt2ImgoutputImgUrls,
+    selectState: (state: RootState) => state.txt2Img
   },
-  // '/generation/image-to-image': {
-  //   generate: postImgToImgGeneration,
-  //   setImageUrls: setImgToImgImageUrls,
-  //   selectState: (state: RootState) => state.imgToImg
-  // },
+  '/generation/image-to-image': {
+    generate: postImg2ImgGeneration,
+    setOutputImgUrls: setImg2ImgoutputImgUrls,
+    selectState: (state: RootState) => state.img2Img
+  }
   // '/generation/inpainting': {
   //   generate: postInpaintingGeneration,
-  //   setImageUrls: setImgToImgImageUrls,
+  //   setOutputImgUrls: setImg2ImgoutputImgUrls,
   //   selectState: (state: RootState) => state.inpainting
   // }
 } as const;
@@ -33,8 +34,8 @@ const GenerateButton = () => {
   const currentPath = location.pathname as keyof typeof sliceActions;
 
   // 필요한 슬라이스 상태만 선택
-  const txtToImgState = useSelector((state: RootState) => state.txtToImg);
-  const imgToImgState = useSelector((state: RootState) => state.imgToImg);
+  const txt2ImgState = useSelector((state: RootState) => state.txt2Img);
+  const img2ImgState = useSelector((state: RootState) => state.img2Img);
   const inpaintingState = useSelector((state: RootState) => state.inpainting);
 
   // 경로에 맞는 슬라이스 액션 가져오기
@@ -44,18 +45,19 @@ const GenerateButton = () => {
     return null; // 경로에 맞는 액션이 없으면 렌더링하지 않음
   }
 
-  const { generate, setImageUrls } = sliceAction;
+  const { generate, setOutputImgUrls } = sliceAction;
 
   // 경로에 맞는 슬라이스 상태만 가져옴
   const selectedState =
     currentPath === '/generation/text-to-image'
-      ? txtToImgState
+      ? txt2ImgState
       : currentPath === '/generation/image-to-image'
-        ? imgToImgState
+        ? img2ImgState
         : inpaintingState;
 
   const {
     model,
+    scheduler,
     prompt,
     negativePrompt,
     width,
@@ -69,8 +71,23 @@ const GenerateButton = () => {
   } = selectedState;
 
   const handleGenerate = async () => {
-    const data = {
+    // 기본 data 구조
+    const data: {
+      model: string;
+      scheduler: string;
+      prompt: string;
+      negative_prompt: string;
+      width: number;
+      height: number;
+      num_inference_steps: number;
+      guidance_scale: number;
+      seed: number;
+      batch_count: number;
+      batch_size: number;
+      output_path: string;
+    } = {
       model,
+      scheduler,
       prompt: prompt || '',
       negative_prompt: negativePrompt || '',
       width,
@@ -82,13 +99,22 @@ const GenerateButton = () => {
       batch_size: batchSize,
       output_path: outputPath
     };
-    console.log(data);
+
+    // image-to-image 경로일 경우에만 strength, images, input_path 추가
+    if (currentPath === '/generation/image-to-image') {
+      const files = img2ImgState.images.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+
+      Object.assign(data, {
+        strength: img2ImgState.strength || 0.75,
+        images: files,
+        input_path: img2ImgState.inputPath
+      });
+    }
 
     try {
-      const imageUrls = await generate('remote', data); // API 호출
-      console.log('Generated image URLs:', imageUrls);
-      dispatch(setImageUrls(imageUrls)); // 이미지 URL을 슬라이스에 저장
-      console.log(imageUrls);
+      const outputImgUrls = await generate('remote', data);
+      console.log('Generated image URLs:', outputImgUrls);
+      dispatch(setOutputImgUrls(outputImgUrls));
     } catch (error) {
       console.error('Error generating image:', error);
     }
@@ -101,6 +127,7 @@ const GenerateButton = () => {
       shape="round"
       size="large"
       onClick={handleGenerate}
+      className="z-10"
     >
       Generate
     </Button>

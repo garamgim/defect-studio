@@ -1,40 +1,58 @@
 import { useState } from 'react';
 import { Button } from 'antd';
 import { FormatPainterOutlined } from '@ant-design/icons';
-import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import Model from '../params/ModelParam';
 import InpaintingModal from '../masking/MaskingModal';
-import SamplingSettings from '../params/SamplingParams';
-import ImageDimensions from '../params/ImgDimensionParams';
-import GeneralSettings from '../params/SeedParam';
-import BatchSettings from '../params/BatchParams';
-import UploadImagePlusMask from '../params/UploadImgWithMaskingParams';
+import SamplingParams from '../params/SamplingParams';
+import ImgDimensionParams from '../params/ImgDimensionParams';
+import SeedParam from '../params/SeedParam';
+import BatchParams from '../params/BatchParams';
+import StrengthParam from '../params/StrengthParam';
+import GuidanceScaleParms from '../params/GuidanceScaleParam';
+import UploadImgWithMaskingParams from '../params/UploadImgWithMaskingParams';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  setModel,
+  setScheduler,
+  setWidth,
+  setHeight,
+  setSamplingSteps,
+  setGuidanceScale,
+  setSeed,
+  setStrength,
+  setIsRandomSeed,
+  setBatchCount,
+  setBatchSize
+} from '../../../store/slices/generation/img2ImgSlice';
 
 const InpaintingSidebar: React.FC = () => {
-  // Redux 상태에서 이미지 가져오기
-  const stageImage = useSelector((state: RootState) => state.masking.stageImage);
-  const canvasImage = useSelector((state: RootState) => state.masking.canvasImage);
-  const combinedImage = useSelector((state: RootState) => state.masking.combinedImage);
+  const { BgImage, canvasImage, combinedImage } = useSelector((state: RootState) => state.masking);
+
+  const dispatch = useDispatch();
+  const {
+    model,
+    scheduler,
+    width,
+    height,
+    samplingSteps,
+    seed,
+    isRandomSeed,
+    guidanceScale,
+    strength,
+    batchCount,
+    batchSize
+  } = useSelector((state: RootState) => state.img2Img);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
+
   const [showModal, setShowModal] = useState(false);
-  const [height, setHeight] = useState(512);
-  const [width, setWidth] = useState(512);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [guidanceScale, setGuidanceScale] = useState(7.5);
-  const [samplingMethod, setSamplingMethod] = useState('DPM++ 2M');
-  const [samplingSteps, setSamplingSteps] = useState(50);
-  const [model, setModel] = useState('Stable Diffusion v1-5');
-  const [seed, setSeed] = useState('-1');
-  const [isRandomSeed, setIsRandomSeed] = useState(false);
-  const [batchCount, setBatchCount] = useState('1');
-  const [batchSize, setBatchSize] = useState('1');
   const [activeTab, setActiveTab] = useState<string>('manual');
 
   const handleRandomSeedChange = () => {
     setIsRandomSeed(!isRandomSeed);
-    setSeed(!isRandomSeed ? '-1' : '');
+    setSeed(!isRandomSeed ? -1 : seed);
   };
 
   const handleImageUpload = (file: File) => {
@@ -60,8 +78,8 @@ const InpaintingSidebar: React.FC = () => {
     }
   };
 
-  const handleDownloadStageImage = () => {
-    handleDownloadImage(stageImage, 'stage_image.png'); // stageImage 다운로드
+  const handleDownloadBgImage = () => {
+    handleDownloadImage(BgImage, 'stage_image.png'); // BgImage 다운로드
   };
 
   const handleDownloadCanvasImage = () => {
@@ -73,15 +91,15 @@ const InpaintingSidebar: React.FC = () => {
   };
 
   return (
-    <div className="w-full lg:w-72 h-full fixed-height mr-6">
-      <div className="w-full lg:w-72 h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
+    <div className="w-full h-full fixed-height mr-6">
+      <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* 모델 선택 */}
         <Model model={model} setModel={setModel} />
 
         <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
         {/* 이미지 업로드 */}
-        <UploadImagePlusMask
+        <UploadImgWithMaskingParams
           handleImageUpload={handleImageUpload}
           imagePreview={imageSrc}
           setActiveTab={setActiveTab}
@@ -109,8 +127,8 @@ const InpaintingSidebar: React.FC = () => {
             )}
 
             <div className="mt-4 flex flex-col space-y-2">
-              {stageImage && (
-                <Button type="default" onClick={handleDownloadStageImage} className="w-full">
+              {BgImage && (
+                <Button type="default" onClick={handleDownloadBgImage} className="w-full">
                   Download Stage Image
                 </Button>
               )}
@@ -129,26 +147,30 @@ const InpaintingSidebar: React.FC = () => {
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 샘플링 설정 */}
-            <SamplingSettings
-              samplingMethod={samplingMethod}
+            <SamplingParams
+              scheduler={scheduler}
               samplingSteps={samplingSteps}
-              setSamplingMethod={setSamplingMethod}
+              setScheduler={setScheduler}
               setSamplingSteps={setSamplingSteps}
             />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 이미지 크기 설정 */}
-            <ImageDimensions width={width} height={height} setWidth={setWidth} setHeight={setHeight} />
+            <ImgDimensionParams width={width} height={height} setWidth={setWidth} setHeight={setHeight} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
-            {/* 생성 설정 */}
-            <GeneralSettings
-              guidanceScale={guidanceScale}
-              setGuidanceScale={setGuidanceScale}
+            {/* guidance scale 설정 */}
+            <GuidanceScaleParms guidanceScale={guidanceScale} setGuidanceScale={setGuidanceScale} />
+
+            {/* strength 설정 */}
+            <StrengthParam strength={strength} setStrength={setStrength} />
+
+            {/* seed 설정 */}
+            <SeedParam
               seed={seed}
-              setSeed={setSeed}
+              setSeed={(value: number) => dispatch(setSeed(value))}
               isRandomSeed={isRandomSeed}
               handleRandomSeedChange={handleRandomSeedChange}
             />
@@ -156,11 +178,11 @@ const InpaintingSidebar: React.FC = () => {
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 배치 설정 */}
-            <BatchSettings
+            <BatchParams
               batchCount={batchCount}
               batchSize={batchSize}
-              setBatchCount={setBatchCount}
-              setBatchSize={setBatchSize}
+              setBatchCount={(value: number) => dispatch(setBatchCount(value))}
+              setBatchSize={(value: number) => dispatch(setBatchSize(value))}
             />
           </>
         )}

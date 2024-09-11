@@ -3,20 +3,20 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { RootState } from '../../../store/store';
 import { Input, Checkbox, Button, Modal, Tooltip } from 'antd';
-import { RiSparkling2Fill } from 'react-icons/ri';
+
 import { MdImageSearch } from 'react-icons/md';
 import GenerateButton from '../../common/GenerateButton';
 
 import {
-  setPrompt as setTxtToImgPrompt,
-  setNegativePrompt as setTxtToImgNegativePrompt,
-  setIsNegativePrompt as setTxtToImgIsNegativePrompt
-} from '../../../store/slices/generation/txtToImgSlice';
+  setPrompt as setTxt2ImgPrompt,
+  setNegativePrompt as setTxt2ImgNegativePrompt,
+  setIsNegativePrompt as setTxt2ImgIsNegativePrompt
+} from '../../../store/slices/generation/txt2ImgSlice';
 import {
-  setPrompt as setImgToImgPrompt,
-  setNegativePrompt as setImgToImgNegativePrompt,
-  setIsNegativePrompt as setImgToImgIsNegativePrompt
-} from '../../../store/slices/generation/imgToImgSlice';
+  setPrompt as setImg2ImgPrompt,
+  setNegativePrompt as setImg2ImgNegativePrompt,
+  setIsNegativePrompt as setImg2ImgIsNegativePrompt
+} from '../../../store/slices/generation/img2ImgSlice';
 import {
   setPrompt as setInpaintingPrompt,
   setNegativePrompt as setInpaintingNegativePrompt,
@@ -28,16 +28,16 @@ const { TextArea } = Input;
 // 경로에 따른 슬라이스 액션 및 상태 매핑
 const sliceActions = {
   '/generation/text-to-image': {
-    setPrompt: setTxtToImgPrompt,
-    setNegativePrompt: setTxtToImgNegativePrompt,
-    setIsNegativePrompt: setTxtToImgIsNegativePrompt,
-    selectSlice: (state: RootState) => state.txtToImg
+    setPrompt: setTxt2ImgPrompt,
+    setNegativePrompt: setTxt2ImgNegativePrompt,
+    setIsNegativePrompt: setTxt2ImgIsNegativePrompt,
+    selectSlice: (state: RootState) => state.txt2Img
   },
   '/generation/image-to-image': {
-    setPrompt: setImgToImgPrompt,
-    setNegativePrompt: setImgToImgNegativePrompt,
-    setIsNegativePrompt: setImgToImgIsNegativePrompt,
-    selectSlice: (state: RootState) => state.imgToImg
+    setPrompt: setImg2ImgPrompt,
+    setNegativePrompt: setImg2ImgNegativePrompt,
+    setIsNegativePrompt: setImg2ImgIsNegativePrompt,
+    selectSlice: (state: RootState) => state.img2Img
   },
   '/generation/inpainting': {
     setPrompt: setInpaintingPrompt,
@@ -144,7 +144,7 @@ const PromptParams = () => {
         onCancel={() => setIsModalVisible(false)}
       >
         <div className="flex flex-wrap gap-2">
-          {phrases.map((phrase, index) => (
+          {phrases.map((phrase: string, index: number) => (
             <Button
               key={index}
               type={prompt.includes(phrase) ? 'primary' : 'default'}

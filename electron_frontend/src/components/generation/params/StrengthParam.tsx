@@ -1,8 +1,6 @@
 import { Form, Slider, Row, Col, InputNumber } from 'antd';
 
 interface StrengthParamsProps {
-  guidanceScale: number;
-  setGuidanceScale: (value: number) => void;
   strength: number;
   setStrength: (value: number) => void;
 }

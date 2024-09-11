@@ -7,8 +7,7 @@ import InpaintingModal from '../masking/MaskingModal';
 import UploadImagePlusMask from '../params/UploadImgWithMaskingParams';
 
 const CleanupSidebar: React.FC = () => {
-  // Redux 상태에서 이미지 가져오기
-  const stageImage = useSelector((state: RootState) => state.masking.stageImage);
+  const BgImage = useSelector((state: RootState) => state.masking.BgImage);
   const canvasImage = useSelector((state: RootState) => state.masking.canvasImage);
   const combinedImage = useSelector((state: RootState) => state.masking.combinedImage);
 
@@ -39,8 +38,8 @@ const CleanupSidebar: React.FC = () => {
     }
   };
 
-  const handleDownloadStageImage = () => {
-    handleDownloadImage(stageImage, 'stage_image.png'); // stageImage 다운로드
+  const handleDownloadBgImage = () => {
+    handleDownloadImage(BgImage, 'stage_image.png'); // BgImage 다운로드
   };
 
   const handleDownloadCanvasImage = () => {
@@ -52,8 +51,8 @@ const CleanupSidebar: React.FC = () => {
   };
 
   return (
-    <div className="w-full lg:w-72 h-full fixed-height mr-6">
-      <div className="w-full lg:w-72 h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
+    <div className="w-full h-full fixed-height mr-6">
+      <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* 이미지 업로드 */}
         <UploadImagePlusMask
           handleImageUpload={handleImageUpload}
@@ -83,8 +82,8 @@ const CleanupSidebar: React.FC = () => {
             )}
 
             <div className="mt-4 flex flex-col space-y-2">
-              {stageImage && (
-                <Button type="default" onClick={handleDownloadStageImage} className="w-full">
+              {BgImage && (
+                <Button type="default" onClick={handleDownloadBgImage} className="w-full">
                   Download Stage Image
                 </Button>
               )}

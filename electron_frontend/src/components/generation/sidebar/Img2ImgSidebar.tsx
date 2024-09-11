@@ -1,19 +1,20 @@
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';g
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
 import {
   setModel,
+  setScheduler,
   setWidth,
   setHeight,
   setSamplingSteps,
-  setSamplingMethod,
   setGuidanceScale,
   setSeed,
   setStrength,
   setIsRandomSeed,
   setBatchCount,
-  setBatchSize
-} from '../../../store/slices/generation/imgToImgSlice';
+  setBatchSize,
+  setImages
+} from '../../../store/slices/generation/img2ImgSlice';
 import ModelParams from '../params/ModelParam';
 import UploadImgParams from '../params/UploadImgParams';
 import StrengthParam from '../params/StrengthParam';
@@ -27,49 +28,53 @@ const Img2ImgSidebar = () => {
   const dispatch = useDispatch();
   const {
     model,
+    scheduler,
     width,
     height,
     samplingSteps,
-    samplingMethod,
     seed,
     isRandomSeed,
     guidanceScale,
     strength,
     batchCount,
     batchSize
-  } = useSelector((state: RootState) => state.imgToImg);
+  } = useSelector((state: RootState) => state.img2Img);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
-  const [_, setImageSrc] = useState<string | null>(null);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
 
   const handleRandomSeedChange = () => {
-    setIsRandomSeed(!isRandomSeed);
-    setSeed(!isRandomSeed ? -1 : seed);
+    dispatch(setIsRandomSeed(!isRandomSeed));
+    dispatch(setSeed(!isRandomSeed ? -1 : seed));
   };
+
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
+      const base64String = reader.result as string; // 변환된 Base64 문자열
       const img = new Image();
       img.onload = () => {
-        setImageSrc(reader.result as string);
+        setImageSrc(base64String);
+        console.log('Base64 String:', base64String); // Base64 문자열 출력
+        dispatch(setImages([base64String])); // Redux 상태에 Base64 문자열 저장
       };
-      img.src = reader.result as string;
+      img.src = base64String; // img.src에 Base64 문자열 설정
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(file); // 파일을 Base64로 변환
   };
 
   return (
-    <div className="w-full lg:w-72 h-full fixed-height mr-6">
-      <div className="w-full lg:w-72 h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
+    <div className="w-full h-full fixed-height mr-6">
+      <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* 모델 선택 */}
         <ModelParams model={model} setModel={setModel} />
 
         <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
         {/* 이미지 업로드 */}
-        <UploadImgParams handleImageUpload={handleImageUpload} imagePreview={imagePreview} />
+        <UploadImgParams handleImageUpload={handleImageUpload} imagePreview={imageSrc} />
 
         {level === 'Advanced' && (
           <>
@@ -82,9 +87,9 @@ const Img2ImgSidebar = () => {
 
             {/* 샘플링 세팅 */}
             <SamplingParams
-              samplingMethod={samplingMethod}
+              scheduler={scheduler}
               samplingSteps={samplingSteps}
-              setSamplingMethod={setSamplingMethod}
+              setScheduler={setScheduler}
               setSamplingSteps={setSamplingSteps}
             />
 
@@ -102,7 +107,7 @@ const Img2ImgSidebar = () => {
             <SeedParam
               seed={seed}
               isRandomSeed={isRandomSeed}
-              setSeed={setSeed}
+              setSeed={(value: number) => dispatch(setSeed(value))}
               handleRandomSeedChange={handleRandomSeedChange}
             />
 
@@ -112,8 +117,8 @@ const Img2ImgSidebar = () => {
             <BatchParams
               batchCount={batchCount}
               batchSize={batchSize}
-              setBatchCount={(value: number) => dispatch(setBatchCount)}
-              setBatchSize={(value: number) => dispatch(setBatchSize)}
+              setBatchCount={(value: number) => dispatch(setBatchCount(value))}
+              setBatchSize={(value: number) => dispatch(setBatchSize(value))}
             />
           </>
         )}

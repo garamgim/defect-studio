@@ -108,7 +108,7 @@ const MaskingModal = ({ onClose, imageSrc }: MaskingModalProps) => {
     console.log('Stage scaled to 1');
 
     try {
-      // 1. StageImage: 배경 이미지 레이어만 저장
+      // 1. BgImage: 배경 이미지 레이어만 저장
       const imageNode = stage.findOne((node: Konva.Node) => node instanceof Konva.Image) as Konva.Image;
 
       if (!imageNode) {
@@ -117,7 +117,7 @@ const MaskingModal = ({ onClose, imageSrc }: MaskingModalProps) => {
       }
 
       // 배경 이미지만 저장
-      const stageImageBase64 = imageNode.toDataURL({
+      const BgImageBase64 = imageNode.toDataURL({
         mimeType: 'image/png',
         x: imagePos.x,
         y: imagePos.y,
@@ -175,7 +175,7 @@ const MaskingModal = ({ onClose, imageSrc }: MaskingModalProps) => {
       // Redux에 저장
       dispatch(
         saveImages({
-          stageImage: stageImageBase64, // 배경 이미지
+          BgImage: BgImageBase64, // 배경 이미지
           canvasImage: canvasImageBase64, // 캔버스 이미지 (흑백 변환 포함)
           combinedImage: combinedImageBase64 // 배경 + 캔버스 합친 이미지
         })

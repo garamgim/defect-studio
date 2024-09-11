@@ -8,10 +8,10 @@ import {
   setSeed,
   setIsRandomSeed,
   setModel,
-  setSamplingMethod,
+  setScheduler,
   setBatchCount,
   setBatchSize
-} from '../../../store/slices/generation/txtToImgSlice';
+} from '../../../store/slices/generation/txt2ImgSlice';
 import ModelParam from '../params/ModelParam';
 import ImgDimensionParams from '../params/ImgDimensionParams';
 import GuidanceScaleParams from '../params/GuidanceScaleParam';
@@ -21,19 +21,9 @@ import BatchParams from '../params/BatchParams';
 
 const Sidebar = () => {
   const dispatch = useDispatch();
-  const {
-    width,
-    height,
-    guidanceScale,
-    samplingSteps,
-    seed,
-    isRandomSeed,
-    model,
-    samplingMethod,
-    batchCount,
-    batchSize
-  } = useSelector((state: RootState) => state.txtToImg); // txtToImg 상태 가져오기
-  
+  const { width, height, guidanceScale, samplingSteps, seed, isRandomSeed, model, scheduler, batchCount, batchSize } =
+    useSelector((state: RootState) => state.txt2Img); // txt2Img 상태 가져오기
+
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
   const handleRandomSeedChange = () => {
@@ -42,8 +32,8 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-full lg:w-72 h-full fixed-height mr-6">
-      <div className="w-full lg:w-72 h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
+    <div className="w-full h-full fixed-height mr-6">
+      <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* 모델 */}
         <ModelParam model={model} setModel={(value: string) => dispatch(setModel(value))} />
 
@@ -63,10 +53,10 @@ const Sidebar = () => {
 
             {/* 샘플링 세팅 */}
             <SamplingParams
-              samplingMethod={samplingMethod}
+              scheduler={scheduler}
               samplingSteps={samplingSteps}
               setSamplingSteps={(value: number) => dispatch(setSamplingSteps(value))}
-              setSamplingMethod={(value: string) => dispatch(setSamplingMethod(value))}
+              setScheduler={(value: string) => dispatch(setScheduler(value))}
             />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
