@@ -32,7 +32,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-full h-full fixed-height mr-6">
+    <div className="w-full h-full mr-6">
       <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* 모델 */}
         <ModelParam model={model} setModel={(value: string) => dispatch(setModel(value))} />

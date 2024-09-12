@@ -19,7 +19,7 @@ interface Img2ImgState {
   outputPath: string;
   isNegativePrompt: boolean;
   outputImgUrls: string[]; // 생성된 이미지 배열
-  clipResult: string;
+  clipData: string[];
 }
 
 const initialState: Img2ImgState = {
@@ -41,7 +41,7 @@ const initialState: Img2ImgState = {
   outputPath: '',
   isNegativePrompt: false, // 기본값: 네거티브 프롬프트 비활성화
   outputImgUrls: [],
-  clipResult: ''
+  clipData: []
 };
 
 const img2ImgSlice = createSlice({
@@ -108,8 +108,8 @@ const img2ImgSlice = createSlice({
     setOutputImgUrls: (state, action: PayloadAction<string[]>) => {
       state.outputImgUrls = action.payload;
     },
-    setClipResult: (state, action: PayloadAction<string>) => {
-      state.clipResult = action.payload;
+    setClipData: (state, action: PayloadAction<string[]>) => {
+      state.clipData = action.payload;
     }
   }
 });
@@ -133,7 +133,7 @@ export const {
   setInputPath,
   setOutputPath,
   setOutputImgUrls,
-  setClipResult
+  setClipData
 } = img2ImgSlice.actions;
 
 export default img2ImgSlice.reducer;

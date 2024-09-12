@@ -2,15 +2,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface MaskingState {
-  BgImage: string | null;
-  canvasImage: string | null;
-  combinedImage: string | null;
+  backgroundImg: string | null;
+  canvasImg: string | null;
+  combinedImg: string | null;
 }
 
 const initialState: MaskingState = {
-  BgImage: null,
-  canvasImage: null,
-  combinedImage: null
+  backgroundImg: null,
+  canvasImg: null,
+  combinedImg: null
 };
 
 const maskingSlice = createSlice({
@@ -18,9 +18,9 @@ const maskingSlice = createSlice({
   initialState,
   reducers: {
     saveImages: (state, action: PayloadAction<MaskingState>) => {
-      state.BgImage = action.payload.BgImage;
-      state.canvasImage = action.payload.canvasImage;
-      state.combinedImage = action.payload.combinedImage;
+      state.backgroundImg = action.payload.backgroundImg;
+      state.canvasImg = action.payload.canvasImg;
+      state.combinedImg = action.payload.combinedImg;
     }
   }
 });

@@ -30,7 +30,6 @@ const MiniProfile = ({ nickname, department_name, email }: miniProfilePropsType)
           className="w-[300px] h-[180px] absolute left-[-1px] top-[-1px] rounded-[10px] bg-white border border-[#e0e0e0]"
           style={{ boxShadow: '0px 4px 4px 0 rgba(0,0,0,0.25)' }}
         />
-        {member_pk}
         <section className="flex flex-col items-center justify-center relative">
           <p className="text-base text-left text-black">{nickname}</p>
           <p className=" text-base text-left text-black">{department_name}</p>

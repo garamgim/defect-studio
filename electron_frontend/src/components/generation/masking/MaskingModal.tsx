@@ -15,6 +15,7 @@ import { saveImages } from '../../../store/slices/generation/maskingSlice';
 
 interface MaskingModalProps {
   onClose: () => void;
+  onApply: () => void;
   imageSrc: string;
 }
 
@@ -25,7 +26,7 @@ interface LineObject {
   fill?: string;
 }
 
-const MaskingModal = ({ onClose, imageSrc }: MaskingModalProps) => {
+const MaskingModal = ({ onClose, onApply, imageSrc }: MaskingModalProps) => {
   const [tool, setTool] = useState<'brush' | 'polygon' | 'select' | null>(null);
   const [isMovingPoints, setIsMovingPoints] = useState(false);
   const [brushSize, setBrushSize] = useState<number>(10);
@@ -99,7 +100,9 @@ const MaskingModal = ({ onClose, imageSrc }: MaskingModalProps) => {
       return;
     }
 
-    const stageOriginalScale = scale; // 현재의 확대 비율 저장
+    setIsMovingPoints(false); // 점 움직이는 버튼 클릭한채이면 점도 캔버스에 포함되므로 false처리함
+
+    // const stageOriginalScale = scale; // 현재의 확대 비율 저장
     const stage = stageRef.current;
 
     // 1. Stage와 Canvas를 축소 상태로 설정
@@ -108,7 +111,7 @@ const MaskingModal = ({ onClose, imageSrc }: MaskingModalProps) => {
     console.log('Stage scaled to 1');
 
     try {
-      // 1. BgImage: 배경 이미지 레이어만 저장
+      // 1. backgroundImg: 배경 이미지 레이어만 저장
       const imageNode = stage.findOne((node: Konva.Node) => node instanceof Konva.Image) as Konva.Image;
 
       if (!imageNode) {
@@ -117,7 +120,7 @@ const MaskingModal = ({ onClose, imageSrc }: MaskingModalProps) => {
       }
 
       // 배경 이미지만 저장
-      const BgImageBase64 = imageNode.toDataURL({
+      const backgroundImgBase64 = imageNode.toDataURL({
         mimeType: 'image/png',
         x: imagePos.x,
         y: imagePos.y,
@@ -127,7 +130,7 @@ const MaskingModal = ({ onClose, imageSrc }: MaskingModalProps) => {
       });
       console.log('Stage image saved');
 
-      // 2. CanvasImage: 투명한 캔버스를 흑백 이미지로 변환하여 저장
+      // 2. canvasImg: 투명한 캔버스를 흑백 이미지로 변환하여 저장
       const canvasLayer = stageRef.current.findOne('#canvas-layer');
 
       if (!canvasLayer) {
@@ -144,7 +147,7 @@ const MaskingModal = ({ onClose, imageSrc }: MaskingModalProps) => {
       console.log('Canvas layer visible');
 
       // 캔버스에서 색칠된 부분만 흑백으로 변환
-      const canvasImageBase64 = await convertCanvasToGrayscale(
+      const canvasImgBase64 = await convertCanvasToGrayscale(
         canvasLayer.toDataURL({
           mimeType: 'image/png',
           x: imagePos.x,
@@ -159,10 +162,9 @@ const MaskingModal = ({ onClose, imageSrc }: MaskingModalProps) => {
       // 원래 상태로 복원
       imageNode.visible(true); // 배경 이미지 다시 보이게 설정
       canvasLayer.visible(true); // 캔버스 레이어 다시 활성화
-      console.log('Restored canvas and image visibility');
 
       // 3. Combined Image: 배경과 캔버스를 합친 이미지 저장
-      const combinedImageBase64 = stage.toDataURL({
+      const combinedImgBase64 = stage.toDataURL({
         mimeType: 'image/png',
         x: imagePos.x,
         y: imagePos.y,
@@ -175,23 +177,16 @@ const MaskingModal = ({ onClose, imageSrc }: MaskingModalProps) => {
       // Redux에 저장
       dispatch(
         saveImages({
-          BgImage: BgImageBase64, // 배경 이미지
-          canvasImage: canvasImageBase64, // 캔버스 이미지 (흑백 변환 포함)
-          combinedImage: combinedImageBase64 // 배경 + 캔버스 합친 이미지
+          backgroundImg: backgroundImgBase64, // 배경 이미지
+          canvasImg: canvasImgBase64, // 캔버스 이미지 (흑백 변환 포함)
+          combinedImg: combinedImgBase64 // 배경 + 캔버스 합친 이미지
         })
       );
       console.log('Images saved to Redux store');
     } catch (error) {
       console.error('Error saving images:', error);
     } finally {
-      // 원래의 확대 상태로 복원
-      stage.scale({ x: stageOriginalScale, y: stageOriginalScale });
-      stage.batchDraw(); // 스케일 복원 후 다시 그리기
-      console.log('Restored original scale');
-
-      // 모달 닫기
-      onClose();
-      console.log('Modal closed');
+      onApply();
     }
   };
 
@@ -211,13 +206,25 @@ const MaskingModal = ({ onClose, imageSrc }: MaskingModalProps) => {
         newWidth = newHeight * imgAspectRatio;
       }
 
-      setImageSize({ width: newWidth, height: newHeight });
+      // 여기서 의존성 배열에 들어가는 상태를 최소화하여 무한 루프를 방지
+      setImageSize((prevSize) => {
+        if (prevSize.width !== newWidth || prevSize.height !== newHeight) {
+          return { width: newWidth, height: newHeight };
+        }
+        return prevSize;
+      });
 
       const centerX = (stageSize.width - newWidth) / 2;
       const centerY = (stageSize.height - newHeight) / 2;
-      setImagePos({ x: centerX, y: centerY });
+
+      setImagePos((prevPos) => {
+        if (prevPos.x !== centerX || prevPos.y !== centerY) {
+          return { x: centerX, y: centerY };
+        }
+        return prevPos;
+      });
     }
-  }, [image, imageStatus, stageSize]);
+  }, [image, imageStatus, stageSize]); // 의존성 배열을 최소한의 값으로 설정
 
   const updateStageSize = () => {
     const modalElement = document.querySelector('.ant-modal-body');
@@ -256,7 +263,7 @@ const MaskingModal = ({ onClose, imageSrc }: MaskingModalProps) => {
     updateStageSize();
     window.addEventListener('resize', updateStageSize);
     return () => window.removeEventListener('resize', updateStageSize);
-  }, [image]);
+  }, [image]); // 여기서도 의존성 배열에 필요한 최소 값만 설정
 
   // 상태 저장
   const saveState = (newObjects: LineObject[]) => {
