@@ -1,6 +1,6 @@
-import "./TokenIssueInput.css";
-import { DatePicker, InputNumber } from "antd";
-import dayjs from "dayjs";
+import './TokenIssueInput.css';
+import { DatePicker, InputNumber } from 'antd';
+import dayjs from 'dayjs';
 
 type PropsType = {
   quantity: number;
@@ -11,15 +11,10 @@ type PropsType = {
 
 const disabledDate = (current: dayjs.Dayjs) => {
   // 과거 날짜는 선택할 수 없도록 함 (오늘 포함)
-  return current && current < dayjs().startOf("day");
+  return current && current < dayjs().startOf('day');
 };
 
-const TokenIssueInput = ({
-  quantity,
-  setQuantity,
-  endDate,
-  setEndDate,
-}: PropsType) => {
+const TokenIssueInput = ({ quantity, setQuantity, endDate, setEndDate }: PropsType) => {
   const handleQuantityChange = (value: string | number | null | undefined) => {
     const reg = /^[1-9]\d*$/;
     if (!value) setQuantity(0);
@@ -32,21 +27,15 @@ const TokenIssueInput = ({
       <p className="title">Token Issue</p>
 
       <div>
-        <p className="sub-title">
-          Specify the amount of tokens to be issued to the respective department
-        </p>
-        <InputNumber
-          value={quantity}
-          onChange={handleQuantityChange}
-          className="input-number-container"
-        />
+        <p className="sub-title">Specify the amount of tokens to be issued to the respective department</p>
+        <InputNumber value={quantity} onChange={handleQuantityChange} className="input-number-container" />
       </div>
 
       <div>
         <p className="sub-title">Enter the token Expiration Date</p>
         <DatePicker
           inputReadOnly
-          onChange={(date) => setEndDate(dayjs(date).format("YYYY-MM-DD"))}
+          onChange={(date) => setEndDate(dayjs(date).format('YYYY-MM-DD'))}
           value={dayjs(endDate)}
           className="input-number-container"
           defaultValue={dayjs(new Date())}

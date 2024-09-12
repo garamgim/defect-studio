@@ -125,11 +125,11 @@ const Navbar = () => {
       )}
 
       <div className="flex ml-auto items-center space-x-4">
-        {isLoggedIn && myInfo && (
+        {isLoggedIn && myInfo ? (
           <>
             <div className="flex items-center">
               <img src={token} className="w-[25px] h-[25px] object-contain" alt="token" />
-              <p className="ml-2 text-base font-bold text-black dark:text-gray-300">300</p>
+              <p className="ml-2 text-base font-bold text-black dark:text-gray-300">{myInfo.token_quantity}</p>
             </div>
             <Dropdown
               overlay={
@@ -157,6 +157,18 @@ const Navbar = () => {
               </Button>
             </Dropdown>
           </>
+        ) : (
+          <div>
+            <Button
+              onClick={() => {
+                navigate('/login');
+              }}
+              className="dark:bg-slate-400 dark:text-white gray-50"
+            >
+              Login
+            </Button>{' '}
+            {/* 로그인 버튼 */}
+          </div>
         )}
         <Switch
           checked={mode === 'dark'}

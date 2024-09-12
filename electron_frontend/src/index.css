@@ -17,25 +17,29 @@ body {
 }
 
 /* custom-scrollbar 스크롤 안보이게 커스텀 */
-.custom-scrollbar, .ant-modal-body {
+.custom-scrollbar,
+.ant-modal-body {
   height: 100%;
   overflow-y: auto; /* 세로 스크롤만 허용 */
   overflow-x: hidden; /* 가로 스크롤 숨기기 */
 }
 
 /* 스크롤바 스타일링 */
-.custom-scrollbar::-webkit-scrollbar, .ant-modal-body::-webkit-scrollbar {
+.custom-scrollbar::-webkit-scrollbar,
+.ant-modal-body::-webkit-scrollbar {
   width: 0px; /* 스크롤바 너비 */
 }
 
-.custom-scrollbar::-webkit-scrollbar-track, .ant-modal-body::-webkit-scrollbar-track {
+.custom-scrollbar::-webkit-scrollbar-track,
+.ant-modal-body::-webkit-scrollbar-track {
   background-color: #ffffff;
   margin-top: 10px; /* 위쪽 여백 */
   margin-bottom: 10px; /* 아래쪽 여백 */
   border-radius: 5px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb, .ant-modal-body::-webkit-scrollbar-thumb {
+.custom-scrollbar::-webkit-scrollbar-thumb,
+.ant-modal-body::-webkit-scrollbar-thumb {
   background-color: #ffffff;
   border-radius: 5px;
   margin-top: 10px; /* 위쪽 여백 */
@@ -177,3 +181,39 @@ html.dark .ant-modal-content {
   background-color: #4b5563;
 }
 
+/* antd Table dark mode 색  */
+html.dark .ant-table {
+  @apply bg-gray-800;
+}
+html.dark .ant-table-tbody .ant-table-row .ant-table-cell-row-hover {
+  @apply bg-gray-700;
+}
+
+/* 토큰 페이지 - 컨텐트 설정 */
+.token-content {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+
+  @apply border-2 border-gray-300 rounded-lg w-full h-full text-[222222] dark:text-white font-samsung;
+}
+
+/* 회원가입 페이지에 대한 입력 설정 */
+html.dark .ant-form-item-control-input-content .ant-input-affix-wrapper {
+  @apply bg-gray-700;
+}
+
+html.dark .ant-form-item-control-input-content .ant-input-affix-wrapper-focused {
+  @apply bg-gray-700;
+}
+
+html.dark .ant-input-status-error {
+  @apply bg-gray-700;
+}
+html.dark .ant-input-outlined {
+  @apply bg-gray-700;
+}
+
+html.dark .ant-form-item-has-error {
+  @apply bg-gray-800;
+}

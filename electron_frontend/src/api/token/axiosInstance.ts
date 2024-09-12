@@ -37,7 +37,6 @@ const setAuthorizationToken = async () => {
       // Refresh 토큰이 만료됐을 경우
       if (error.response && error.response.status === 401) {
         console.log('Refresh token expired or invalid');
-
         // 로그아웃 처리 - 액세스 토큰 삭제
         localStorage.removeItem('accessToken');
       }
