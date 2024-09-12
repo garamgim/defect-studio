@@ -1,6 +1,6 @@
 import SearchDepartments from './SearchDepartments';
 import TokenIssueInput from './TokenIssueInput';
-import { convertDateToString } from '../../../util/covertDateToString';
+import { convertDateToString } from '../../../utils/covertDateToString';
 import { useState } from 'react';
 import { createTokenIssue, TokenIssueRequestType } from '../../../api/token';
 import { message } from 'antd';

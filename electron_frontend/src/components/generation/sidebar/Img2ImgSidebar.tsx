@@ -49,7 +49,6 @@ const Img2ImgSidebar = () => {
     dispatch(setSeed(!isRandomSeed ? -1 : seed));
   };
 
-
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -81,7 +80,12 @@ const Img2ImgSidebar = () => {
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 이미지 크기 */}
-            <ImgDimensionParams width={width} height={height} setWidth={setWidth} setHeight={setHeight} />
+            <ImgDimensionParams
+              width={width}
+              height={height}
+              setWidth={(value) => dispatch(setWidth(value))}
+              setHeight={(value) => dispatch(setHeight(value))}
+            />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
@@ -96,12 +100,13 @@ const Img2ImgSidebar = () => {
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 초기 이미지 변화 제어 */}
-            <GuidanceScaleParam guidanceScale={guidanceScale} setGuidanceScale={setGuidanceScale} />
+            <GuidanceScaleParam
+              guidanceScale={guidanceScale}
+              setGuidanceScale={(value: number) => dispatch(setGuidanceScale(value))}
+            />
 
             {/* 초기 이미지 변화 제어 */}
-            <StrengthParam strength={strength} setStrength={setStrength} />
-
-            <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
+            <StrengthParam strength={strength} setStrength={(value: number) => dispatch(setStrength(value))} />
 
             {/* 이미지 재현/다양성 제어 */}
             <SeedParam

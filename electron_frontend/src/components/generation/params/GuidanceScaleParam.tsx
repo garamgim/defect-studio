@@ -13,33 +13,33 @@ const ControlParams = ({ guidanceScale, setGuidanceScale }: GuidanceScaleParamsP
   };
 
   return (
-    <div className="p-6">
-      <p className="text-[14px] font-semibold text-[#222] mb-3 dark:text-gray-300">Guidance Scale</p>
+    <div className="pt-6 px-6">
+      {/* <p className="text-[14px] font-semibold text-[#222] mb-3 dark:text-gray-300">Guidance Scale</p> */}
       <Form layout="vertical" className="space-y-5">
-        {/* <Form.Item label="Guidance scale"> */}
-        <Row gutter={16}>
-          <Col span={16}>
-            <Slider
-              min={1.0}
-              max={30.0}
-              step={0.1}
-              value={guidanceScale}
-              onChange={handleGuidanceScaleChange}
-              tooltip={{ open: undefined }}
-            />
-          </Col>
-          <Col span={8}>
-            <InputNumber
-              min={1.0}
-              max={30.0}
-              step={0.1}
-              value={guidanceScale}
-              onChange={handleGuidanceScaleChange}
-              style={{ width: '100%' }}
-            />
-          </Col>
-        </Row>
-        {/* </Form.Item> */}
+        <Form.Item label="Guidance scale">
+          <Row gutter={16}>
+            <Col span={16}>
+              <Slider
+                min={1.0}
+                max={30.0}
+                step={0.1}
+                value={guidanceScale}
+                onChange={handleGuidanceScaleChange}
+                tooltip={{ open: undefined }}
+              />
+            </Col>
+            <Col span={8}>
+              <InputNumber
+                min={1.0}
+                max={30.0}
+                step={0.1}
+                value={guidanceScale}
+                onChange={handleGuidanceScaleChange}
+                style={{ width: '100%' }}
+              />
+            </Col>
+          </Row>
+        </Form.Item>
       </Form>
     </div>
   );
