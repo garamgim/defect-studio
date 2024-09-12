@@ -2,12 +2,12 @@ import { Button } from 'antd';
 import { RiSparkling2Fill } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { postTxt2ImgGeneration, postImg2ImgGeneration } from '../../api/generation';
+import { postTxt2ImgGeneration, postImg2ImgGeneration, postInpaintingGeneration } from '../../api/generation';
 import { RootState } from '../../store/store';
 import { setOutputImgUrls as setTxt2ImgoutputImgUrls } from '../../store/slices/generation/txt2ImgSlice';
 import { setOutputImgUrls as setImg2ImgoutputImgUrls } from '../../store/slices/generation/img2ImgSlice';
 import { convertStringToFile } from '../../utils/convertStringToFile';
-// import { setOutputImgUrls as setInpaintingoutputImgUrls from '../../store/slices/generation/inpaintingSlice';
+import { setOutputImgUrls as setInpaintingoutputImgUrls } from '../../store/slices/generation/inpaintingSlice';
 
 // 경로에 따른 슬라이스 액션 매핑
 const sliceActions = {
@@ -20,12 +20,12 @@ const sliceActions = {
     generate: postImg2ImgGeneration,
     setOutputImgUrls: setImg2ImgoutputImgUrls,
     selectState: (state: RootState) => state.img2Img
+  },
+  '/generation/inpainting': {
+    generate: postInpaintingGeneration,
+    setOutputImgUrls: setImg2ImgoutputImgUrls,
+    selectState: (state: RootState) => state.inpainting
   }
-  // '/generation/inpainting': {
-  //   generate: postInpaintingGeneration,
-  //   setOutputImgUrls: setImg2ImgoutputImgUrls,
-  //   selectState: (state: RootState) => state.inpainting
-  // }
 } as const;
 
 const GenerateButton = () => {
@@ -97,7 +97,7 @@ const GenerateButton = () => {
       seed,
       batch_count: batchCount,
       batch_size: batchSize,
-      output_path: outputPath
+      output_path: outputPath,
     };
 
     // image-to-image 경로일 경우에만 strength, images, input_path 추가
@@ -106,8 +106,19 @@ const GenerateButton = () => {
 
       Object.assign(data, {
         strength: img2ImgState.strength || 0.75,
+        images: files || [],
+        input_path: img2ImgState.inputPath || ''
+      });
+    } else if (currentPath === '/generation/inpainting') {
+      const files = img2ImgState.images.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+
+      Object.assign(data, {
+        strength: img2ImgState.strength || 0.75,
         images: files,
-        input_path: img2ImgState.inputPath
+        init_image_list: inpaintingState.initImageList,
+        mask_image_list: inpaintingState.maskImageList,
+        init_input_path: inpaintingState.initInputPath,
+        mask_input_path: inpaintingState.maskInputPath
       });
     }
 

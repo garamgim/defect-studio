@@ -67,8 +67,6 @@ const Sidebar = () => {
               setGuidanceScale={(value: number) => dispatch(setGuidanceScale(value))}
             />
 
-            <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
-
             {/* 이미지 재현 & 다양성 세팅 */}
             <SeedParam
               seed={seed}

@@ -1,88 +1,29 @@
-import { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useLocation } from 'react-router-dom';
-import { RootState } from '../../../store/store';
-import { Input, Checkbox, Button, Modal, Tooltip } from 'antd';
-
-import { MdImageSearch } from 'react-icons/md';
+import { Input, Checkbox, Button, Tooltip } from 'antd';
+import { CheckboxChangeEvent } from 'antd/es/checkbox';
+// import { MdImageSearch } from 'react-icons/md';
 import GenerateButton from '../../common/GenerateButton';
 
-import {
-  setPrompt as setTxt2ImgPrompt,
-  setNegativePrompt as setTxt2ImgNegativePrompt,
-  setIsNegativePrompt as setTxt2ImgIsNegativePrompt
-} from '../../../store/slices/generation/txt2ImgSlice';
-import {
-  setPrompt as setImg2ImgPrompt,
-  setNegativePrompt as setImg2ImgNegativePrompt,
-  setIsNegativePrompt as setImg2ImgIsNegativePrompt
-} from '../../../store/slices/generation/img2ImgSlice';
-import {
-  setPrompt as setInpaintingPrompt,
-  setNegativePrompt as setInpaintingNegativePrompt,
-  setIsNegativePrompt as setInpaintingIsNegativePrompt
-} from '../../../store/slices/generation/inpaintingSlice';
+interface PromptParamsProps {
+  prompt: string;
+  setPrompt: (value: string) => void;
+  negativePrompt: string;
+  setNegativePrompt: (value: string) => void;
+  isNegativePrompt: boolean;
+  handleNegativePromptChange: (evnet: CheckboxChangeEvent) => void;
+}
 
-const { TextArea } = Input;
+const PromptParams = ({
+  prompt,
+  setPrompt,
+  negativePrompt,
+  setNegativePrompt,
+  isNegativePrompt,
+  handleNegativePromptChange
+}: PromptParamsProps) => {
+  const { TextArea } = Input;
 
-// 경로에 따른 슬라이스 액션 및 상태 매핑
-const sliceActions = {
-  '/generation/text-to-image': {
-    setPrompt: setTxt2ImgPrompt,
-    setNegativePrompt: setTxt2ImgNegativePrompt,
-    setIsNegativePrompt: setTxt2ImgIsNegativePrompt,
-    selectSlice: (state: RootState) => state.txt2Img
-  },
-  '/generation/image-to-image': {
-    setPrompt: setImg2ImgPrompt,
-    setNegativePrompt: setImg2ImgNegativePrompt,
-    setIsNegativePrompt: setImg2ImgIsNegativePrompt,
-    selectSlice: (state: RootState) => state.img2Img
-  },
-  '/generation/inpainting': {
-    setPrompt: setInpaintingPrompt,
-    setNegativePrompt: setInpaintingNegativePrompt,
-    setIsNegativePrompt: setInpaintingIsNegativePrompt,
-    selectSlice: (state: RootState) => state.inpainting
-  }
-};
-
-const PromptParams = () => {
-  const dispatch = useDispatch();
-  const location = useLocation();
-  const currentPath = location.pathname as keyof typeof sliceActions;
-
-  // 경로에 맞는 슬라이스 액션과 상태 선택
-  const { setPrompt, setNegativePrompt, setIsNegativePrompt, selectSlice } = sliceActions[currentPath] || {};
-
-  // 슬라이스에서 상태 가져오기
-  const { prompt, negativePrompt, isNegativePrompt } = useSelector((state: RootState) => selectSlice(state));
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const phrases = prompt ? prompt.split(', ') : [];
-
-  const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (setPrompt) {
-      dispatch(setPrompt(e.target.value));
-    }
-  };
-
-  const handleNegativePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (setNegativePrompt) {
-      dispatch(setNegativePrompt(e.target.value));
-    }
-  };
-
-  const handleNegativePromptToggle = () => {
-    if (setIsNegativePrompt) {
-      dispatch(setIsNegativePrompt(!isNegativePrompt));
-    }
-  };
-
-  // 상태 변경 후 체크박스 상태 확인
-  useEffect(() => {
-    console.log('isNegativePrompt 상태:', isNegativePrompt);
-  }, [isNegativePrompt]);
+  // const [isModalVisible, setIsModalVisible] = useState(false);
+  // const phrases = prompt ? prompt.split(', ') : [];
 
   return (
     <div className="w-full p-6 bg-white rounded-[20px] shadow-md mx-auto border border-gray-300 dark:bg-gray-600 dark:border-none">
@@ -92,8 +33,8 @@ const PromptParams = () => {
         </div>
 
         <Checkbox
-          checked={isNegativePrompt} // 슬라이스에서 가져온 isNegativePrompt 상태 사용
-          onChange={handleNegativePromptToggle} // 상태 변경을 위한 핸들러
+          checked={isNegativePrompt}
+          onChange={handleNegativePromptChange}
           className="text-[14px] text-left text-[#464646]"
         >
           Add Negative Prompt
@@ -106,9 +47,11 @@ const PromptParams = () => {
           className="pr-10"
           placeholder="Enter your prompt here..."
           value={prompt}
-          onChange={handlePromptChange}
+          onChange={(event) => {
+            setPrompt(event.target.value);
+          }}
         />
-        {location.pathname !== '/generation/text-to-image' && (
+        {/* {location.pathname !== '/generation/text-to-image' && (
           <Tooltip title="Uploaded image is converted to a text description to assist in prompt creation.">
             <Button
               type="link"
@@ -117,7 +60,7 @@ const PromptParams = () => {
               onClick={() => setIsModalVisible(true)}
             />
           </Tooltip>
-        )}
+        )} */}
       </div>
 
       {isNegativePrompt && (
@@ -128,7 +71,9 @@ const PromptParams = () => {
             className="mb-4"
             placeholder="Enter your negative prompt here..."
             value={negativePrompt}
-            onChange={handleNegativePromptChange}
+            onChange={(event) => {
+              setNegativePrompt(event.target.value);
+            }}
           />
         </>
       )}
@@ -137,7 +82,7 @@ const PromptParams = () => {
         <GenerateButton />
       </div>
 
-      <Modal
+      {/* <Modal
         title="Select Inputs"
         open={isModalVisible}
         onOk={() => setIsModalVisible(false)}
@@ -158,7 +103,7 @@ const PromptParams = () => {
             </Button>
           ))}
         </div>
-      </Modal>
+      </Modal> */}
     </div>
   );
 };

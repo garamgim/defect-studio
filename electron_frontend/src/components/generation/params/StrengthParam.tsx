@@ -13,33 +13,33 @@ const StrengthParam = ({ strength, setStrength }: StrengthParamsProps) => {
   };
 
   return (
-    <div className="p-6">
-      <p className="text-[14px] font-semibold text-[#222] mb-3 dark:text-gray-300">Denoising Strength</p>
+    <div className="px-6">
+      {/* <p className="text-[14px] font-semibold text-[#222] mb-3 dark:text-gray-300">Denoising Strength</p> */}
       <Form layout="vertical" className="space-y-5">
-        {/* <Form.Item label="Denoising Strength"> */}
-        <Row gutter={16}>
-          <Col span={16}>
-            <Slider
-              min={0.0}
-              max={1.0}
-              step={0.01}
-              value={strength}
-              onChange={handleStrengthChange}
-              tooltip={{ open: undefined }}
-            />
-          </Col>
-          <Col span={8}>
-            <InputNumber
-              min={0.0}
-              max={1.0}
-              step={0.01}
-              value={strength}
-              onChange={handleStrengthChange}
-              style={{ width: '100%' }}
-            />
-          </Col>
-        </Row>
-        {/* </Form.Item> */}
+        <Form.Item label="Denoising Strength">
+          <Row gutter={16}>
+            <Col span={16}>
+              <Slider
+                min={0.0}
+                max={1.0}
+                step={0.01}
+                value={strength}
+                onChange={handleStrengthChange}
+                tooltip={{ open: undefined }}
+              />
+            </Col>
+            <Col span={8}>
+              <InputNumber
+                min={0.0}
+                max={1.0}
+                step={0.01}
+                value={strength}
+                onChange={handleStrengthChange}
+                style={{ width: '100%' }}
+              />
+            </Col>
+          </Row>
+        </Form.Item>
       </Form>
     </div>
   );

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, MenuItemConstructorOptions,ipcMain } from 'electron';
+import { app, BrowserWindow, Menu, MenuItemConstructorOptions, ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import fs from 'fs';
@@ -93,7 +93,6 @@ app.on('activate', () => {
   }
 });
 
-
 ipcMain.handle('get-files-in-folder', async (_, folderPath) => {
   try {
     const files = fs.readdirSync(folderPath);
@@ -107,6 +106,5 @@ ipcMain.handle('get-files-in-folder', async (_, folderPath) => {
     return [];
   }
 });
-
 
 app.whenReady().then(createWindow);

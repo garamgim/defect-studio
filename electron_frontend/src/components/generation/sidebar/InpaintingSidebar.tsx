@@ -23,8 +23,14 @@ import {
   setStrength,
   setIsRandomSeed,
   setBatchCount,
-  setBatchSize
-} from '../../../store/slices/generation/img2ImgSlice';
+  setBatchSize,
+  setInitImageList,
+  setMaskImageList,
+  setInitInputPath,
+  setMaskInputPath,
+  setOutputPath,
+  setOutputImgUrls
+} from '../../../store/slices/generation/inpaintingSlice';
 
 const InpaintingSidebar: React.FC = () => {
   const { BgImage, canvasImage, combinedImage } = useSelector((state: RootState) => state.masking);
@@ -42,7 +48,7 @@ const InpaintingSidebar: React.FC = () => {
     strength,
     batchCount,
     batchSize
-  } = useSelector((state: RootState) => state.img2Img);
+  } = useSelector((state: RootState) => state.inpainting);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
