@@ -1,6 +1,7 @@
 import axios from 'axios';
 import axiosInstance from './token/axiosInstance';
-type departmentType = {
+
+export type departmentType = {
   department_id: number;
   department_name: string;
 };

@@ -35,7 +35,7 @@ export async function login(user: loginData) {
 }
 
 // 유저 정보 가져올 떄 쓰는 정보
-export type userInfo = {
+export type userInfoType = {
   member_pk: number;
   login_id: string;
   nickname: string;
@@ -47,7 +47,7 @@ export type userInfo = {
 };
 
 // 서버로부터 유저 정보 가져오기
-export const getUserInfo = async (): Promise<AxiosResponse<userInfo, AxiosError>> => {
+export const getUserInfo = async (): Promise<AxiosResponse<userInfoType, AxiosError>> => {
   try {
     const response = await axiosInstance.get('/members');
     console.log('response Data ' + response);
@@ -68,7 +68,7 @@ export const useGetMyInfo = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
     isLoading: myInfoLoading,
     isError: isGetMyInfoError,
     error: myInfoError
-  } = useQuery<AxiosResponse<userInfo>, AxiosError, userInfo, string[]>({
+  } = useQuery<AxiosResponse<userInfoType>, AxiosError, userInfoType, string[]>({
     queryKey: ['myInfo'],
     queryFn: getUserInfo,
     select: (data) => data.data,

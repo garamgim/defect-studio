@@ -1,5 +1,5 @@
-import { memo } from "react";
-import "./TokenTabs.css";
+import { memo } from 'react';
+import './TokenTabs.css';
 
 export interface TabItemType {
   id: string;
@@ -20,19 +20,12 @@ interface TokenTabsProps {
 const TokenTabs = ({ activeTab, setActiveTab, tabItems }: TokenTabsProps) => {
   return (
     <div className="mb-4 border-gray-200 dark:border-gray-700">
-      <ul
-        className="flex flex-wrap -mb-px text-sm font-medium text-center"
-        id="default-tab"
-      >
+      <ul className="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-tab">
         {tabItems.map((item) => (
           <li key={item.id}>
             <button
               onClick={() => setActiveTab(item.value)}
-              className={`token-tab-default ${
-                activeTab === item.value
-                  ? "token-tab-active"
-                  : "token-tab-inactive"
-              } `}
+              className={`token-tab-default ${activeTab === item.value ? 'token-tab-active' : 'token-tab-inactive'} `}
             >
               {item.name}
             </button>

@@ -1,4 +1,4 @@
-import SearchDepartments from './SearchDepartments';
+import SearchDepartments from '../common/SearchDepartments';
 import TokenIssueInput from './TokenIssueInput';
 import { useState } from 'react';
 import { createTokenIssue, TokenIssueRequestType } from '../../../api/token';
