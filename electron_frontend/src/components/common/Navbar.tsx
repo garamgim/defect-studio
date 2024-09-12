@@ -65,7 +65,7 @@ const Navbar = () => {
     }
   ];
 
-  const { myInfo } = useGetMyInfo();
+  const { myInfo } = useGetMyInfo({ isLoggedIn });
 
   return (
     <div className="fixed z-20 w-full h-[60px] flex items-center px-10 bg-white border-b border-gray-300 dark:bg-gray-800 dark:border-none">

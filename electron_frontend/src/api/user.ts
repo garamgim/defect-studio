@@ -61,7 +61,7 @@ export const getUserInfo = async (): Promise<AxiosResponse<userInfo, AxiosError>
 };
 
 // 커스텀 훅 -> 유저 정보 가져오기
-export const useGetMyInfo = () => {
+export const useGetMyInfo = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   const {
     data: myInfo,
     isPending: myInfoPending,
@@ -71,7 +71,8 @@ export const useGetMyInfo = () => {
   } = useQuery<AxiosResponse<userInfo>, AxiosError, userInfo, string[]>({
     queryKey: ['myInfo'],
     queryFn: getUserInfo,
-    select: (data) => data.data
+    select: (data) => data.data,
+    enabled: isLoggedIn
   });
 
   return {
