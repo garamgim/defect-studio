@@ -1,16 +1,16 @@
-import { Form, Input, Button, Select, message } from "antd";
-import { signUpFormType } from "../types/user";
-import { signupHTTP } from "../api/signupHTTP";
-import { useNavigate } from "react-router-dom";
+import { Form, Input, Button, Select, message } from 'antd';
+import { signUpFormType } from '../types/user';
+import { signupHTTP } from '../api/signupHTTP';
+import { useNavigate } from 'react-router-dom';
 
 const initialValues: signUpFormType = {
-  login_id: "defaultLoginID",
-  password: "",
-  name: "defaultName",
-  nickname: "defaultNickname",
-  email: "default@example.com",
-  role: "department_member",
-  department_id: 0,
+  login_id: '',
+  password: '',
+  name: '',
+  nickname: '',
+  email: '',
+  role: 'department_member',
+  department_id: 0
 };
 
 const Signup = () => {
@@ -20,16 +20,16 @@ const Signup = () => {
     try {
       await signupHTTP(data);
       form.resetFields();
-      message.success("Successfully signed up. Try logging in now.");
-      navigate("/login");
+      message.success('Successfully signed up. Try logging in now.');
+      navigate('/login');
     } catch (error) {
-      message.error("Failed to sign up. Please try again later.");
+      message.error('Failed to sign up. Please try again later.');
     }
   };
 
   const [form] = Form.useForm();
   return (
-    <div className="w-full h-full min-h-[1024px] relative overflow-hidden bg-white">
+    <div className="w-full h-full min-h-[1024px] relative overflow-hidden bg-white dark:bg-gray-800">
       <p className="absolute left-1/2 top-8 transform -translate-x-1/2 text-2xl sm:text-3xl font-black text-center text-black">
         Welcome to Defect Studio
       </p>
@@ -38,20 +38,20 @@ const Signup = () => {
           form={form}
           onFinish={onSubmit}
           layout="vertical"
-          style={{ width: "90%", minWidth: "400px" }}
+          style={{ width: '90%', minWidth: '400px' }}
           initialValues={initialValues}
         >
           <Form.Item
             label="Login ID"
             name="login_id"
             rules={[
-              { required: true, message: "Login ID is required" },
-              { min: 3, message: "Login ID must be at least 3 characters" },
-              { max: 16, message: "Login ID must be at most 16 characters" },
+              { required: true, message: 'Login ID is required' },
+              { min: 3, message: 'Login ID must be at least 3 characters' },
+              { max: 16, message: 'Login ID must be at most 16 characters' },
               {
                 pattern: /^[a-zA-Z0-9]+$/,
-                message: "Login ID can only contain letters and numbers",
-              },
+                message: 'Login ID can only contain letters and numbers'
+              }
             ]}
           >
             <Input />
@@ -60,14 +60,13 @@ const Signup = () => {
             label="Password"
             name="password"
             rules={[
-              { required: true, message: "Password is required" },
-              { min: 8, message: "Password must be at least 8 characters" },
-              { max: 20, message: "Password must be at most 20 characters" },
+              { required: true, message: 'Password is required' },
+              { min: 8, message: 'Password must be at least 8 characters' },
+              { max: 20, message: 'Password must be at most 20 characters' },
               {
-                pattern: /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[#![\]]).{8,}$/,
-                message:
-                  "Password must include alphabet, numbers, and special characters #![]",
-              },
+                pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/,
+                message: 'Password must include alphabet, number Each'
+              }
             ]}
           >
             <Input.Password />
@@ -76,13 +75,12 @@ const Signup = () => {
             label="Name"
             name="name"
             rules={[
-              { required: true, message: "Name is required" },
-              { max: 15, message: "Name must be at most 15 characters" },
+              { required: true, message: 'Name is required' },
+              { max: 15, message: 'Name must be at most 15 characters' },
               {
                 pattern: /^[a-zA-Z0-9가-힣]+$/,
-                message:
-                  "Name can only contain letters, numbers, and Korean characters",
-              },
+                message: 'Name can only contain letters, numbers, and Korean characters'
+              }
             ]}
           >
             <Input />
@@ -91,13 +89,12 @@ const Signup = () => {
             label="Nickname"
             name="nickname"
             rules={[
-              { required: true, message: "Nickname is required" },
-              { max: 15, message: "Nickname must be at most 15 characters" },
+              { required: true, message: 'Nickname is required' },
+              { max: 15, message: 'Nickname must be at most 15 characters' },
               {
                 pattern: /^[a-zA-Z0-9가-힣]+$/,
-                message:
-                  "Nickname can only contain letters, numbers, and Korean characters",
-              },
+                message: 'Nickname can only contain letters, numbers, and Korean characters'
+              }
             ]}
           >
             <Input />
@@ -106,35 +103,27 @@ const Signup = () => {
             label="Email"
             name="email"
             rules={[
-              { required: true, message: "Email is required" },
-              { type: "email", message: "Invalid email address" },
+              { required: true, message: 'Email is required' },
+              { type: 'email', message: 'Invalid email address' }
             ]}
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            label="Role"
-            name="role"
-            rules={[{ required: true, message: "Role is required" }]}
-          >
+          <Form.Item label="Role" name="role" rules={[{ required: true, message: 'Role is required' }]}>
             <Select>
-              <Select.Option value="department_member">
-                Department Member
-              </Select.Option>
-              <Select.Option value="department_admin">
-                Department Admin"
-              </Select.Option>
+              <Select.Option value="department_member">Department Member</Select.Option>
+              <Select.Option value="department_admin">Department Admin"</Select.Option>
               <Select.Option value="super_admin">Super Admin</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item
             label="Department ID"
             name="department_id"
-            rules={[{ required: true, message: "Department ID is required" }]}
+            rules={[{ required: true, message: 'Department ID is required' }]}
           >
             <Input />
           </Form.Item>
-          <Form.Item style={{ display: "flex", justifyContent: "center" }}>
+          <Form.Item style={{ display: 'flex', justifyContent: 'center' }}>
             <Button
               type="primary"
               htmlType="submit"

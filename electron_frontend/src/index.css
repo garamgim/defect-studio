@@ -203,3 +203,40 @@ html.dark .ant-form-item-label > label {
 html.dark .ant-modal-content {
   background-color: #4b5563;
 }
+
+/* antd Table dark mode 색  */
+html.dark .ant-table {
+  @apply bg-gray-800;
+}
+html.dark .ant-table-tbody .ant-table-row .ant-table-cell-row-hover {
+  @apply bg-gray-700;
+}
+
+/* 토큰 페이지 - 컨텐트 설정 */
+.token-content {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+
+  @apply border-2 border-gray-300 rounded-lg w-full h-full text-[222222] dark:text-white font-samsung;
+}
+
+/* 회원가입 페이지에 대한 입력 설정 */
+html.dark .ant-form-item-control-input-content .ant-input-affix-wrapper {
+  @apply bg-gray-700;
+}
+
+html.dark .ant-form-item-control-input-content .ant-input-affix-wrapper-focused {
+  @apply bg-gray-700;
+}
+
+html.dark .ant-input-status-error {
+  @apply bg-gray-700;
+}
+html.dark .ant-input-outlined {
+  @apply bg-gray-700;
+}
+
+html.dark .ant-form-item-has-error {
+  @apply bg-gray-800;
+}
