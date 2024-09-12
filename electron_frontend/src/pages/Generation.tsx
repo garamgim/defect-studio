@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import { Button, Modal } from 'antd';
-import TextToImage from '../components/generation/layouts/TextToImage';
-import ImageToImage from '../components/generation/layouts/ImageToImage';
-import Inpainting from '../components/generation/layouts/Inpainting';
-import RemoveBackground from '../components/generation/layouts/RemoveBackground';
-import Cleanup from '../components/generation/layouts/Cleanup';
+import TextToImage from '../components/generation/layouts/Txt2ImgLayout';
+import ImageToImage from '../components/generation/layouts/Img2ImgLayout';
+import Inpainting from '../components/generation/layouts/InpaintingLayout';
+import RemoveBackground from '../components/generation/layouts/RemoveBgLayout';
+import Cleanup from '../components/generation/layouts/CleanupLayout';
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from 'react-icons/ai';
 import { FaImage, FaMagic, FaPaintBrush, FaEraser, FaTrash } from 'react-icons/fa';
 import PresetContent from '../components/generation/presets/PresetContent';
@@ -32,7 +32,7 @@ const Generation = () => {
     <div className="flex h-[calc(100vh-60px)] bg-gray-100 dark:bg-gray-800">
       {/* 사이드 메뉴탭 선택 */}
       <div
-        className={`py-8 fixed top-0 left-0 bg-white shadow-lg z-20 h-full transition-transform duration-300 ease-in-out ${
+        className={`pt-8 fixed top-0 left-0 bg-white shadow-lg z-20 h-full transition-transform duration-300 ease-in-out overflow-y-auto custom-scrollbar pb-[150px] ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } w-20 dark:bg-gray-800 dark:border-r dark:border-gray-600`}
         style={{ top: '60px' }}

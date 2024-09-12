@@ -33,6 +33,7 @@ export async function login(user: loginData) {
     throw error;
   }
 }
+
 // 유저 정보 가져올 떄 쓰는 정보
 export type userInfo = {
   member_pk: number;

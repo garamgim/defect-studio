@@ -1,7 +1,7 @@
 import { Upload, Tabs, Input } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 
-interface UploadImagePlusMaskProps {
+interface UploadImgWithMaskingParamsProps {
   handleImageUpload: (file: File) => void;
   imagePreview: string | null;
   // inpaintingResult: string | null;
@@ -9,7 +9,11 @@ interface UploadImagePlusMaskProps {
   setActiveTab: (key: string) => void; // Add this prop to handle tab change
 }
 
-const UploadImagePlusMask: React.FC<UploadImagePlusMaskProps> = ({ handleImageUpload, imagePreview, setActiveTab }) => {
+const UploadImgWithMasking: React.FC<UploadImgWithMaskingParamsProps> = ({
+  handleImageUpload,
+  imagePreview,
+  setActiveTab
+}) => {
   const uploadProps = {
     accept: 'image/*',
     beforeUpload: (file: File) => {
@@ -76,4 +80,4 @@ const UploadImagePlusMask: React.FC<UploadImagePlusMaskProps> = ({ handleImageUp
   );
 };
 
-export default UploadImagePlusMask;
+export default UploadImgWithMasking;

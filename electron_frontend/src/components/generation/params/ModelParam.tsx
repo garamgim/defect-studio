@@ -1,11 +1,11 @@
 import { Select, Form } from 'antd';
 
-interface ModelProps {
+interface ModelParamProps {
   model: string;
-  setModel: (model: string) => void; 
+  setModel: (model: string) => void;
 }
 
-const Model = ({ model, setModel }: ModelProps) => {
+const ModelParam = ({ model, setModel }: ModelParamProps) => {
   const handleChange = (value: string) => {
     setModel(value);
   };
@@ -17,17 +17,17 @@ const Model = ({ model, setModel }: ModelProps) => {
         <Form.Item>
           <Select
             value={model}
-            onChange={handleChange} 
+            onChange={handleChange}
             options={[
               {
-                value: 'Stable Diffusion v1-5',
-                label: 'Stable Diffusion v1-5'
+                value: 'CompVis/stable-diffusion-v1-4',
+                label: 'CompVis/stable-diffusion-v1-4'
               },
               {
-                value: 'Stable Diffusion v2-1',
-                label: 'Stable Diffusion v2-1'
+                value: 'model2',
+                label: 'model2'
               },
-              { value: 'Custom Model', label: 'Custom Model' }
+              { value: 'model3', label: 'model3' }
             ]}
             placeholder="Select a model"
           />
@@ -37,4 +37,4 @@ const Model = ({ model, setModel }: ModelProps) => {
   );
 };
 
-export default Model;
+export default ModelParam;

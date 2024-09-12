@@ -1,18 +1,13 @@
 import { Form, Select, Slider, Row, Col, InputNumber } from 'antd';
 
-interface SamplingSettingsProps {
-  samplingMethod: string;
-  setSamplingMethod: (value: string) => void;
+interface SamplingParamsProps {
+  scheduler: string;
+  setScheduler: (value: string) => void;
   samplingSteps: number;
   setSamplingSteps: (value: number) => void;
 }
 
-const SamplingSettings = ({
-  samplingMethod,
-  samplingSteps,
-  setSamplingMethod,
-  setSamplingSteps
-}: SamplingSettingsProps) => {
+const SamplingParams = ({ scheduler, samplingSteps, setScheduler, setSamplingSteps }: SamplingParamsProps) => {
   const handleSamplingStepsChange = (value: number | null) => {
     if (value !== null) {
       setSamplingSteps(value);
@@ -23,16 +18,16 @@ const SamplingSettings = ({
     <div className="p-6">
       <p className="text-[14px] font-semibold text-[#222] mb-3 dark:text-gray-300">Sampling Settings</p>
       <Form layout="vertical" className="space-y-5">
-        <Form.Item label="Sampling method">
+        <Form.Item label="Scheduler">
           <Select
-            value={samplingMethod}
-            onChange={(value) => setSamplingMethod(value)}
+            value={scheduler}
+            onChange={(value) => setScheduler(value)}
             options={[
               { value: 'DPM++ 2M', label: 'DPM++ 2M' },
               { value: 'Euler a', label: 'Euler a' },
               { value: 'LMS', label: 'LMS' }
             ]}
-            placeholder="Select a sampling method"
+            placeholder="Select a scheduler"
           />
         </Form.Item>
 
@@ -63,4 +58,4 @@ const SamplingSettings = ({
   );
 };
 
-export default SamplingSettings;
+export default SamplingParams;

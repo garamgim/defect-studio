@@ -11,25 +11,25 @@ export const showToast = (message: string, options?: ToastOptions) => {
 
 export const showToastSuccess = (message: JSX.Element) => {
   toast.success(message, {
-    position: "bottom-right",
+    position: 'bottom-right',
     autoClose: 2200,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,
     draggable: true,
-    theme: "light",
+    theme: 'light'
   });
 };
 
 export const showToastError = (message: JSX.Element) => {
   toast.error(message, {
-    position: "bottom-right",
+    position: 'bottom-right',
     autoClose: 5000,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,
     draggable: true,
-    theme: "light",
+    theme: 'light'
   });
 };
 
