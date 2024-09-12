@@ -21,7 +21,7 @@ interface InpaintingState {
   maskInputPath: string;
   outputPath: string;
   outputImgUrls: string[];
-  clipResult: string;
+  clipData: string[];
 }
 
 const initialState: InpaintingState = {
@@ -45,7 +45,7 @@ const initialState: InpaintingState = {
   maskInputPath: '',
   outputPath: '',
   outputImgUrls: [],
-  clipResult: ''
+  clipData: []
 };
 
 const inpaintingSlice = createSlice({
@@ -118,8 +118,8 @@ const inpaintingSlice = createSlice({
     setOutputImgUrls: (state, action: PayloadAction<string[]>) => {
       state.outputImgUrls = action.payload;
     },
-    setClipResult: (state, action: PayloadAction<string>) => {
-      state.clipResult = action.payload;
+    setClipData: (state, action: PayloadAction<string[]>) => {
+      state.clipData = action.payload;
     }
   }
 });
@@ -145,7 +145,7 @@ export const {
   setMaskInputPath,
   setOutputPath,
   setOutputImgUrls,
-  setClipResult
+  setClipData
 } = inpaintingSlice.actions;
 
 export default inpaintingSlice.reducer;

@@ -2,15 +2,43 @@ import Sidebar from '../sidebar/Txt2ImgSidebar';
 import PromptParams from '../params/PromptParams';
 import Txt2ImgDisplay from '../outputDisplay/Txt2ImgDisplay';
 import { useDispatch, useSelector } from 'react-redux';
-import { setPrompt, setNegativePrompt, setIsNegativePrompt } from '../../../store/slices/generation/txt2ImgSlice';
+import { setPrompt, setNegativePrompt, setIsNegativePrompt, setOutputImgUrls } from '../../../store/slices/generation/txt2ImgSlice';
+import { postTxt2ImgGeneration } from '../../../api/generation';  // API 호출 함수 가져오기
 import { RootState } from '../../../store/store';
+import GenerateButton from '../../common/GenerateButton';
 
 const Txt2ImgLayout = () => {
   const dispatch = useDispatch();
-  const { prompt, negativePrompt, isNegativePrompt } = useSelector((state: RootState) => state.txt2Img);
+  const { prompt, negativePrompt, isNegativePrompt, model, scheduler, width, height, samplingSteps, guidanceScale, seed, batchCount, batchSize, outputPath } = useSelector((state: RootState) => state.txt2Img);
 
   const handleNegativePromptChange = () => {
     dispatch(setIsNegativePrompt(!isNegativePrompt));
+  };
+
+  const handleGenerate = async () => {
+    const data = {
+      model,
+      scheduler,
+      prompt,
+      negative_prompt: negativePrompt,
+      width,
+      height,
+      num_inference_steps: samplingSteps,
+      guidance_scale: guidanceScale,
+      seed,
+      batch_count: batchCount,
+      batch_size: batchSize,
+      output_path: outputPath,
+    };
+
+    try {
+      const outputImgUrls = await postTxt2ImgGeneration('remote', data);
+      console.log('Generated image URLs:', outputImgUrls);
+      
+      dispatch(setOutputImgUrls(outputImgUrls));
+    } catch (error) {
+      console.error('Error generating image:', error);
+    }
   };
 
   return (
@@ -40,6 +68,11 @@ const Txt2ImgLayout = () => {
             handleNegativePromptChange={handleNegativePromptChange}
           />
         </div>
+      </div>
+
+      {/* Generate 버튼 */}
+      <div className="fixed bottom-[50px] right-[56px]">
+        <GenerateButton onClick={handleGenerate} />  
       </div>
     </div>
   );

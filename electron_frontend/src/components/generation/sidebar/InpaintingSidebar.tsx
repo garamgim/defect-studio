@@ -3,7 +3,7 @@ import { Button } from 'antd';
 import { FormatPainterOutlined } from '@ant-design/icons';
 import { RootState } from '../../../store/store';
 import Model from '../params/ModelParam';
-import InpaintingModal from '../masking/MaskingModal';
+import MaskingModal from '../masking/MaskingModal';
 import SamplingParams from '../params/SamplingParams';
 import ImgDimensionParams from '../params/ImgDimensionParams';
 import SeedParam from '../params/SeedParam';
@@ -26,14 +26,12 @@ import {
   setBatchSize,
   setInitImageList,
   setMaskImageList,
-  setInitInputPath,
-  setMaskInputPath,
-  setOutputPath,
-  setOutputImgUrls
+  setClipData
 } from '../../../store/slices/generation/inpaintingSlice';
+import { getClip } from '../../../api/generation';
 
-const InpaintingSidebar: React.FC = () => {
-  const { BgImage, canvasImage, combinedImage } = useSelector((state: RootState) => state.masking);
+const InpaintingSidebar = () => {
+  const { backgroundImg, canvasImg, combinedImg } = useSelector((state: RootState) => state.masking);
 
   const dispatch = useDispatch();
   const {
@@ -47,7 +45,8 @@ const InpaintingSidebar: React.FC = () => {
     guidanceScale,
     strength,
     batchCount,
-    batchSize
+    batchSize,
+    initImageList
   } = useSelector((state: RootState) => state.inpainting);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
@@ -64,40 +63,61 @@ const InpaintingSidebar: React.FC = () => {
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
+      const base64String = reader.result as string; // 변환된 Base64 문자열
       const img = new Image();
-      img.onload = () => {
-        setImageSrc(reader.result as string);
+      img.onload = async () => {
+        setImageSrc(base64String);
+        console.log('Base64 String:', base64String); // Base64 문자열 출력
+
+        try {
+          // Base64을 Blob으로 변환 후 getClip 호출
+          console.log('파일: ', file)
+          const response = await getClip([file]); // 파일 배열로 전달
+          console.log('결과: ', response)
+          dispatch(setClipData(response)); // 클립 결과를 Redux 상태에 저장
+        } catch (error) {
+          console.error('Failed to get clip data:', error);
+        }
       };
-      img.src = reader.result as string;
+      img.src = base64String;
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(file); // 파일을 Base64로 변환
   };
+  
+  // const handleDownloadImage = (url: string | null, filename: string) => {
+  //   if (url) {
+  //     const link = document.createElement('a');
+  //     link.href = url;
+  //     link.download = filename;
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  //   }
+  // };
 
-  const handleDownloadImage = (url: string | null, filename: string) => {
-    if (url) {
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
+  // const handleDownloadbackgroundImg = () => {
+  //   handleDownloadImage(backgroundImg, 'stage_image.png'); // backgroundImg 다운로드
+  // };
 
-  const handleDownloadBgImage = () => {
-    handleDownloadImage(BgImage, 'stage_image.png'); // BgImage 다운로드
-  };
-
-  const handleDownloadCanvasImage = () => {
-    handleDownloadImage(canvasImage, 'canvas_image.png'); // canvasImage 다운로드
-  };
+  // const handleDownloadcanvasImg = () => {
+  //   handleDownloadImage(canvasImg, 'canvas_image.png'); // canvasImg 다운로드
+  // };
 
   const handleCloseModal = () => {
-    setShowModal(false); // 모달 닫기
+    setShowModal(false);
+  };
+
+  const handleApply = () => {
+    if (backgroundImg && canvasImg) {
+      dispatch(setInitImageList([backgroundImg]));
+      dispatch(setMaskImageList([canvasImg]));
+      console.log("확인: ", initImageList)
+    }
+    setShowModal(false);
   };
 
   return (
-    <div className="w-full h-full fixed-height mr-6">
+    <div className="w-full h-full mr-6">
       <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* 모델 선택 */}
         <Model model={model} setModel={setModel} />
@@ -126,25 +146,25 @@ const InpaintingSidebar: React.FC = () => {
             )}
 
             {/* 인페인팅 결과 및 다운로드 */}
-            {combinedImage && (
+            {combinedImg && (
               <div className="w-full border border-dashed border-gray-300 rounded-lg mt-4 flex flex-col items-center">
-                <img src={combinedImage} alt="Inpainting Result" className="w-full h-full object-cover rounded-lg" />
+                <img src={combinedImg} alt="Inpainting Result" className="w-full h-full object-cover rounded-lg" />
               </div>
             )}
 
-            <div className="mt-4 flex flex-col space-y-2">
-              {BgImage && (
-                <Button type="default" onClick={handleDownloadBgImage} className="w-full">
+            {/* <div className="mt-4 flex flex-col space-y-2">
+              {backgroundImg && (
+                <Button type="default" onClick={handleDownloadbackgroundImg} className="w-full">
                   Download Stage Image
                 </Button>
               )}
 
-              {canvasImage && (
-                <Button type="default" onClick={handleDownloadCanvasImage} className="w-full">
+              {canvasImg && (
+                <Button type="default" onClick={handleDownloadcanvasImg} className="w-full">
                   Download Canvas Image
                 </Button>
               )}
-            </div>
+            </div> */}
           </div>
         )}
 
@@ -156,22 +176,30 @@ const InpaintingSidebar: React.FC = () => {
             <SamplingParams
               scheduler={scheduler}
               samplingSteps={samplingSteps}
-              setScheduler={setScheduler}
-              setSamplingSteps={setSamplingSteps}
+              setSamplingSteps={(value: number) => dispatch(setSamplingSteps(value))}
+              setScheduler={(value: string) => dispatch(setScheduler(value))}
             />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 이미지 크기 설정 */}
-            <ImgDimensionParams width={width} height={height} setWidth={setWidth} setHeight={setHeight} />
+            <ImgDimensionParams
+              width={width}
+              height={height}
+              setWidth={(value: number) => dispatch(setWidth(value))}
+              setHeight={(value: number) => dispatch(setHeight(value))}
+            />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* guidance scale 설정 */}
-            <GuidanceScaleParms guidanceScale={guidanceScale} setGuidanceScale={setGuidanceScale} />
+            <GuidanceScaleParms
+              guidanceScale={guidanceScale}
+              setGuidanceScale={(value: number) => dispatch(setGuidanceScale(value))}
+            />
 
             {/* strength 설정 */}
-            <StrengthParam strength={strength} setStrength={setStrength} />
+            <StrengthParam strength={strength} setStrength={(value: number) => dispatch(setStrength(value))} />
 
             {/* seed 설정 */}
             <SeedParam
@@ -195,7 +223,7 @@ const InpaintingSidebar: React.FC = () => {
       </div>
 
       {/* Masking 모달 창 */}
-      {showModal && imageSrc && <InpaintingModal imageSrc={imageSrc} onClose={handleCloseModal} />}
+      {showModal && imageSrc && <MaskingModal imageSrc={imageSrc} onClose={handleCloseModal} onApply={handleApply} />}
     </div>
   );
 };

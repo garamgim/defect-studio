@@ -13,7 +13,8 @@ import {
   setIsRandomSeed,
   setBatchCount,
   setBatchSize,
-  setImages
+  setImages,
+  setClipData
 } from '../../../store/slices/generation/img2ImgSlice';
 import ModelParams from '../params/ModelParam';
 import UploadImgParams from '../params/UploadImgParams';
@@ -23,6 +24,7 @@ import SamplingParams from '../params/SamplingParams';
 import SeedParam from '../params/SeedParam';
 import BatchParams from '../params/BatchParams';
 import GuidanceScaleParam from '../params/GuidanceScaleParam';
+import { getClip } from '../../../api/generation';
 
 const Img2ImgSidebar = () => {
   const dispatch = useDispatch();
@@ -54,18 +56,28 @@ const Img2ImgSidebar = () => {
     reader.onloadend = () => {
       const base64String = reader.result as string; // 변환된 Base64 문자열
       const img = new Image();
-      img.onload = () => {
+      img.onload = async () => {
         setImageSrc(base64String);
         console.log('Base64 String:', base64String); // Base64 문자열 출력
         dispatch(setImages([base64String])); // Redux 상태에 Base64 문자열 저장
+
+        try {
+          // Base64을 Blob으로 변환 후 getClip 호출
+          console.log('파일: ', file)
+          const response = await getClip([file]); // 파일 배열로 전달
+          console.log('결과: ', response)
+          dispatch(setClipData(response)); // 클립 결과를 Redux 상태에 저장
+        } catch (error) {
+          console.error('Failed to get clip data:', error);
+        }
       };
-      img.src = base64String; // img.src에 Base64 문자열 설정
+      img.src = base64String;
     };
     reader.readAsDataURL(file); // 파일을 Base64로 변환
   };
-
+  
   return (
-    <div className="w-full h-full fixed-height mr-6">
+    <div className="w-full h-full mr-6">
       <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* 모델 선택 */}
         <ModelParams model={model} setModel={setModel} />
@@ -83,8 +95,8 @@ const Img2ImgSidebar = () => {
             <ImgDimensionParams
               width={width}
               height={height}
-              setWidth={(value) => dispatch(setWidth(value))}
-              setHeight={(value) => dispatch(setHeight(value))}
+              setWidth={(value: number) => dispatch(setWidth(value))}
+              setHeight={(value: number) => dispatch(setHeight(value))}
             />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
@@ -93,8 +105,8 @@ const Img2ImgSidebar = () => {
             <SamplingParams
               scheduler={scheduler}
               samplingSteps={samplingSteps}
-              setScheduler={setScheduler}
-              setSamplingSteps={setSamplingSteps}
+              setSamplingSteps={(value: number) => dispatch(setSamplingSteps(value))}
+              setScheduler={(value: string) => dispatch(setScheduler(value))}
             />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
@@ -133,3 +145,4 @@ const Img2ImgSidebar = () => {
 };
 
 export default Img2ImgSidebar;
+

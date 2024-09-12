@@ -1,13 +1,21 @@
 import { Form, Select, Slider, Row, Col, InputNumber } from 'antd';
+import { useQuery } from '@tanstack/react-query';
+import { getSchedulers } from '../../../api/generation';
 
 interface SamplingParamsProps {
-  scheduler: string;
   setScheduler: (value: string) => void;
   samplingSteps: number;
   setSamplingSteps: (value: number) => void;
+  scheduler: string;
 }
 
-const SamplingParams = ({ scheduler, samplingSteps, setScheduler, setSamplingSteps }: SamplingParamsProps) => {
+const SamplingParams = ({ setScheduler, samplingSteps, setSamplingSteps, scheduler }: SamplingParamsProps) => {
+
+  const { data: schedulerList } = useQuery<string[], Error>({
+    queryKey: ['schedulers'],
+    queryFn: getSchedulers,
+  });
+
   const handleSamplingStepsChange = (value: number | null) => {
     if (value !== null) {
       setSamplingSteps(value);
@@ -20,14 +28,9 @@ const SamplingParams = ({ scheduler, samplingSteps, setScheduler, setSamplingSte
       <Form layout="vertical" className="space-y-5">
         <Form.Item label="Scheduler">
           <Select
-            value={scheduler}
+            value={scheduler} 
             onChange={(value) => setScheduler(value)}
-            options={[
-              { value: 'DPM++ 2M', label: 'DPM++ 2M' },
-              { value: 'Euler a', label: 'Euler a' },
-              { value: 'LMS', label: 'LMS' }
-            ]}
-            placeholder="Select a scheduler"
+            options={schedulerList?.map((scheduler) => ({ value: scheduler, label: scheduler })) } 
           />
         </Form.Item>
 

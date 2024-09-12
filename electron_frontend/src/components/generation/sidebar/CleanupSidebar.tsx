@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { Button } from 'antd';
+import { useSelector, useDispatch } from 'react-redux';
 import { FormatPainterOutlined } from '@ant-design/icons';
-import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import InpaintingModal from '../masking/MaskingModal';
+import MaskingModal from '../masking/MaskingModal';
 import UploadImagePlusMask from '../params/UploadImgWithMaskingParams';
+import { setImages, setMasks } from '../../../store/slices/generation/cleanupSlice';
 
-const CleanupSidebar: React.FC = () => {
-  const BgImage = useSelector((state: RootState) => state.masking.BgImage);
-  const canvasImage = useSelector((state: RootState) => state.masking.canvasImage);
-  const combinedImage = useSelector((state: RootState) => state.masking.combinedImage);
+const CleanupSidebar = () => {
+  const { backgroundImg, canvasImg, combinedImg } = useSelector((state: RootState) => state.masking);
 
+  const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('manual');
@@ -27,31 +27,20 @@ const CleanupSidebar: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleDownloadImage = (url: string | null, filename: string) => {
-    if (url) {
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
-
-  const handleDownloadBgImage = () => {
-    handleDownloadImage(BgImage, 'stage_image.png'); // BgImage 다운로드
-  };
-
-  const handleDownloadCanvasImage = () => {
-    handleDownloadImage(canvasImage, 'canvas_image.png'); // canvasImage 다운로드
-  };
-
   const handleCloseModal = () => {
-    setShowModal(false); // 모달 닫기
+    setShowModal(false);
+  };
+
+  const handleApply = () => {
+    if (backgroundImg && canvasImg) {
+      dispatch(setImages([backgroundImg]));
+      dispatch(setMasks([canvasImg]));
+    }
+    setShowModal(false);
   };
 
   return (
-    <div className="w-full h-full fixed-height mr-6">
+    <div className="w-full h-full mr-6">
       <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* 이미지 업로드 */}
         <UploadImagePlusMask
@@ -75,31 +64,17 @@ const CleanupSidebar: React.FC = () => {
             )}
 
             {/* 인페인팅 결과 및 다운로드 */}
-            {combinedImage && (
+            {combinedImg && (
               <div className="w-full border border-dashed border-gray-300 rounded-lg mt-4 flex flex-col items-center">
-                <img src={combinedImage} alt="Inpainting Result" className="w-full h-full object-cover rounded-lg" />
+                <img src={combinedImg} alt="Inpainting Result" className="w-full h-full object-cover rounded-lg" />
               </div>
             )}
-
-            <div className="mt-4 flex flex-col space-y-2">
-              {BgImage && (
-                <Button type="default" onClick={handleDownloadBgImage} className="w-full">
-                  Download Stage Image
-                </Button>
-              )}
-
-              {canvasImage && (
-                <Button type="default" onClick={handleDownloadCanvasImage} className="w-full">
-                  Download Canvas Image
-                </Button>
-              )}
-            </div>
           </div>
         )}
       </div>
 
-      {/* ㅡMasking 모달 창 */}
-      {showModal && imageSrc && <InpaintingModal imageSrc={imageSrc} onClose={handleCloseModal} />}
+      {/* Masking 모달 창 */}
+      {showModal && imageSrc && <MaskingModal imageSrc={imageSrc} onClose={handleCloseModal} onApply={handleApply} />}
     </div>
   );
 };

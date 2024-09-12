@@ -1,20 +1,24 @@
 import { configureStore } from '@reduxjs/toolkit';
-import levelReducer from './slices/levelSlice';
-import themeReducer from './slices/themeSlice';
-import maskingReducer from './slices/generation/maskingSlice';
-import txt2ImgReducer from './slices/generation/txt2ImgSlice';
-import img2ImgReducer from './slices/generation/img2ImgSlice';
-import InpaintingReducer from './slices/generation/inpaintingSlice';
+import levelSlice from './slices/levelSlice';
+import themeSlice from './slices/themeSlice';
+import maskingSlice from './slices/generation/maskingSlice';
+import txt2ImgSlice from './slices/generation/txt2ImgSlice';
+import img2ImgSlice from './slices/generation/img2ImgSlice';
+import inpaintingSlice from './slices/generation/inpaintingSlice';
+import removeBgSlice from './slices/generation/removeBgSlice';
+import cleanupSlice from './slices/generation/cleanupSlice';
 import userInfoSlice from './slices/userInfoSlice';
 
 const store = configureStore({
   reducer: {
-    level: levelReducer,
-    theme: themeReducer,
-    masking: maskingReducer,
-    txt2Img: txt2ImgReducer,
-    img2Img: img2ImgReducer,
-    inpainting: InpaintingReducer,
+    level: levelSlice,
+    theme: themeSlice,
+    masking: maskingSlice,
+    txt2Img: txt2ImgSlice,
+    img2Img: img2ImgSlice,
+    inpainting: inpaintingSlice,
+    removeBg: removeBgSlice,
+    cleanup: cleanupSlice,
     userInfo: userInfoSlice
   }
 });

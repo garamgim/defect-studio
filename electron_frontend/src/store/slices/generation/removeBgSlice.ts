@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface RemoveBgState {
-  images: string[]; // 업로드할 이미지 파일들
+  images: string[]; 
   inputPath: string;
   outputPath: string;
   outputImgUrls: string[];
@@ -10,7 +10,7 @@ interface RemoveBgState {
 const initialState: RemoveBgState = {
   images: [],
   inputPath: '',
-  outputPath: '/output',
+  outputPath: '',
   outputImgUrls: []
 };
 

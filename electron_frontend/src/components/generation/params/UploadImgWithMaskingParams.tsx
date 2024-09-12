@@ -4,9 +4,7 @@ import { InboxOutlined } from '@ant-design/icons';
 interface UploadImgWithMaskingParamsProps {
   handleImageUpload: (file: File) => void;
   imagePreview: string | null;
-  // inpaintingResult: string | null;
-  // handleDownloadImage: (url: string | null, filename: string) => void;
-  setActiveTab: (key: string) => void; // Add this prop to handle tab change
+  setActiveTab: (key: string) => void; 
 }
 
 const UploadImgWithMasking: React.FC<UploadImgWithMaskingParamsProps> = ({
@@ -75,7 +73,7 @@ const UploadImgWithMasking: React.FC<UploadImgWithMaskingParamsProps> = ({
   return (
     <div className="p-6">
       <p className="text-[14px] font-semibold text-[#222] mb-3 dark:text-gray-300">Upload Image</p>
-      <Tabs items={items} onChange={setActiveTab} /> {/* Handle tab change */}
+      <Tabs items={items} onChange={setActiveTab} /> 
     </div>
   );
 };
