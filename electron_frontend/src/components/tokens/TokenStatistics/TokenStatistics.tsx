@@ -1,11 +1,14 @@
-import { useState } from 'react';
-import SearchDepartments from '../TokenIssurance/SearchDepartments';
+import TokenStatisticsHeader from './TokenStatisticsHeader';
+
+interface searchType {
+  category: 'department' | 'person';
+  value: string | null;
+}
 
 const TokenStatistics = () => {
-  const [departmentsId, setDepartmentsId] = useState<number[]>([]);
   return (
     <section className="flex flex-col justify-center align-middle">
-      <SearchDepartments departmentsId={departmentsId} setDepartmentsId={setDepartmentsId} />
+      <TokenStatisticsHeader />
     </section>
   );
 };

@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { getUserInfo } from '../../api/getUserInfo';
-import { useEffect } from 'react';
 import { logout } from '../../api/user';
 interface miniProfilePropsType {
   nickname: string;
@@ -11,17 +10,6 @@ interface miniProfilePropsType {
 
 const MiniProfile = ({ nickname, department_name, email }: miniProfilePropsType) => {
   const navigate = useNavigate();
-  useEffect(() => {
-    const testfunc = async () => {
-      try {
-        const response = await getUserInfo();
-        console.log(response);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    testfunc();
-  });
 
   return (
     <>
@@ -34,7 +22,7 @@ const MiniProfile = ({ nickname, department_name, email }: miniProfilePropsType)
           <p className="text-base text-left text-black">{nickname}</p>
           <p className=" text-base text-left text-black">{department_name}</p>
           <p className=" text-sm text-left text-[#47415e]">{email}</p>
-          <div className="flex flex-row justify-evenly">
+          <div className="flex flex-row justify-between align-middle">
             <button
               onClick={() => {
                 logout();

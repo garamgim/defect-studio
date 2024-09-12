@@ -1,10 +1,10 @@
-import "./TokenHeader.css";
+import './TokenHeader.css';
 
 const TokenHeader = () => {
   return (
-    <header className="token-header">
-      <h1>Tokens</h1>
-      <p>Your Authority : {}</p>
+    <header>
+      <h1 className="text-[30px] font-bold mb-2 dark:text-gray-300">Tokens</h1>
+      <p className="text-[20px] mb-2 dark:text-gray-300">Your Authority : {}</p>
     </header>
   );
 };
