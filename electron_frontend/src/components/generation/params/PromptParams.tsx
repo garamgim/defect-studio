@@ -50,7 +50,7 @@ const sliceActions = {
 const PromptParams = () => {
   const dispatch = useDispatch();
   const location = useLocation();
-  const currentPath = location.pathname;
+  const currentPath = location.pathname as keyof typeof sliceActions;
 
   // 경로에 맞는 슬라이스 액션과 상태 선택
   const { setPrompt, setNegativePrompt, setIsNegativePrompt, selectSlice } = sliceActions[currentPath] || {};
@@ -148,7 +148,11 @@ const PromptParams = () => {
             <Button
               key={index}
               type={prompt.includes(phrase) ? 'primary' : 'default'}
-              onClick={() => dispatch(setPrompt ? setPrompt(phrase) : null)}
+              onClick={() => {
+                if (setPrompt) {
+                  dispatch(setPrompt(phrase));
+                }
+              }}
             >
               {phrase}
             </Button>
