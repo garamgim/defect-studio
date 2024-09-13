@@ -5,9 +5,20 @@ import { InboxOutlined } from '@ant-design/icons';
 interface UploadImgParamsProps {
   handleImageUpload: (file: File) => void;
   imagePreview: string | ArrayBuffer | null;
+  inputPath: string;
+  setInputPath: (valud: string) => void;
+  outputPath: string;
+  setOutputPath: (value: string) => void;
 }
 
-const UploadImgParams = ({ handleImageUpload, imagePreview }: UploadImgParamsProps) => {
+const UploadImgParams = ({
+  handleImageUpload,
+  imagePreview,
+  inputPath,
+  outputPath,
+  setInputPath,
+  setOutputPath
+}: UploadImgParamsProps) => {
   const uploadProps: UploadProps = {
     accept: 'image/*',
     beforeUpload: (file) => {
@@ -51,14 +62,32 @@ const UploadImgParams = ({ handleImageUpload, imagePreview }: UploadImgParamsPro
             <label htmlFor="imagePath" className="block text-[14px] text-[#222] mb-1 dark:text-gray-300">
               Input directory
             </label>
-            <Input type="text" id="imagePath" className="w-full" placeholder="Enter the image path" />
+            <Input
+              value={inputPath}
+              onChange={(event) => {
+                setInputPath(event.target.value);
+              }}
+              type="text"
+              id="imagePath"
+              className="w-full"
+              placeholder="Enter the image path"
+            />
           </div>
 
           <div className="mb-2">
             <label htmlFor="outputPath" className="block text-[14px] text-[#222] mb-1 dark:text-gray-300">
               Output directory
             </label>
-            <Input type="text" id="outputPath" className="w-full" placeholder="Enter the output path" />
+            <Input
+              value={outputPath}
+              onChange={(event) => {
+                setOutputPath(event.target.value);
+              }}
+              type="text"
+              id="outputPath"
+              className="w-full"
+              placeholder="Enter the output path"
+            />
           </div>
         </div>
       )
