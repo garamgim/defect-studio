@@ -3,6 +3,9 @@ import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { MdImageSearch } from 'react-icons/md';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
+import { setIsNegativePrompt } from '../../../store/slices/generation/txt2ImgSlice';
 
 interface PromptParamsProps {
   prompt: string;
@@ -27,6 +30,12 @@ const PromptParams = ({
   const location = useLocation();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
+
+  if (level === 'Basic') {
+    setIsNegativePrompt(false);
+  }
+
   const clipPhrases = clipData ? clipData.flatMap((data) => data.split(', ')) : [];
 
   const handlePromptUpdate = (phrase: string) => {
@@ -42,13 +51,15 @@ const PromptParams = ({
           <p className="text-sm font-bold text-left text-[#222] dark:text-gray-200">Prompt</p>
         </div>
 
-        <Checkbox
-          checked={isNegativePrompt}
-          onChange={handleNegativePromptChange}
-          className="text-[14px] text-left text-[#464646]"
-        >
-          Add Negative Prompt
-        </Checkbox>
+        {level === 'Advanced' && (
+          <Checkbox
+            checked={isNegativePrompt}
+            onChange={handleNegativePromptChange}
+            className="text-[14px] text-left text-[#464646]"
+          >
+            Add Negative Prompt
+          </Checkbox>
+        )}
       </div>
 
       <div className="relative mb-4">
@@ -73,7 +84,7 @@ const PromptParams = ({
         )}
       </div>
 
-      {isNegativePrompt && (
+      {level === 'Advanced' && isNegativePrompt && (
         <>
           <p className="text-sm text-left text-[#222] mb-2 dark:text-gray-300">Negative Prompt</p>
           <TextArea
@@ -96,7 +107,8 @@ const PromptParams = ({
         footer={null} // 기본 OK/Cancel 버튼 제거
         closable={false} // X 버튼 제거
         onCancel={() => setIsModalVisible(false)}
-      ><div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Prompt Helper</div>
+      >
+        <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Prompt Helper</div>
         <div className="flex flex-wrap gap-2">
           {clipPhrases.length > 0 ? (
             clipPhrases.map((phrase, index) => (

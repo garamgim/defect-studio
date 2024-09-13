@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Img2ImgState {
+  mode: 'manual' | 'batch'; // 메뉴얼/배치 모두 구분
   model: string;
   scheduler: string;
   prompt: string;
@@ -23,6 +24,7 @@ interface Img2ImgState {
 }
 
 const initialState: Img2ImgState = {
+  mode: 'manual',
   model: 'CompVis/stable-diffusion-v1-4',
   scheduler: 'DPM++ 2M',
   prompt: '',
@@ -33,13 +35,13 @@ const initialState: Img2ImgState = {
   guidanceScale: 7.5,
   strength: 0.75,
   seed: -1,
-  isRandomSeed: false, // 기본값: 랜덤 시드 비활성화
+  isRandomSeed: false,
   batchCount: 1,
   batchSize: 1,
   images: [],
   inputPath: '',
   outputPath: '',
-  isNegativePrompt: false, // 기본값: 네거티브 프롬프트 비활성화
+  isNegativePrompt: false,
   outputImgUrls: [],
   clipData: []
 };
@@ -48,6 +50,9 @@ const img2ImgSlice = createSlice({
   name: 'img2Img',
   initialState,
   reducers: {
+    setMode: (state, action: PayloadAction<'maual' | 'batch'>) => {
+      state.model = action.payload;
+    },
     setModel: (state, action: PayloadAction<string>) => {
       state.model = action.payload;
     },

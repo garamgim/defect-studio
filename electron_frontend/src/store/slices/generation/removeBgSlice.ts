@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface RemoveBgState {
-  images: string[]; 
+  images: string[];
   inputPath: string;
   outputPath: string;
   outputImgUrls: string[];

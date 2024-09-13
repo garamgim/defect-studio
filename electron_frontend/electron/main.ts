@@ -93,6 +93,8 @@ app.on('activate', () => {
   }
 });
 
+app.whenReady().then(createWindow);
+
 ipcMain.handle('get-files-in-folder', async (_, folderPath) => {
   try {
     const files = fs.readdirSync(folderPath);
@@ -100,11 +102,27 @@ ipcMain.handle('get-files-in-folder', async (_, folderPath) => {
       const ext = path.extname(file).toLowerCase();
       return ['.jpg', '.jpeg', '.png', '.gif'].includes(ext);
     });
-    return imageFiles;
+
+    // 파일을 읽고 File-like 객체로 변환하여 반환
+    const fileDataPromises = imageFiles.map((fileName) => {
+      const filePath = path.join(folderPath, fileName);
+      const fileBuffer = fs.readFileSync(filePath);
+      const fileData = {
+        name: fileName,
+        type: 'image/' + path.extname(fileName).slice(1),
+        size: fileBuffer.length,
+        data: fileBuffer.toString('base64') // base64로 인코딩하여 전송
+      };
+      return fileData;
+    });
+
+    return fileDataPromises; // 파일 데이터 배열 반환
   } catch (error) {
     console.error('Error reading folder:', error);
     return [];
   }
 });
 
-app.whenReady().then(createWindow);
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});

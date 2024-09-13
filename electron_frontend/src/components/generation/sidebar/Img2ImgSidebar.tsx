@@ -14,7 +14,9 @@ import {
   setBatchCount,
   setBatchSize,
   setImages,
-  setClipData
+  setClipData,
+  setInputPath,
+  setOutputPath
 } from '../../../store/slices/generation/img2ImgSlice';
 import ModelParams from '../params/ModelParam';
 import UploadImgParams from '../params/UploadImgParams';
@@ -39,7 +41,9 @@ const Img2ImgSidebar = () => {
     guidanceScale,
     strength,
     batchCount,
-    batchSize
+    batchSize,
+    inputPath,
+    outputPath
   } = useSelector((state: RootState) => state.img2Img);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
@@ -63,9 +67,9 @@ const Img2ImgSidebar = () => {
 
         try {
           // Base64을 Blob으로 변환 후 getClip 호출
-          console.log('파일: ', file)
+          console.log('파일: ', file);
           const response = await getClip([file]); // 파일 배열로 전달
-          console.log('결과: ', response)
+          console.log('결과: ', response);
           dispatch(setClipData(response)); // 클립 결과를 Redux 상태에 저장
         } catch (error) {
           console.error('Failed to get clip data:', error);
@@ -75,7 +79,7 @@ const Img2ImgSidebar = () => {
     };
     reader.readAsDataURL(file); // 파일을 Base64로 변환
   };
-  
+
   return (
     <div className="w-full h-full mr-6">
       <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
@@ -85,7 +89,18 @@ const Img2ImgSidebar = () => {
         <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
         {/* 이미지 업로드 */}
-        <UploadImgParams handleImageUpload={handleImageUpload} imagePreview={imageSrc} />
+        <UploadImgParams
+          handleImageUpload={handleImageUpload}
+          imagePreview={imageSrc}
+          inputPath={inputPath}
+          outputPath={outputPath}
+          setInputPath={(value: string) => {
+            dispatch(setInputPath(value));
+          }}
+          setOutputPath={(value: string) => {
+            dispatch(setOutputPath(value));
+          }}
+        />
 
         {level === 'Advanced' && (
           <>
@@ -145,4 +160,3 @@ const Img2ImgSidebar = () => {
 };
 
 export default Img2ImgSidebar;
-

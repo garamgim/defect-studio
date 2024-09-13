@@ -32,16 +32,36 @@ const Img2ImgLayout = () => {
     batchCount,
     batchSize,
     outputPath,
-    clipData
+    clipData,
+    mode
   } = useSelector((state: RootState) => state.img2Img);
 
   const handleNegativePromptChange = () => {
     dispatch(setIsNegativePrompt(!isNegativePrompt));
   };
 
+  let files;
+
   const handleGenerate = async () => {
-    // Base64 문자열을 파일로 변환
-    const files = images.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+    if (mode === 'manual') {
+      files = images.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+    } else {
+      const fileDataArray = (await window.electron.getFilesInFolder(inputPath)) as FileData[];
+
+      // base64 데이터를 Blob으로 변환하고 File 객체로 생성
+      files = fileDataArray.map((fileData) => {
+        const byteString = atob(fileData.data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uintArray = new Uint8Array(arrayBuffer);
+
+        for (let i = 0; i < byteString.length; i++) {
+          uintArray[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([arrayBuffer], { type: fileData.type });
+        return new File([blob], fileData.name, { type: fileData.type });
+      });
+    }
 
     const data = {
       model,
