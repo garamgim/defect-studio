@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface CleanupState {
-  images: string[];
-  masks: string[];
+  initImageList: string[];
+  maskImageList: string[];
   outputImgUrls: string[];
 }
 
 const initialState: CleanupState = {
-  images: [],
-  masks: [],
+  initImageList: [],
+  maskImageList: [],
   outputImgUrls: []
 };
 
@@ -16,11 +16,11 @@ const cleanupSlice = createSlice({
   name: 'cleanup',
   initialState,
   reducers: {
-    setImages: (state, action: PayloadAction<string[]>) => {
-      state.images = action.payload;
+    setInitImageList: (state, action: PayloadAction<string[]>) => {
+      state.initImageList = action.payload;
     },
-    setMasks: (state, action: PayloadAction<string[]>) => {
-      state.masks = action.payload;
+    setMaskImageList: (state, action: PayloadAction<string[]>) => {
+      state.maskImageList = action.payload;
     },
     setOutputImgUrls: (state, action: PayloadAction<string[]>) => {
       state.outputImgUrls = action.payload;
@@ -28,6 +28,6 @@ const cleanupSlice = createSlice({
   }
 });
 
-export const { setImages, setMasks, setOutputImgUrls } = cleanupSlice.actions;
+export const { setInitImageList, setMaskImageList, setOutputImgUrls } = cleanupSlice.actions;
 
 export default cleanupSlice.reducer;

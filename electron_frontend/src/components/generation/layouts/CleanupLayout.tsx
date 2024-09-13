@@ -9,11 +9,11 @@ import CleanupDisplay from '../outputDisplay/CleanupDisplay';
 
 const Cleanup = () => {
   const dispatch = useDispatch();
-  const { images, masks } = useSelector((state: RootState) => state.cleanup);
+  const { initImageList, maskImageList } = useSelector((state: RootState) => state.cleanup);
 
   const handleGenerate = async () => {
-    const bgfiles = images.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
-    const canvasfiles = masks.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+    const bgfiles = initImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+    const canvasfiles = maskImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
 
     const data = {
       images: bgfiles,

@@ -15,8 +15,9 @@ import { saveImages } from '../../../store/slices/generation/maskingSlice';
 
 interface MaskingModalProps {
   onClose: () => void;
-  onApply: () => void;
   imageSrc: string;
+  setInitImageList: (value: string[]) => void;
+  setMaskImageList: (value: string[]) => void;
 }
 
 interface LineObject {
@@ -26,7 +27,7 @@ interface LineObject {
   fill?: string;
 }
 
-const MaskingModal = ({ onClose, onApply, imageSrc }: MaskingModalProps) => {
+const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }: MaskingModalProps) => {
   const [tool, setTool] = useState<'brush' | 'polygon' | 'select' | null>(null);
   const [isMovingPoints, setIsMovingPoints] = useState(false);
   const [brushSize, setBrushSize] = useState<number>(10);
@@ -182,11 +183,15 @@ const MaskingModal = ({ onClose, onApply, imageSrc }: MaskingModalProps) => {
           combinedImg: combinedImgBase64 // 배경 + 캔버스 합친 이미지
         })
       );
+
+      setInitImageList([backgroundImgBase64]);
+      setMaskImageList([canvasImgBase64]);
+
       console.log('Images saved to Redux store');
     } catch (error) {
       console.error('Error saving images:', error);
     } finally {
-      onApply();
+      onClose();
     }
   };
 
