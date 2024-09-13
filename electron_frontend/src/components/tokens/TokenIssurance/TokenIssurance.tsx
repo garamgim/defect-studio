@@ -1,4 +1,4 @@
-import SearchDepartments from './SearchDepartments';
+import SearchDepartments from '../common/SearchDepartments';
 import TokenIssueInput from './TokenIssueInput';
 import { convertDateToString } from '../../../utils/covertDateToString';
 import { useState } from 'react';
