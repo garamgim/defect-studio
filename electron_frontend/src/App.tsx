@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import store from './store/store'
+import store from './store/store';
 import Navbar from './components/common/Navbar';
 import Home from './pages/Home';
 import Generation from './pages/Generation';
