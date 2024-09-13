@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import UploadImage from '../params/UploadImgParams';
 import { useDispatch } from 'react-redux';
-import { setImages } from '../../../store/slices/generation/removeBgSlice'
+import { setImages } from '../../../store/slices/generation/removeBgSlice';
 
 const RemoveBgSidebar = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [imageSrc, setImageSrc] = useState<string | null>(null);
 
   const handleImageUpload = (file: File) => {
@@ -13,8 +13,8 @@ const RemoveBgSidebar = () => {
       const img = new Image();
       img.onload = () => {
         const imageDataUrl = reader.result as string;
-        setImageSrc(imageDataUrl);  
-        
+        setImageSrc(imageDataUrl);
+
         if (imageDataUrl) {
           dispatch(setImages([imageDataUrl]));
         }

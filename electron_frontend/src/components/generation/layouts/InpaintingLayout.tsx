@@ -45,6 +45,8 @@ const InpaintingLayout = () => {
     // Base64 문자열을 파일로 변환
     const bgfiles = initImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
     const canvasfiles = maskImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+    console.log('배경: ', bgfiles);
+    console.log('캔버스: ', canvasfiles);
 
     const data = {
       model,

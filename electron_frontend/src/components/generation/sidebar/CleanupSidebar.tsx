@@ -5,10 +5,11 @@ import { FormatPainterOutlined } from '@ant-design/icons';
 import { RootState } from '../../../store/store';
 import MaskingModal from '../masking/MaskingModal';
 import UploadImagePlusMask from '../params/UploadImgWithMaskingParams';
-import { setImages, setMasks } from '../../../store/slices/generation/cleanupSlice';
+import { setInitImageList, setMaskImageList } from '../../../store/slices/generation/cleanupSlice';
+import { saveImages } from '../../../store/slices/generation/maskingSlice';
 
 const CleanupSidebar = () => {
-  const { backgroundImg, canvasImg, combinedImg } = useSelector((state: RootState) => state.masking);
+  const { combinedImg } = useSelector((state: RootState) => state.masking);
 
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
@@ -21,6 +22,14 @@ const CleanupSidebar = () => {
       const img = new Image();
       img.onload = () => {
         setImageSrc(reader.result as string);
+
+        dispatch(
+          saveImages({
+            backgroundImg: null,
+            canvasImg: null,
+            combinedImg: null
+          })
+        );
       };
       img.src = reader.result as string;
     };
@@ -28,14 +37,6 @@ const CleanupSidebar = () => {
   };
 
   const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
-  const handleApply = () => {
-    if (backgroundImg && canvasImg) {
-      dispatch(setImages([backgroundImg]));
-      dispatch(setMasks([canvasImg]));
-    }
     setShowModal(false);
   };
 
@@ -74,7 +75,18 @@ const CleanupSidebar = () => {
       </div>
 
       {/* Masking 모달 창 */}
-      {showModal && imageSrc && <MaskingModal imageSrc={imageSrc} onClose={handleCloseModal} onApply={handleApply} />}
+      {showModal && imageSrc && (
+        <MaskingModal
+          imageSrc={imageSrc}
+          onClose={handleCloseModal}
+          setInitImageList={(value: string[]) => {
+            dispatch(setInitImageList(value));
+          }}
+          setMaskImageList={(value: string[]) => {
+            dispatch(setMaskImageList(value));
+          }}
+        />
+      )}
     </div>
   );
 };

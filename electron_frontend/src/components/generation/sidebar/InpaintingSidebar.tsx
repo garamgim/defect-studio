@@ -12,6 +12,7 @@ import StrengthParam from '../params/StrengthParam';
 import GuidanceScaleParms from '../params/GuidanceScaleParam';
 import UploadImgWithMaskingParams from '../params/UploadImgWithMaskingParams';
 import { useSelector, useDispatch } from 'react-redux';
+import { saveImages } from '../../../store/slices/generation/maskingSlice';
 import {
   setModel,
   setScheduler,
@@ -31,7 +32,7 @@ import {
 import { getClip } from '../../../api/generation';
 
 const InpaintingSidebar = () => {
-  const { backgroundImg, canvasImg, combinedImg } = useSelector((state: RootState) => state.masking);
+  const { combinedImg } = useSelector((state: RootState) => state.masking);
 
   const dispatch = useDispatch();
   const {
@@ -45,8 +46,7 @@ const InpaintingSidebar = () => {
     guidanceScale,
     strength,
     batchCount,
-    batchSize,
-    initImageList
+    batchSize
   } = useSelector((state: RootState) => state.inpainting);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
@@ -69,11 +69,19 @@ const InpaintingSidebar = () => {
         setImageSrc(base64String);
         console.log('Base64 String:', base64String); // Base64 문자열 출력
 
+        dispatch(
+          saveImages({
+            backgroundImg: null,
+            canvasImg: null,
+            combinedImg: null
+          })
+        );
+
         try {
           // Base64을 Blob으로 변환 후 getClip 호출
-          console.log('파일: ', file)
+          console.log('파일: ', file);
           const response = await getClip([file]); // 파일 배열로 전달
-          console.log('결과: ', response)
+          console.log('결과: ', response);
           dispatch(setClipData(response)); // 클립 결과를 Redux 상태에 저장
         } catch (error) {
           console.error('Failed to get clip data:', error);
@@ -83,7 +91,7 @@ const InpaintingSidebar = () => {
     };
     reader.readAsDataURL(file); // 파일을 Base64로 변환
   };
-  
+
   // const handleDownloadImage = (url: string | null, filename: string) => {
   //   if (url) {
   //     const link = document.createElement('a');
@@ -104,15 +112,6 @@ const InpaintingSidebar = () => {
   // };
 
   const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
-  const handleApply = () => {
-    if (backgroundImg && canvasImg) {
-      dispatch(setInitImageList([backgroundImg]));
-      dispatch(setMaskImageList([canvasImg]));
-      console.log("확인: ", initImageList)
-    }
     setShowModal(false);
   };
 
@@ -151,8 +150,8 @@ const InpaintingSidebar = () => {
                 <img src={combinedImg} alt="Inpainting Result" className="w-full h-full object-cover rounded-lg" />
               </div>
             )}
-
-            {/* <div className="mt-4 flex flex-col space-y-2">
+            {/* 
+            <div className="mt-4 flex flex-col space-y-2">
               {backgroundImg && (
                 <Button type="default" onClick={handleDownloadbackgroundImg} className="w-full">
                   Download Stage Image
@@ -223,7 +222,18 @@ const InpaintingSidebar = () => {
       </div>
 
       {/* Masking 모달 창 */}
-      {showModal && imageSrc && <MaskingModal imageSrc={imageSrc} onClose={handleCloseModal} onApply={handleApply} />}
+      {showModal && imageSrc && (
+        <MaskingModal
+          imageSrc={imageSrc}
+          onClose={handleCloseModal}
+          setInitImageList={(value: string[]) => {
+            dispatch(setInitImageList(value));
+          }}
+          setMaskImageList={(value: string[]) => {
+            dispatch(setMaskImageList(value));
+          }}
+        />
+      )}
     </div>
   );
 };
