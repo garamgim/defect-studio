@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.token-tab-default {
+  @apply inline-block p-4 font-samsung text-[15px];
+}
+
+.token-tab-inactive {
+  @apply text-[#b2b2b2] dark:text-gray-300;
+}
+
+.token-tab-inactive:hover {
+  @apply bg-gray-300 hover:dark:bg-slate-800 border-b-2 border-black dark:border-white;
+}
+
+.token-tab-active {
+  @apply border-b-2 text-black dark:text-white font-bold border-black dark:border-white;
+}

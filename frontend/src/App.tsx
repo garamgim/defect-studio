@@ -6,38 +6,80 @@ import Home from './pages/Home';
 import Generation from './pages/Generation';
 import Training from './pages/Training';
 import Model from './pages/Model';
-import Settings from './pages/Settings';
-import Docs from './pages/Docs';
+import Tokens from './pages/Tokens';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import { FabricProvider } from './contexts/FabricContext';
+import PrivateRoute from './components/routing/PrivateRoute';
+import Settings from './pages/Settings';
 
 function AppContent() {
   return (
-    <div>
+    <>
       <Navbar />
       <div className="pt-[60px]">
         <Routes>
-          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/generation/*" element={<Generation />} />
-          <Route path="/training" element={<Training />} />
-          <Route path="/model" element={<Model />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/docs" element={<Docs />} />
+
+          {/* 로그인 안한경우 접근 불가 */}
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/generation/*"
+            element={
+              <PrivateRoute>
+                <Generation />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/training"
+            element={
+              <PrivateRoute>
+                <Training />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/model"
+            element={
+              <PrivateRoute>
+                <Model />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <PrivateRoute>
+                <Settings />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/tokens"
+            element={
+              <PrivateRoute>
+                <Tokens />
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </div>
-    </div>
+    </>
   );
 }
 
 function App() {
   return (
     <Provider store={store}>
-      <FabricProvider>
-        <AppContent />
-      </FabricProvider>
+      <AppContent />
     </Provider>
   );
 }
