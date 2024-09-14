@@ -1,9 +1,9 @@
-// global.d.ts
 export {};
 
 declare global {
   interface Window {
     electron: {
+      selectFolder(): Promise<string | null>;
       getFilesInFolder: (folderPath: string) => Promise<FileData[]>;
     };
   }
@@ -12,6 +12,6 @@ declare global {
     name: string;
     type: string;
     size: number;
-    data: string; // base64 encoded data
+    data: string; // base64
   }
 }

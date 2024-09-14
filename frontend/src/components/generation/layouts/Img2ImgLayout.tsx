@@ -46,7 +46,7 @@ const Img2ImgLayout = () => {
     if (mode === 'manual') {
       files = images.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
     } else {
-      const fileDataArray = (await window.electron.getFilesInFolder(inputPath)) as FileData[];
+      const fileDataArray = await window.electron.getFilesInFolder(inputPath);
 
       // base64 데이터를 Blob으로 변환하고 File 객체로 생성
       files = fileDataArray.map((fileData) => {
@@ -82,10 +82,8 @@ const Img2ImgLayout = () => {
     };
 
     try {
-      // API 호출
       const outputImgUrls = await postImg2ImgGeneration('remote', data);
       console.log('Generated image URLs:', outputImgUrls);
-      // 결과 이미지를 상태에 저장
       dispatch(setOutputImgUrls(outputImgUrls));
     } catch (error) {
       console.error('Error generating image:', error);

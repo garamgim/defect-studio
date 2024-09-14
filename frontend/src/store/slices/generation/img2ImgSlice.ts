@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Img2ImgState {
-  mode: 'manual' | 'batch'; // 메뉴얼/배치 모두 구분
+  mode: 'manual' | 'batch'; // 메뉴얼/배치 모드 구분
   model: string;
   scheduler: string;
   prompt: string;
@@ -50,8 +50,8 @@ const img2ImgSlice = createSlice({
   name: 'img2Img',
   initialState,
   reducers: {
-    setMode: (state, action: PayloadAction<'maual' | 'batch'>) => {
-      state.model = action.payload;
+    setMode: (state, action: PayloadAction<'manual' | 'batch'>) => {
+      state.mode = action.payload;
     },
     setModel: (state, action: PayloadAction<string>) => {
       state.model = action.payload;
@@ -120,6 +120,7 @@ const img2ImgSlice = createSlice({
 });
 
 export const {
+  setMode,
   setModel,
   setScheduler,
   setPrompt,

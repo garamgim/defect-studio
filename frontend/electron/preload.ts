@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld('electron', {
     }
   },
 
-  // Expose custom APIs
+  // 파일 선택과 같은 사용자 정의 API
+  selectFolder: () => ipcRenderer.invoke('select-folder'),
   getFilesInFolder: (folderPath: string) => ipcRenderer.invoke('get-files-in-folder', folderPath)
 });

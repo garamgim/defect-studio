@@ -14,9 +14,10 @@ import {
   setBatchCount,
   setBatchSize,
   setImages,
-  setClipData,
+  // setClipData,
   setInputPath,
-  setOutputPath
+  setOutputPath,
+  setMode
 } from '../../../store/slices/generation/img2ImgSlice';
 import ModelParams from '../params/ModelParam';
 import UploadImgParams from '../params/UploadImgParams';
@@ -26,7 +27,7 @@ import SamplingParams from '../params/SamplingParams';
 import SeedParam from '../params/SeedParam';
 import BatchParams from '../params/BatchParams';
 import GuidanceScaleParam from '../params/GuidanceScaleParam';
-import { getClip } from '../../../api/generation';
+// import { getClip } from '../../../api/generation';
 
 const Img2ImgSidebar = () => {
   const dispatch = useDispatch();
@@ -62,15 +63,12 @@ const Img2ImgSidebar = () => {
       const img = new Image();
       img.onload = async () => {
         setImageSrc(base64String);
-        console.log('Base64 String:', base64String); // Base64 문자열 출력
         dispatch(setImages([base64String])); // Redux 상태에 Base64 문자열 저장
 
         try {
           // Base64을 Blob으로 변환 후 getClip 호출
-          console.log('파일: ', file);
-          const response = await getClip([file]); // 파일 배열로 전달
-          console.log('결과: ', response);
-          dispatch(setClipData(response)); // 클립 결과를 Redux 상태에 저장
+          // const response = await getClip([file]); // 파일 배열로 전달
+          // dispatch(setClipData(response)); // 클립 결과를 Redux 상태에 저장
         } catch (error) {
           console.error('Failed to get clip data:', error);
         }
@@ -99,6 +97,9 @@ const Img2ImgSidebar = () => {
           }}
           setOutputPath={(value: string) => {
             dispatch(setOutputPath(value));
+          }}
+          setMode={(value: 'manual' | 'batch') => {
+            dispatch(setMode(value));
           }}
         />
 

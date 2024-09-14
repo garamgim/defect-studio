@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, MenuItemConstructorOptions, ipcMain } from 'electron';
+import { app, BrowserWindow, Menu, MenuItemConstructorOptions, ipcMain, dialog } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import fs from 'fs';
@@ -95,6 +95,18 @@ app.on('activate', () => {
 
 app.whenReady().then(createWindow);
 
+ipcMain.handle('select-folder', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory'] // 폴더 선택 가능
+  });
+
+  if (result.canceled || result.filePaths.length === 0) {
+    return null; // 사용자가 폴더 선택을 취소했을 경우
+  }
+
+  return result.filePaths[0]; // 선택된 폴더의 경로 반환
+});
+
 ipcMain.handle('get-files-in-folder', async (_, folderPath) => {
   try {
     const files = fs.readdirSync(folderPath);
@@ -121,8 +133,4 @@ ipcMain.handle('get-files-in-folder', async (_, folderPath) => {
     console.error('Error reading folder:', error);
     return [];
   }
-});
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
 });
