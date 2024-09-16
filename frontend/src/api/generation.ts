@@ -179,6 +179,7 @@ export const getClip = async (imageFiles: File[]): Promise<string[]> => {
     });
 
     if (response.status === 201) {
+      console.log(response.data.generated_prompts);
       return response.data.generated_prompts;
     } else {
       throw new Error('Failed to get generated prompts');

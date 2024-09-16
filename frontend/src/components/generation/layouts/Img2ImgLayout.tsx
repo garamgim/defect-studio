@@ -8,12 +8,14 @@ import {
   setIsNegativePrompt,
   setOutputImgUrls,
   setIsLoading,
-  setUploadImgsCount
+  setUploadImgsCount,
+  setClipData
 } from '../../../store/slices/generation/img2ImgSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { postImg2ImgGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import GenerateButton from '../../common/GenerateButton';
+import { getClip } from '../../../api/generation';
 
 const Img2ImgLayout = () => {
   const dispatch = useDispatch();
@@ -89,12 +91,31 @@ const Img2ImgLayout = () => {
     try {
       dispatch(setIsLoading(true));
       const outputImgUrls = await postImg2ImgGeneration('remote', data);
-      console.log('Generated image URLs:', outputImgUrls);
       dispatch(setOutputImgUrls(outputImgUrls));
     } catch (error) {
       console.error('Error generating image:', error);
     } finally {
       dispatch(setIsLoading(false));
+    }
+  };
+
+  // Clip아이콘 클릭
+  const handleClipClick = async () => {
+    // clipData가 빈 배열일 때만 getClip 실행
+    if (clipData.length === 0) {
+      try {
+        if (images.length > 0) {
+          const file = convertStringToFile(images[0], 'image.png');
+
+          const generatedPrompts = await getClip([file]);
+          dispatch(setClipData(generatedPrompts));
+          console.log('clip 갱신: ', clipData);
+        } else {
+          console.error('No image available for clip generation');
+        }
+      } catch (error) {
+        console.error('Error generating clip data:', error);
+      }
     }
   };
 
@@ -115,15 +136,17 @@ const Img2ImgLayout = () => {
           <PromptParams
             prompt={prompt}
             negativePrompt={negativePrompt}
-            setPrompt={(value) => {
+            setPrompt={(value: string) => {
               dispatch(setPrompt(value));
             }}
-            setNegativePrompt={(value) => {
+            setNegativePrompt={(value: string) => {
               dispatch(setNegativePrompt(value));
             }}
             isNegativePrompt={isNegativePrompt}
             handleNegativePromptChange={handleNegativePromptChange}
-            clipData={clipData}
+            // 메뉴얼 모드일 때만 props로 전달(batch에서는 clip실행 안함)
+            clipData={mode === 'manual' ? clipData : []}
+            handleClipClick={mode === 'manual' ? handleClipClick : undefined}
           />
         </div>
       </div>

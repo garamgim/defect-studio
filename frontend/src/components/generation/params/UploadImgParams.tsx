@@ -1,5 +1,4 @@
 import { Tabs, Upload, Input, Button } from 'antd';
-import type { UploadProps } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { FiFolderPlus } from 'react-icons/fi';
 
@@ -22,9 +21,9 @@ const UploadImgParams = ({
   setOutputPath,
   setMode
 }: UploadImgParamsProps) => {
-  const uploadProps: UploadProps = {
+  const uploadProps = {
     accept: 'image/*',
-    beforeUpload: (file) => {
+    beforeUpload: (file: File) => {
       handleImageUpload(file);
       return false;
     },

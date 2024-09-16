@@ -6,12 +6,16 @@ import {
   setPrompt,
   setNegativePrompt,
   setIsNegativePrompt,
-  setOutputImgUrls
+  setOutputImgUrls,
+  setClipData,
+  setIsLoading,
+  setUploadImgsCount
 } from '../../../store/slices/generation/inpaintingSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { postInpaintingGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import GenerateButton from '../../common/GenerateButton';
+import { getClip } from '../../../api/generation';
 
 const InpaintingLayout = () => {
   const dispatch = useDispatch();
@@ -34,17 +38,55 @@ const InpaintingLayout = () => {
     batchCount,
     batchSize,
     outputPath,
-    clipData
+    clipData,
+    mode,
+    isLoading
   } = useSelector((state: RootState) => state.inpainting);
 
   const handleNegativePromptChange = () => {
     dispatch(setIsNegativePrompt(!isNegativePrompt));
   };
 
+  let bgFiles;
+  let canvasFiles;
+
   const handleGenerate = async () => {
-    // Base64 문자열을 파일로 변환
-    const bgfiles = initImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
-    const canvasfiles = maskImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+    if (mode === 'manual') {
+      bgFiles = initImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+      canvasFiles = maskImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+      dispatch(setUploadImgsCount(batchCount * batchSize));
+    } else {
+      const bgFileDataArray = await window.electron.getFilesInFolder(initInputPath);
+      const maskFileDataArray = await window.electron.getFilesInFolder(maskInputPath);
+      dispatch(setUploadImgsCount(bgFileDataArray.length * batchCount * batchSize));
+
+      // base64 데이터를 Blob으로 변환하고 File 객체로 생성
+      bgFiles = bgFileDataArray.map((fileData) => {
+        const byteString = atob(fileData.data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uintArray = new Uint8Array(arrayBuffer);
+
+        for (let i = 0; i < byteString.length; i++) {
+          uintArray[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([arrayBuffer], { type: fileData.type });
+        return new File([blob], fileData.name, { type: fileData.type });
+      });
+
+      canvasFiles = maskFileDataArray.map((fileData) => {
+        const byteString = atob(fileData.data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uintArray = new Uint8Array(arrayBuffer);
+
+        for (let i = 0; i < byteString.length; i++) {
+          uintArray[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([arrayBuffer], { type: fileData.type });
+        return new File([blob], fileData.name, { type: fileData.type });
+      });
+    }
 
     const data = {
       model,
@@ -60,20 +102,40 @@ const InpaintingLayout = () => {
       batch_size: batchSize,
       output_path: outputPath,
       strength,
-      init_image_list: bgfiles,
-      mask_image_list: canvasfiles,
+      init_image_list: bgFiles,
+      mask_image_list: canvasFiles,
       init_input_path: initInputPath,
       mask_input_path: maskInputPath
     };
 
     try {
-      // API 호출
+      dispatch(setIsLoading(true));
       const outputImgUrls = await postInpaintingGeneration('remote', data);
-      console.log('Generated image URLs:', outputImgUrls);
-      // 결과 이미지를 상태에 저장
       dispatch(setOutputImgUrls(outputImgUrls));
     } catch (error) {
       console.error('Error generating image:', error);
+    } finally {
+      dispatch(setIsLoading(false));
+    }
+  };
+
+  // Clip아이콘 클릭
+  const handleClipClick = async () => {
+    // clipData가 빈 배열일 때만 getClip 실행
+    if (clipData.length === 0) {
+      try {
+        if (initImageList.length > 0) {
+          const file = convertStringToFile(initImageList[0], 'image.png');
+
+          const generatedPrompts = await getClip([file]);
+          dispatch(setClipData(generatedPrompts));
+          console.log('clip 갱신: ', clipData);
+        } else {
+          console.error('No image available for clip generation');
+        }
+      } catch (error) {
+        console.error('Error generating clip data:', error);
+      }
     }
   };
 
@@ -98,14 +160,16 @@ const InpaintingLayout = () => {
             setPrompt={(value) => dispatch(setPrompt(value))}
             setNegativePrompt={(value) => dispatch(setNegativePrompt(value))}
             handleNegativePromptChange={handleNegativePromptChange}
-            clipData={clipData}
+            // 메뉴얼 모드일 때만 props로 전달(batch에서는 clip실행 안함)
+            clipData={mode === 'manual' ? clipData : []}
+            handleClipClick={mode === 'manual' ? handleClipClick : undefined}
           />
         </div>
       </div>
 
       {/* Generate 버튼 */}
       <div className="fixed bottom-[50px] right-[56px]">
-        <GenerateButton onClick={handleGenerate} />
+        <GenerateButton onClick={handleGenerate} disabled={isLoading} />
       </div>
     </div>
   );

@@ -3,16 +3,36 @@ import GenerateButton from '../../common/GenerateButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import { postRemoveBgGeneration } from '../../../api/generation';
-import { setOutputImgUrls } from '../../../store/slices/generation/removeBgSlice';
+import { setOutputImgUrls, setIsLoading } from '../../../store/slices/generation/removeBgSlice';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import RemoveBgDisplay from '../outputDisplay/RemoveBgDisplay';
 
 const RemoveBackground = () => {
   const dispatch = useDispatch();
-  const { images, inputPath, outputPath } = useSelector((state: RootState) => state.removeBg);
+  const { images, inputPath, outputPath, isLoading, mode } = useSelector((state: RootState) => state.removeBg);
+
+  let files;
 
   const handleGenerate = async () => {
-    const files = images.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+    if (mode === 'manual') {
+      files = images.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+    } else {
+      const fileDataArray = await window.electron.getFilesInFolder(inputPath);
+
+      // base64 데이터를 Blob으로 변환하고 File 객체로 생성
+      files = fileDataArray.map((fileData) => {
+        const byteString = atob(fileData.data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uintArray = new Uint8Array(arrayBuffer);
+
+        for (let i = 0; i < byteString.length; i++) {
+          uintArray[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([arrayBuffer], { type: fileData.type });
+        return new File([blob], fileData.name, { type: fileData.type });
+      });
+    }
 
     const data = {
       images: files,
@@ -21,12 +41,13 @@ const RemoveBackground = () => {
     };
 
     try {
+      dispatch(setIsLoading(true));
       const outputImgUrls = await postRemoveBgGeneration('remote', data);
-      console.log('Background removed image URLs:', outputImgUrls);
-
       dispatch(setOutputImgUrls(outputImgUrls));
     } catch (error) {
       console.error('Error removing background:', error);
+    } finally {
+      dispatch(setIsLoading(false));
     }
   };
 
@@ -44,7 +65,7 @@ const RemoveBackground = () => {
 
       {/* Generate 버튼 */}
       <div className="fixed bottom-[60px] ml-[180px]">
-        <GenerateButton onClick={handleGenerate} />
+        <GenerateButton onClick={handleGenerate} disabled={isLoading} />
       </div>
     </div>
   );

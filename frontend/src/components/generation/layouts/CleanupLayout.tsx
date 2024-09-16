@@ -3,29 +3,68 @@ import Sidebar from '../sidebar/CleanupSidebar';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import { postCleanupGeneration } from '../../../api/generation';
-import { setOutputImgUrls } from '../../../store/slices/generation/cleanupSlice';
+import { setOutputImgUrls, setIsLoading } from '../../../store/slices/generation/cleanupSlice';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import CleanupDisplay from '../outputDisplay/CleanupDisplay';
 
 const Cleanup = () => {
   const dispatch = useDispatch();
-  const { initImageList, maskImageList } = useSelector((state: RootState) => state.cleanup);
+  const { initImageList, maskImageList, mode, initInputPath, maskInputPath, isLoading } = useSelector(
+    (state: RootState) => state.cleanup
+  );
+
+  let bgFiles;
+  let canvasFiles;
 
   const handleGenerate = async () => {
-    const bgfiles = initImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
-    const canvasfiles = maskImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+    if (mode === 'manual') {
+      bgFiles = initImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+      canvasFiles = maskImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+    } else {
+      const bgFileDataArray = await window.electron.getFilesInFolder(initInputPath);
+      const maskFileDataArray = await window.electron.getFilesInFolder(maskInputPath);
+
+      // base64 데이터를 Blob으로 변환하고 File 객체로 생성
+      bgFiles = bgFileDataArray.map((fileData) => {
+        const byteString = atob(fileData.data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uintArray = new Uint8Array(arrayBuffer);
+
+        for (let i = 0; i < byteString.length; i++) {
+          uintArray[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([arrayBuffer], { type: fileData.type });
+        return new File([blob], fileData.name, { type: fileData.type });
+      });
+
+      canvasFiles = maskFileDataArray.map((fileData) => {
+        const byteString = atob(fileData.data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uintArray = new Uint8Array(arrayBuffer);
+
+        for (let i = 0; i < byteString.length; i++) {
+          uintArray[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([arrayBuffer], { type: fileData.type });
+        return new File([blob], fileData.name, { type: fileData.type });
+      });
+    }
 
     const data = {
-      images: bgfiles,
-      masks: canvasfiles
+      images: bgFiles,
+      masks: canvasFiles
     };
 
     try {
+      dispatch(setIsLoading(true));
       const outputImgUrls = await postCleanupGeneration('remote', data);
-      console.log('Cleanup image URLs:', outputImgUrls);
       dispatch(setOutputImgUrls(outputImgUrls));
     } catch (error) {
       console.error('Error cleaning up image:', error);
+    } finally {
+      dispatch(setIsLoading(false));
     }
   };
 
@@ -43,7 +82,7 @@ const Cleanup = () => {
 
       {/* Generate 버튼 */}
       <div className="fixed bottom-[60px] ml-[180px]">
-        <GenerateButton onClick={handleGenerate} />
+        <GenerateButton onClick={handleGenerate} disabled={isLoading} />
       </div>
     </div>
   );

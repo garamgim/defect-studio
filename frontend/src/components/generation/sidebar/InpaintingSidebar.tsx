@@ -27,9 +27,12 @@ import {
   setBatchSize,
   setInitImageList,
   setMaskImageList,
-  setClipData
+  setClipData,
+  setInitInputPath,
+  setMaskInputPath,
+  setOutputPath,
+  setMode
 } from '../../../store/slices/generation/inpaintingSlice';
-import { getClip } from '../../../api/generation';
 
 const InpaintingSidebar = () => {
   const { combinedImg } = useSelector((state: RootState) => state.masking);
@@ -46,14 +49,17 @@ const InpaintingSidebar = () => {
     guidanceScale,
     strength,
     batchCount,
-    batchSize
+    batchSize,
+    initInputPath,
+    maskInputPath,
+    outputPath,
+    mode
   } = useSelector((state: RootState) => state.inpainting);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
   const [showModal, setShowModal] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('manual');
 
   const handleRandomSeedChange = () => {
     setIsRandomSeed(!isRandomSeed);
@@ -63,11 +69,12 @@ const InpaintingSidebar = () => {
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-      const base64String = reader.result as string; // 변환된 Base64 문자열
+      const base64String = reader.result as string;
       const img = new Image();
       img.onload = async () => {
+        dispatch(setClipData([]));
         setImageSrc(base64String);
-        console.log('Base64 String:', base64String); // Base64 문자열 출력
+        dispatch(setInitImageList([base64String]));
 
         dispatch(
           saveImages({
@@ -76,38 +83,11 @@ const InpaintingSidebar = () => {
             combinedImg: null
           })
         );
-
-        try {
-          // Base64을 Blob으로 변환 후 getClip 호출
-          const response = await getClip([file]); // 파일 배열로 전달
-          dispatch(setClipData(response)); // 클립 결과를 Redux 상태에 저장
-        } catch (error) {
-          console.error('Failed to get clip data:', error);
-        }
       };
       img.src = base64String;
     };
-    reader.readAsDataURL(file); // 파일을 Base64로 변환
+    reader.readAsDataURL(file);
   };
-
-  // const handleDownloadImage = (url: string | null, filename: string) => {
-  //   if (url) {
-  //     const link = document.createElement('a');
-  //     link.href = url;
-  //     link.download = filename;
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     document.body.removeChild(link);
-  //   }
-  // };
-
-  // const handleDownloadbackgroundImg = () => {
-  //   handleDownloadImage(backgroundImg, 'stage_image.png'); // backgroundImg 다운로드
-  // };
-
-  // const handleDownloadcanvasImg = () => {
-  //   handleDownloadImage(canvasImg, 'canvas_image.png'); // canvasImg 다운로드
-  // };
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -125,13 +105,27 @@ const InpaintingSidebar = () => {
         <UploadImgWithMaskingParams
           handleImageUpload={handleImageUpload}
           imagePreview={imageSrc}
-          setActiveTab={setActiveTab}
+          initInputPath={initInputPath}
+          maskInputPath={maskInputPath}
+          outputPath={outputPath}
+          setInitInputPath={(value: string) => {
+            dispatch(setInitInputPath(value));
+          }}
+          setMaskInputPath={(value: string) => {
+            dispatch(setMaskInputPath(value));
+          }}
+          setOutputPath={(value: string) => {
+            dispatch(setOutputPath(value));
+          }}
+          setMode={(value: 'manual' | 'batch') => {
+            dispatch(setMode(value));
+          }}
         />
 
         {imageSrc && (
           <div className="px-6 pb-10">
             {/* Start Masking 버튼 */}
-            {activeTab === 'manual' && (
+            {mode === 'manual' && (
               <Button
                 type="primary"
                 icon={<FormatPainterOutlined />}
@@ -148,20 +142,6 @@ const InpaintingSidebar = () => {
                 <img src={combinedImg} alt="Inpainting Result" className="w-full h-full object-cover rounded-lg" />
               </div>
             )}
-            {/* 
-            <div className="mt-4 flex flex-col space-y-2">
-              {backgroundImg && (
-                <Button type="default" onClick={handleDownloadbackgroundImg} className="w-full">
-                  Download Stage Image
-                </Button>
-              )}
-
-              {canvasImg && (
-                <Button type="default" onClick={handleDownloadcanvasImg} className="w-full">
-                  Download Canvas Image
-                </Button>
-              )}
-            </div> */}
           </div>
         )}
 

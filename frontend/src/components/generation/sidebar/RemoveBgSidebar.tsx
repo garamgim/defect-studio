@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import UploadImage from '../params/UploadImgParams';
 import { useDispatch } from 'react-redux';
-import { setImages, setInputPath, setOutputPath } from '../../../store/slices/generation/removeBgSlice';
+import { setImages, setInputPath, setOutputPath, setMode } from '../../../store/slices/generation/removeBgSlice';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 
@@ -13,14 +13,11 @@ const RemoveBgSidebar = () => {
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
+      const base64String = reader.result as string;
       const img = new Image();
       img.onload = () => {
-        const imageDataUrl = reader.result as string;
-        setImageSrc(imageDataUrl);
-
-        if (imageDataUrl) {
-          dispatch(setImages([imageDataUrl]));
-        }
+        setImageSrc(base64String);
+        dispatch(setImages([base64String]));
       };
       img.src = reader.result as string;
     };
@@ -41,6 +38,9 @@ const RemoveBgSidebar = () => {
           }}
           setOutputPath={(value: string) => {
             dispatch(setOutputPath(value));
+          }}
+          setMode={(value: 'manual' | 'batch') => {
+            dispatch(setMode(value));
           }}
         />
       </div>

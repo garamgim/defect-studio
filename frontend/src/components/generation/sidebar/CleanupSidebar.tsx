@@ -5,23 +5,33 @@ import { FormatPainterOutlined } from '@ant-design/icons';
 import { RootState } from '../../../store/store';
 import MaskingModal from '../masking/MaskingModal';
 import UploadImagePlusMask from '../params/UploadImgWithMaskingParams';
-import { setInitImageList, setMaskImageList } from '../../../store/slices/generation/cleanupSlice';
+import {
+  setInitImageList,
+  setMaskImageList,
+  setInitInputPath,
+  setMaskInputPath,
+  setOutputPath,
+  setMode
+} from '../../../store/slices/generation/cleanupSlice';
 import { saveImages } from '../../../store/slices/generation/maskingSlice';
 
 const CleanupSidebar = () => {
+  const { initInputPath, maskInputPath, outputPath, mode } = useSelector((state: RootState) => state.cleanup);
+
   const { combinedImg } = useSelector((state: RootState) => state.masking);
 
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('manual');
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
+      const base64String = reader.result as string;
       const img = new Image();
       img.onload = () => {
-        setImageSrc(reader.result as string);
+        setImageSrc(base64String);
+        dispatch(setInitImageList([base64String]));
 
         dispatch(
           saveImages({
@@ -47,13 +57,27 @@ const CleanupSidebar = () => {
         <UploadImagePlusMask
           handleImageUpload={handleImageUpload}
           imagePreview={imageSrc}
-          setActiveTab={setActiveTab}
+          initInputPath={initInputPath}
+          maskInputPath={maskInputPath}
+          outputPath={outputPath}
+          setInitInputPath={(value: string) => {
+            dispatch(setInitInputPath(value));
+          }}
+          setMaskInputPath={(value: string) => {
+            dispatch(setMaskInputPath(value));
+          }}
+          setOutputPath={(value: string) => {
+            dispatch(setOutputPath(value));
+          }}
+          setMode={(value: 'manual' | 'batch') => {
+            dispatch(setMode(value));
+          }}
         />
 
         {imageSrc && (
           <div className="px-6 pb-10">
             {/* Start Masking 버튼 */}
-            {activeTab === 'manual' && (
+            {mode === 'manual' && (
               <Button
                 type="primary"
                 icon={<FormatPainterOutlined />}

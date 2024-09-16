@@ -21,8 +21,10 @@ interface Img2ImgState {
   isNegativePrompt: boolean;
   outputImgUrls: string[]; // 생성된 이미지 배열
   clipData: string[];
+
+  // skeleton ui에 이용
   isLoading: boolean;
-  uploadImgsCount: number; // 배치모드일 경우 생성할 이미지 개수 계산을 위해 추가(skeleton ui에 이용)
+  uploadImgsCount: number;
 }
 
 const initialState: Img2ImgState = {

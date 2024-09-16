@@ -9,7 +9,7 @@ import {
   setOutputImgUrls,
   setIsLoading
 } from '../../../store/slices/generation/txt2ImgSlice';
-import { postTxt2ImgGeneration } from '../../../api/generation'; // API 호출 함수 가져오기
+import { postTxt2ImgGeneration } from '../../../api/generation';
 import { RootState } from '../../../store/store';
 import GenerateButton from '../../common/GenerateButton';
 
@@ -53,12 +53,8 @@ const Txt2ImgLayout = () => {
     };
 
     try {
-      console.log('전: ', isLoading);
       dispatch(setIsLoading(true));
-      console.log('후: ', isLoading);
       const outputImgUrls = await postTxt2ImgGeneration('remote', data);
-      console.log('Generated image URLs:', outputImgUrls);
-
       dispatch(setOutputImgUrls(outputImgUrls));
     } catch (error) {
       console.error('Error generating image:', error);
