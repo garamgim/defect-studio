@@ -6,7 +6,9 @@ import {
   setPrompt,
   setNegativePrompt,
   setIsNegativePrompt,
-  setOutputImgUrls
+  setOutputImgUrls,
+  setIsLoading,
+  setUploadImgsCount
 } from '../../../store/slices/generation/img2ImgSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { postImg2ImgGeneration } from '../../../api/generation';
@@ -33,7 +35,8 @@ const Img2ImgLayout = () => {
     batchSize,
     outputPath,
     clipData,
-    mode
+    mode,
+    isLoading
   } = useSelector((state: RootState) => state.img2Img);
 
   const handleNegativePromptChange = () => {
@@ -45,8 +48,10 @@ const Img2ImgLayout = () => {
   const handleGenerate = async () => {
     if (mode === 'manual') {
       files = images.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+      dispatch(setUploadImgsCount(batchCount * batchSize));
     } else {
       const fileDataArray = await window.electron.getFilesInFolder(inputPath);
+      dispatch(setUploadImgsCount(fileDataArray.length * batchCount * batchSize));
 
       // base64 데이터를 Blob으로 변환하고 File 객체로 생성
       files = fileDataArray.map((fileData) => {
@@ -82,11 +87,14 @@ const Img2ImgLayout = () => {
     };
 
     try {
+      dispatch(setIsLoading(true));
       const outputImgUrls = await postImg2ImgGeneration('remote', data);
       console.log('Generated image URLs:', outputImgUrls);
       dispatch(setOutputImgUrls(outputImgUrls));
     } catch (error) {
       console.error('Error generating image:', error);
+    } finally {
+      dispatch(setIsLoading(false));
     }
   };
 
@@ -122,7 +130,7 @@ const Img2ImgLayout = () => {
 
       {/* Generate 버튼 */}
       <div className="fixed bottom-[50px] right-[56px]">
-        <GenerateButton onClick={handleGenerate} />
+        <GenerateButton onClick={handleGenerate} disabled={isLoading} />
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ interface Txt2ImgState {
   outputPath: string;
   isNegativePrompt: boolean;
   outputImgUrls: string[]; // 생성된 이미지 URL 리스트
+  isLoading: boolean;
 }
 
 const initialState: Txt2ImgState = {
@@ -33,7 +34,8 @@ const initialState: Txt2ImgState = {
   batchSize: 1,
   outputPath: '',
   isNegativePrompt: false,
-  outputImgUrls: []
+  outputImgUrls: [],
+  isLoading: false
 };
 
 const txt2ImgSlice = createSlice({
@@ -90,6 +92,9 @@ const txt2ImgSlice = createSlice({
     },
     setOutputImgUrls: (state, action: PayloadAction<string[]>) => {
       state.outputImgUrls = action.payload;
+    },
+    setIsLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
     }
   }
 });
@@ -109,7 +114,8 @@ export const {
   setBatchSize,
   setOutputPath,
   setIsNegativePrompt,
-  setOutputImgUrls
+  setOutputImgUrls,
+  setIsLoading
 } = txt2ImgSlice.actions;
 
 export default txt2ImgSlice.reducer;

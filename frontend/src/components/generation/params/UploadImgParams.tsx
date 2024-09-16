@@ -1,6 +1,7 @@
 import { Tabs, Upload, Input, Button } from 'antd';
 import type { UploadProps } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
+import { FiFolderPlus } from 'react-icons/fi';
 
 interface UploadImgParamsProps {
   handleImageUpload: (file: File) => void;
@@ -100,9 +101,11 @@ const UploadImgParams = ({
                 type="text"
                 id="imagePath"
                 className="w-full"
-                placeholder="Enter the image path or select folder"
+                placeholder="Enter the image path"
               />
-              <Button onClick={handleSelectInputFolder}>Select Folder</Button>
+              <Button onClick={handleSelectInputFolder} className="px-[12px]">
+                <FiFolderPlus className="w-[18px] h-[18px] text-[#222]" />
+              </Button>
             </div>
           </div>
 
@@ -119,9 +122,11 @@ const UploadImgParams = ({
                 type="text"
                 id="outputPath"
                 className="w-full"
-                placeholder="Enter the output path or select folder"
+                placeholder="Enter the output path"
               />
-              <Button onClick={handleSelectOutputFolder}>Select Folder</Button>
+              <Button onClick={handleSelectOutputFolder} className="px-[12px]">
+                <FiFolderPlus className="w-[18px] h-[18px] text-[#222]" />
+              </Button>
             </div>
           </div>
         </div>
