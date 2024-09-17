@@ -83,6 +83,7 @@ export async function postImg2ImgGeneration(
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
+      console.log(key, value);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
@@ -97,9 +98,6 @@ export async function postImg2ImgGeneration(
         'Content-Type': 'multipart/form-data'
       }
     });
-
-    console.log('Response status:', response.status);
-    console.log('Response data:', response.data.image_list);
 
     if (response.status === 201) {
       return response.data.image_list; // image_list 배열 반환
@@ -139,7 +137,6 @@ export async function postInpaintingGeneration(
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
-      console.log(key, value);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
@@ -154,9 +151,6 @@ export async function postInpaintingGeneration(
         'Content-Type': 'multipart/form-data'
       }
     });
-
-    console.log('Response status:', response.status);
-    console.log('Response data:', response.data.image_list);
 
     if (response.status === 201) {
       return response.data.image_list; // image_list 배열 반환
@@ -175,7 +169,7 @@ export const getClip = async (imageFiles: File[]): Promise<string[]> => {
     const formData = new FormData();
 
     imageFiles.forEach((file) => {
-      formData.append('images', file); 
+      formData.append('images', file);
     });
 
     const response = await axiosInstance.post('/generation/clip', formData, {
@@ -185,6 +179,7 @@ export const getClip = async (imageFiles: File[]): Promise<string[]> => {
     });
 
     if (response.status === 201) {
+      console.log(response.data.generated_prompts);
       return response.data.generated_prompts;
     } else {
       throw new Error('Failed to get generated prompts');
@@ -208,7 +203,6 @@ export async function postRemoveBgGeneration(
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
-      console.log(key, value)
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
@@ -223,9 +217,6 @@ export async function postRemoveBgGeneration(
         'Content-Type': 'multipart/form-data'
       }
     });
-
-    console.log('Response status:', response.status);
-    console.log('Response data:', response.data.image_list);
 
     if (response.status === 201) {
       return response.data.image_list; // image_list 배열 반환
@@ -250,13 +241,11 @@ export async function postCleanupGeneration(
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
-      console.log(key, value);
-      console.log('test')
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
         });
-      } 
+      }
     });
 
     const response = await axiosInstance.post(`generation/cleanup/${gpu_env}`, formData, {
@@ -264,9 +253,6 @@ export async function postCleanupGeneration(
         'Content-Type': 'multipart/form-data'
       }
     });
-
-    console.log('Response status:', response.status);
-    console.log('Response data:', response.data.image_list);
 
     if (response.status === 201) {
       return response.data.image_list; // image_list 배열 반환

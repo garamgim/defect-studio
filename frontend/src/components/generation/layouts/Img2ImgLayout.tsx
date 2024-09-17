@@ -6,12 +6,16 @@ import {
   setPrompt,
   setNegativePrompt,
   setIsNegativePrompt,
-  setOutputImgUrls
+  setOutputImgUrls,
+  setIsLoading,
+  setUploadImgsCount,
+  setClipData
 } from '../../../store/slices/generation/img2ImgSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { postImg2ImgGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import GenerateButton from '../../common/GenerateButton';
+import { getClip } from '../../../api/generation';
 
 const Img2ImgLayout = () => {
   const dispatch = useDispatch();
@@ -33,7 +37,8 @@ const Img2ImgLayout = () => {
     batchSize,
     outputPath,
     clipData,
-    mode
+    mode,
+    isLoading
   } = useSelector((state: RootState) => state.img2Img);
 
   const handleNegativePromptChange = () => {
@@ -43,10 +48,14 @@ const Img2ImgLayout = () => {
   let files;
 
   const handleGenerate = async () => {
+    console.log(mode, images);
     if (mode === 'manual') {
       files = images.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+      dispatch(setUploadImgsCount(batchCount * batchSize));
+      console.log('파일: ', files);
     } else {
-      const fileDataArray = (await window.electron.getFilesInFolder(inputPath)) as FileData[];
+      const fileDataArray = await window.electron.getFilesInFolder(inputPath);
+      dispatch(setUploadImgsCount(fileDataArray.length * batchCount * batchSize));
 
       // base64 데이터를 Blob으로 변환하고 File 객체로 생성
       files = fileDataArray.map((fileData) => {
@@ -82,20 +91,40 @@ const Img2ImgLayout = () => {
     };
 
     try {
-      // API 호출
+      dispatch(setIsLoading(true));
       const outputImgUrls = await postImg2ImgGeneration('remote', data);
-      console.log('Generated image URLs:', outputImgUrls);
-      // 결과 이미지를 상태에 저장
       dispatch(setOutputImgUrls(outputImgUrls));
     } catch (error) {
       console.error('Error generating image:', error);
+    } finally {
+      dispatch(setIsLoading(false));
+    }
+  };
+
+  // Clip아이콘 클릭
+  const handleClipClick = async () => {
+    // clipData가 빈 배열일 때만 getClip 실행
+    if (clipData.length === 0) {
+      try {
+        if (images.length > 0) {
+          const file = convertStringToFile(images[0], 'image.png');
+
+          const generatedPrompts = await getClip([file]);
+          dispatch(setClipData(generatedPrompts));
+          console.log('clip 갱신: ', clipData);
+        } else {
+          console.error('No image available for clip generation');
+        }
+      } catch (error) {
+        console.error('Error generating clip data:', error);
+      }
     }
   };
 
   return (
     <div className="flex h-[calc(100vh-60px)] pt-4 pb-6">
       {/* 사이드바 */}
-      <div className="w-[360px] pl-8 pr-4 h-full hidden md:block">
+      <div className="w-[360px] pl-8 h-full hidden md:block">
         <Sidebar />
       </div>
 
@@ -109,22 +138,24 @@ const Img2ImgLayout = () => {
           <PromptParams
             prompt={prompt}
             negativePrompt={negativePrompt}
-            setPrompt={(value) => {
+            setPrompt={(value: string) => {
               dispatch(setPrompt(value));
             }}
-            setNegativePrompt={(value) => {
+            setNegativePrompt={(value: string) => {
               dispatch(setNegativePrompt(value));
             }}
             isNegativePrompt={isNegativePrompt}
             handleNegativePromptChange={handleNegativePromptChange}
-            clipData={clipData}
+            // 메뉴얼 모드일 때만 props로 전달(batch에서는 clip실행 안함)
+            clipData={mode === 'manual' ? clipData : []}
+            handleClipClick={mode === 'manual' ? handleClipClick : undefined}
           />
         </div>
       </div>
 
       {/* Generate 버튼 */}
       <div className="fixed bottom-[50px] right-[56px]">
-        <GenerateButton onClick={handleGenerate} />
+        <GenerateButton onClick={handleGenerate} disabled={isLoading} />
       </div>
     </div>
   );

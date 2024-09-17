@@ -1,37 +1,42 @@
-from typing import Annotated
+import json
 from datetime import datetime, timedelta, timezone
+from typing import Annotated
 
 from aioredis import Redis
-from fastapi import APIRouter
 from alembic.util import status
-from fastapi.params import Depends
-from sqlalchemy.orm import Session
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter
 from fastapi import HTTPException, Response, status, Request
+from fastapi.params import Depends
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
 
-import crud
+from crud import members as members_crud
 from core.config import settings
-from dependencies import get_db, get_redis
 from core.security import verify_password, create_access_token, create_refresh_token, decode_refresh_token
+from dependencies import get_db, get_redis
+from enums import Role
 
-app = APIRouter(
+router = APIRouter(
     prefix="/auth",
     tags=["auth"]
 )
 
 
-@app.post("/login")
+@router.post("/login")
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
                 session: Session = Depends(get_db)):
     member = authentication_member(form_data.username, form_data.password, session)
     if not member:
         raise HTTPException(status_code=401, detail="아이디나 비밀번호가 일치하지 않습니다.")
 
+    if member.role == Role.guest:
+        raise HTTPException(status_code=403, detail="관리자 승인이 필요합니다.")
+
     response = create_response_with_tokens(member.login_id)
     return response
 
 
-@app.post("/logout")
+@router.post("/logout")
 async def logout(request: Request, response: Response, redis: Redis = Depends(get_redis)):
     refresh_token = request.cookies.get("refresh_token")
     if not refresh_token:
@@ -42,7 +47,7 @@ async def logout(request: Request, response: Response, redis: Redis = Depends(ge
     response.delete_cookie("refresh_token")
 
 
-@app.post("/reissue")
+@router.post("/reissue")
 async def reissue(request: Request, redis: Redis = Depends(get_redis)):
     refresh_token = request.cookies.get("refresh_token")
 
@@ -56,12 +61,18 @@ async def reissue(request: Request, redis: Redis = Depends(get_redis)):
     decoded_refresh_token = decode_refresh_token(refresh_token)
     login_id = decoded_refresh_token.get("login_id")
 
+    # 기존 토큰은 blacklist 처리
+    expiration_datetime = datetime.fromtimestamp(decoded_refresh_token.get("expiration_time"))
+    await redis.setex(refresh_token, int((expiration_datetime - datetime.utcnow()).total_seconds()), "blacklisted")
+
+    # refresh token, access token을 모두 새로 발급
     response = create_response_with_tokens(login_id)
+
     return response
 
 
-def authentication_member(username: str, password: str, session: Session = Depends(get_db)):
-    member = crud.get_member_by_login_id(session, username)
+def authentication_member(login_id: str, password: str, session: Session = Depends(get_db)):
+    member = members_crud.get_member_by_login_id(session, login_id)
     if not member:
         raise HTTPException(status_code=404, detail="해당 유저를 찾을 수 없습니다.")
     if not verify_password(password, member.password):
@@ -74,16 +85,17 @@ def create_response_with_tokens(login_id: str):
     refresh_token = create_refresh_token(login_id)
 
     headers = {"Authorization": f"Bearer {access_token}"}
-    response = Response(status_code=status.HTTP_200_OK, headers=headers)
-    expiration_time = datetime.now(timezone.utc) + timedelta(minutes=settings.JWT_REFRESH_TOKEN_EXPIRE_MINUTES)
 
+    response = Response(status_code=status.HTTP_200_OK, headers=headers)
+
+    expiration_time = datetime.now(timezone.utc) + timedelta(minutes=settings.JWT_REFRESH_TOKEN_EXPIRE_MINUTES)
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         expires=expiration_time,
         httponly=True,
-        secure=True,  # HTTPS
-        samesite="Lax"
+        secure=True,
+        samesite="None"
     )
 
     return response

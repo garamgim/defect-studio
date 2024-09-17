@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Img2ImgState {
-  mode: 'manual' | 'batch'; // 메뉴얼/배치 모두 구분
+  mode: 'manual' | 'batch'; // 메뉴얼/배치 모드 구분
   model: string;
   scheduler: string;
   prompt: string;
@@ -15,12 +15,16 @@ interface Img2ImgState {
   isRandomSeed: boolean;
   batchCount: number;
   batchSize: number;
-  images: string[]; // 초기 이미지 배열
+  images: string[];
   inputPath: string;
   outputPath: string;
   isNegativePrompt: boolean;
   outputImgUrls: string[]; // 생성된 이미지 배열
   clipData: string[];
+
+  // skeleton ui에 이용
+  isLoading: boolean;
+  uploadImgsCount: number;
 }
 
 const initialState: Img2ImgState = {
@@ -43,15 +47,17 @@ const initialState: Img2ImgState = {
   outputPath: '',
   isNegativePrompt: false,
   outputImgUrls: [],
-  clipData: []
+  clipData: [],
+  isLoading: false,
+  uploadImgsCount: 1
 };
 
 const img2ImgSlice = createSlice({
   name: 'img2Img',
   initialState,
   reducers: {
-    setMode: (state, action: PayloadAction<'maual' | 'batch'>) => {
-      state.model = action.payload;
+    setMode: (state, action: PayloadAction<'manual' | 'batch'>) => {
+      state.mode = action.payload;
     },
     setModel: (state, action: PayloadAction<string>) => {
       state.model = action.payload;
@@ -115,11 +121,18 @@ const img2ImgSlice = createSlice({
     },
     setClipData: (state, action: PayloadAction<string[]>) => {
       state.clipData = action.payload;
+    },
+    setIsLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
+    setUploadImgsCount: (state, action: PayloadAction<number>) => {
+      state.uploadImgsCount = action.payload;
     }
   }
 });
 
 export const {
+  setMode,
   setModel,
   setScheduler,
   setPrompt,
@@ -138,7 +151,9 @@ export const {
   setInputPath,
   setOutputPath,
   setOutputImgUrls,
-  setClipData
+  setClipData,
+  setIsLoading,
+  setUploadImgsCount
 } = img2ImgSlice.actions;
 
 export default img2ImgSlice.reducer;

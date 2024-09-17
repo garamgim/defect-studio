@@ -5,23 +5,33 @@ import { FormatPainterOutlined } from '@ant-design/icons';
 import { RootState } from '../../../store/store';
 import MaskingModal from '../masking/MaskingModal';
 import UploadImagePlusMask from '../params/UploadImgWithMaskingParams';
-import { setInitImageList, setMaskImageList } from '../../../store/slices/generation/cleanupSlice';
+import {
+  setInitImageList,
+  setMaskImageList,
+  setInitInputPath,
+  setMaskInputPath,
+  setOutputPath,
+  setMode
+} from '../../../store/slices/generation/cleanupSlice';
 import { saveImages } from '../../../store/slices/generation/maskingSlice';
 
 const CleanupSidebar = () => {
+  const { initInputPath, maskInputPath, outputPath, mode, initImageList } = useSelector(
+    (state: RootState) => state.cleanup
+  );
+
   const { combinedImg } = useSelector((state: RootState) => state.masking);
 
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('manual');
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
+      const base64String = reader.result as string;
       const img = new Image();
       img.onload = () => {
-        setImageSrc(reader.result as string);
+        dispatch(setInitImageList([base64String]));
 
         dispatch(
           saveImages({
@@ -46,14 +56,28 @@ const CleanupSidebar = () => {
         {/* 이미지 업로드 */}
         <UploadImagePlusMask
           handleImageUpload={handleImageUpload}
-          imagePreview={imageSrc}
-          setActiveTab={setActiveTab}
+          imagePreview={initImageList[0]}
+          initInputPath={initInputPath}
+          maskInputPath={maskInputPath}
+          outputPath={outputPath}
+          setInitInputPath={(value: string) => {
+            dispatch(setInitInputPath(value));
+          }}
+          setMaskInputPath={(value: string) => {
+            dispatch(setMaskInputPath(value));
+          }}
+          setOutputPath={(value: string) => {
+            dispatch(setOutputPath(value));
+          }}
+          setMode={(value: 'manual' | 'batch') => {
+            dispatch(setMode(value));
+          }}
         />
 
-        {imageSrc && (
+        {initImageList[0] && (
           <div className="px-6 pb-10">
             {/* Start Masking 버튼 */}
-            {activeTab === 'manual' && (
+            {mode === 'manual' && (
               <Button
                 type="primary"
                 icon={<FormatPainterOutlined />}
@@ -64,8 +88,8 @@ const CleanupSidebar = () => {
               </Button>
             )}
 
-            {/* 인페인팅 결과 및 다운로드 */}
-            {combinedImg && (
+            {/* 인페인팅 결과 */}
+            {mode === 'manual' && combinedImg && (
               <div className="w-full border border-dashed border-gray-300 rounded-lg mt-4 flex flex-col items-center">
                 <img src={combinedImg} alt="Inpainting Result" className="w-full h-full object-cover rounded-lg" />
               </div>
@@ -75,9 +99,9 @@ const CleanupSidebar = () => {
       </div>
 
       {/* Masking 모달 창 */}
-      {showModal && imageSrc && (
+      {showModal && initImageList[0] && (
         <MaskingModal
-          imageSrc={imageSrc}
+          imageSrc={initImageList[0]}
           onClose={handleCloseModal}
           setInitImageList={(value: string[]) => {
             dispatch(setInitImageList(value));

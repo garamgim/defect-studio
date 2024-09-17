@@ -97,7 +97,6 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }:
   };
   const handleSaveImages = async () => {
     if (!stageRef.current) {
-      console.log('Stage reference is missing');
       return;
     }
 
@@ -109,14 +108,12 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }:
     // 1. Stage와 Canvas를 축소 상태로 설정
     stage.scale({ x: 1, y: 1 });
     stage.batchDraw(); // 축소 상태로 다시 그리기
-    console.log('Stage scaled to 1');
 
     try {
       // 1. backgroundImg: 배경 이미지 레이어만 저장
       const imageNode = stage.findOne((node: Konva.Node) => node instanceof Konva.Image) as Konva.Image;
 
       if (!imageNode) {
-        console.log('Image node not found');
         return; // 이미지 노드가 없으면 리턴
       }
 
@@ -129,23 +126,18 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }:
         height: imageSize.height,
         pixelRatio: 1 // 원래 크기로 저장
       });
-      console.log('Stage image saved');
 
       // 2. canvasImg: 투명한 캔버스를 흑백 이미지로 변환하여 저장
       const canvasLayer = stageRef.current.findOne('#canvas-layer');
 
       if (!canvasLayer) {
-        console.log('Canvas layer not found');
         return; // 캔버스 레이어가 없으면 리턴
       }
-
-      console.log('Canvas layer found:', canvasLayer);
 
       // 배경 이미지 숨기고 캔버스만 보이도록 설정
       imageNode.visible(false); // 배경 이미지 비활성화
       canvasLayer.visible(true); // 캔버스만 보이게 설정
       stage.batchDraw();
-      console.log('Canvas layer visible');
 
       // 캔버스에서 색칠된 부분만 흑백으로 변환
       const canvasImgBase64 = await convertCanvasToGrayscale(
@@ -158,7 +150,6 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }:
           pixelRatio: 1 // 축소 상태로 저장
         })
       );
-      console.log('Canvas image saved and converted to grayscale');
 
       // 원래 상태로 복원
       imageNode.visible(true); // 배경 이미지 다시 보이게 설정
@@ -173,7 +164,6 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }:
         height: imageSize.height,
         pixelRatio: 1
       });
-      console.log('Combined image saved');
 
       // Redux에 저장
       dispatch(
@@ -186,8 +176,6 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }:
 
       setInitImageList([backgroundImgBase64]);
       setMaskImageList([canvasImgBase64]);
-
-      console.log('Images saved to Redux store');
     } catch (error) {
       console.error('Error saving images:', error);
     } finally {

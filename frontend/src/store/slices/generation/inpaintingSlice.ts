@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface InpaintingState {
+  mode: 'manual' | 'batch';
   model: string;
   scheduler: string;
   prompt: string;
@@ -22,9 +23,14 @@ interface InpaintingState {
   outputPath: string;
   outputImgUrls: string[];
   clipData: string[];
+
+  // skeleton ui에 이용
+  isLoading: boolean;
+  uploadImgsCount: number;
 }
 
 const initialState: InpaintingState = {
+  mode: 'manual',
   model: 'CompVis/stable-diffusion-v1-4',
   scheduler: 'DPM++ 2M',
   prompt: '',
@@ -45,13 +51,19 @@ const initialState: InpaintingState = {
   maskInputPath: '',
   outputPath: '',
   outputImgUrls: [],
-  clipData: []
+  clipData: [],
+
+  isLoading: false,
+  uploadImgsCount: 1
 };
 
 const inpaintingSlice = createSlice({
   name: 'inpainting',
   initialState,
   reducers: {
+    setMode: (state, action: PayloadAction<'manual' | 'batch'>) => {
+      state.mode = action.payload;
+    },
     setModel: (state, action: PayloadAction<string>) => {
       state.model = action.payload;
     },
@@ -120,11 +132,18 @@ const inpaintingSlice = createSlice({
     },
     setClipData: (state, action: PayloadAction<string[]>) => {
       state.clipData = action.payload;
+    },
+    setIsLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
+    setUploadImgsCount: (state, action: PayloadAction<number>) => {
+      state.uploadImgsCount = action.payload;
     }
   }
 });
 
 export const {
+  setMode,
   setModel,
   setScheduler,
   setPrompt,
@@ -145,7 +164,9 @@ export const {
   setMaskInputPath,
   setOutputPath,
   setOutputImgUrls,
-  setClipData
+  setClipData,
+  setIsLoading,
+  setUploadImgsCount
 } = inpaintingSlice.actions;
 
 export default inpaintingSlice.reducer;

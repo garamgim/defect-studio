@@ -1,11 +1,10 @@
 import { Input, Checkbox, Button, Tooltip, Modal } from 'antd';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { MdImageSearch } from 'react-icons/md';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import { setIsNegativePrompt } from '../../../store/slices/generation/txt2ImgSlice';
 
 interface PromptParamsProps {
   prompt: string;
@@ -15,6 +14,7 @@ interface PromptParamsProps {
   isNegativePrompt: boolean;
   handleNegativePromptChange: (event: CheckboxChangeEvent) => void;
   clipData?: string[];
+  handleClipClick?: () => Promise<void>; // 비동기 함수
 }
 
 const PromptParams = ({
@@ -24,24 +24,48 @@ const PromptParams = ({
   setNegativePrompt,
   isNegativePrompt,
   handleNegativePromptChange,
-  clipData = []
+  clipData = [],
+  handleClipClick
 }: PromptParamsProps) => {
   const { TextArea } = Input;
   const location = useLocation();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [clipPhrases, setClipPhrases] = useState<string[]>([]);
+  const [isClipLoading, setIsClipLoading] = useState(false);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
-  if (level === 'Basic') {
-    setIsNegativePrompt(false);
-  }
+  // clipData가 변경될 때마다 clipPhrases를 업데이트
+  useEffect(() => {
+    if (clipData && clipData.length > 0) {
+      setClipPhrases(clipData.flatMap((data) => data.split(', ')));
+    }
+  }, [clipData]);
 
-  const clipPhrases = clipData ? clipData.flatMap((data) => data.split(', ')) : [];
+  // Basic일 경우에는 Negative Prompt를 비활성화
+  useEffect(() => {
+    if (level === 'Basic') {
+      setNegativePrompt('');
+    }
+  }, [level, setNegativePrompt]);
 
   const handlePromptUpdate = (phrase: string) => {
-    // 기존 프롬프트가 비어 있으면 새로 추가, 아니면 기존 프롬프트에 붙여서 추가
     const newPrompt = prompt ? `${prompt}, ${phrase}` : phrase;
     setPrompt(newPrompt);
+  };
+
+  // 모달이 열릴 때 clipData를 최신 상태로 반영
+  const handleIconClick = async () => {
+    setIsClipLoading(true);
+
+    // 모달이 열릴 때 최신 clipData로 clipPhrases 초기화
+    setClipPhrases(clipData.flatMap((data) => data.split(', ')));
+    setIsModalVisible(true);
+
+    if (handleClipClick) {
+      await handleClipClick();
+      setIsClipLoading(false);
+    }
   };
 
   return (
@@ -68,17 +92,15 @@ const PromptParams = ({
           className="pr-10"
           placeholder="Enter your prompt here..."
           value={prompt}
-          onChange={(event) => {
-            setPrompt(event.target.value);
-          }}
+          onChange={(event) => setPrompt(event.target.value)}
         />
-        {location.pathname !== '/generation/text-to-image' && (
+        {location.pathname !== '/generation/text-to-image' && handleClipClick && (
           <Tooltip title="Uploaded image is converted to a text description to assist in prompt creation.">
             <Button
               type="link"
               className="absolute bottom-2 right-2 dark:text-gray-300"
               icon={<MdImageSearch className="text-xl" />}
-              onClick={() => setIsModalVisible(true)}
+              onClick={handleIconClick}
             />
           </Tooltip>
         )}
@@ -92,14 +114,13 @@ const PromptParams = ({
             className="mb-4"
             placeholder="Enter your negative prompt here..."
             value={negativePrompt}
-            onChange={(event) => {
-              setNegativePrompt(event.target.value);
-            }}
+            onChange={(event) => setNegativePrompt(event.target.value)}
           />
         </>
       )}
 
-      <div className="h-[40px] flex justify-end"></div>
+      {/* generate버튼 위치 */}
+      <div className="h-[40px]"></div>
 
       {/* clip 모달창 */}
       <Modal
@@ -110,7 +131,9 @@ const PromptParams = ({
       >
         <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Prompt Helper</div>
         <div className="flex flex-wrap gap-2">
-          {clipPhrases.length > 0 ? (
+          {isClipLoading ? (
+            <p>Loading...</p>
+          ) : clipPhrases.length > 0 ? (
             clipPhrases.map((phrase, index) => (
               <Button
                 key={index}
@@ -124,7 +147,7 @@ const PromptParams = ({
             <p>No clip data</p>
           )}
         </div>
-        {/* 모달 하단에 Close 버튼 추가 */}
+
         <div className="mt-4 flex justify-end">
           <Button type="primary" onClick={() => setIsModalVisible(false)}>
             Close

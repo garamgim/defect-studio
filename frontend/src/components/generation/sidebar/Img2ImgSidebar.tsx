@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
 import {
@@ -14,9 +13,10 @@ import {
   setBatchCount,
   setBatchSize,
   setImages,
-  setClipData,
   setInputPath,
-  setOutputPath
+  setOutputPath,
+  setMode,
+  setClipData
 } from '../../../store/slices/generation/img2ImgSlice';
 import ModelParams from '../params/ModelParam';
 import UploadImgParams from '../params/UploadImgParams';
@@ -26,7 +26,6 @@ import SamplingParams from '../params/SamplingParams';
 import SeedParam from '../params/SeedParam';
 import BatchParams from '../params/BatchParams';
 import GuidanceScaleParam from '../params/GuidanceScaleParam';
-import { getClip } from '../../../api/generation';
 
 const Img2ImgSidebar = () => {
   const dispatch = useDispatch();
@@ -43,12 +42,11 @@ const Img2ImgSidebar = () => {
     batchCount,
     batchSize,
     inputPath,
-    outputPath
+    outputPath,
+    images
   } = useSelector((state: RootState) => state.img2Img);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
-
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
 
   const handleRandomSeedChange = () => {
     dispatch(setIsRandomSeed(!isRandomSeed));
@@ -58,26 +56,16 @@ const Img2ImgSidebar = () => {
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-      const base64String = reader.result as string; // 변환된 Base64 문자열
+      const base64String = reader.result as string;
       const img = new Image();
-      img.onload = async () => {
-        setImageSrc(base64String);
-        console.log('Base64 String:', base64String); // Base64 문자열 출력
-        dispatch(setImages([base64String])); // Redux 상태에 Base64 문자열 저장
-
-        try {
-          // Base64을 Blob으로 변환 후 getClip 호출
-          console.log('파일: ', file);
-          const response = await getClip([file]); // 파일 배열로 전달
-          console.log('결과: ', response);
-          dispatch(setClipData(response)); // 클립 결과를 Redux 상태에 저장
-        } catch (error) {
-          console.error('Failed to get clip data:', error);
-        }
+      img.onload = () => {
+        dispatch(setClipData([]));
+        dispatch(setImages([base64String]));
+        console.log('images: ', images);
       };
       img.src = base64String;
     };
-    reader.readAsDataURL(file); // 파일을 Base64로 변환
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -91,7 +79,7 @@ const Img2ImgSidebar = () => {
         {/* 이미지 업로드 */}
         <UploadImgParams
           handleImageUpload={handleImageUpload}
-          imagePreview={imageSrc}
+          imagePreview={images[0]}
           inputPath={inputPath}
           outputPath={outputPath}
           setInputPath={(value: string) => {
@@ -99,6 +87,9 @@ const Img2ImgSidebar = () => {
           }}
           setOutputPath={(value: string) => {
             dispatch(setOutputPath(value));
+          }}
+          setMode={(value: 'manual' | 'batch') => {
+            dispatch(setMode(value));
           }}
         />
 

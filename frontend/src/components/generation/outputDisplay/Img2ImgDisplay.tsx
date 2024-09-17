@@ -2,20 +2,43 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 
 const Img2ImgDisplay = () => {
-  // 슬라이스에서 생성된 이미지 URL 가져오기
-  const outputImgUrls = useSelector((state: RootState) => state.img2Img.outputImgUrls);
+  const { outputImgUrls, isLoading, width, height, uploadImgsCount } = useSelector((state: RootState) => state.img2Img);
+
+  // 생성할 이미지 가로세로 비율 계산
+  const aspectRatio = width / height;
 
   return (
     <div className="h-full image-display grid gap-4 overflow-y-auto custom-scrollbar2">
-      {outputImgUrls.length > 0 ? (
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mr-[16px]">
+          {Array.from({ length: uploadImgsCount }).map((_, index) => (
+            <div
+              key={index}
+              className="relative w-full h-0"
+              style={{
+                paddingBottom: `${100 / aspectRatio}%`
+              }}
+            >
+              <div className="absolute top-0 left-0 w-full h-full bg-gray-200 dark:bg-gray-700 animate-pulse rounded-xl border border-gray-300 dark:border-gray-700" />
+            </div>
+          ))}
+        </div>
+      ) : outputImgUrls.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mr-[16px]">
           {outputImgUrls.map((url, index) => (
-            <img
+            <div
               key={index}
-              src={url}
-              alt={`Generated image ${index}`}
-              className="w-full h-auto object-cover rounded-xl border border-gray-300 dark:border-gray-700"
-            />
+              className="relative w-full h-0"
+              style={{
+                paddingBottom: `${100 / aspectRatio}%`
+              }}
+            >
+              <img
+                src={url}
+                alt={`Generated image ${index}`}
+                className="absolute top-0 left-0 w-full h-full object-cover rounded-xl border border-gray-300 dark:border-gray-700"
+              />
+            </div>
           ))}
         </div>
       ) : (

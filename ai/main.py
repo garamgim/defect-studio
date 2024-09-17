@@ -1,40 +1,47 @@
-import io
-
 import uvicorn
-from PIL import Image
+import time
+import torch
 from fastapi import FastAPI
+from starlette.middleware.base import BaseHTTPMiddleware
 
-from util import upload_files, delete_files
+from api.routes.main import api_router
 
 app = FastAPI()
 
+class TimerMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        start_time = time.time()
+        response = await call_next(request)
+        process_time = time.time() - start_time
+        print(f"Request processing time: {process_time} seconds")
+        return response
 
-@app.get('/upload')
-def upload():
+app.add_middleware(TimerMiddleware)
 
-    # Image 1
-    im = Image.open("./dog.png")
-    stream1 = io.BytesIO()
-    im.save(stream1, format="jpeg", quality=90)
-    stream1.seek(0)
+# 메모리 누스 해결 미들웨어 클래스 정의
+class CustomMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        try:
+            # 요청이 처리되기 전에 실행할 작업
+            print("Request received")
 
-    # Image 2
-    im = Image.open("./cat.png")
-    stream2 = io.BytesIO()
-    im.save(stream2, format="jpeg", quality=90)
-    stream2.seek(0)
+            # 다음 미들웨어 또는 라우터로 요청을 전달
+            response = await call_next(request)
 
-    stream_list = [stream1, stream2]
+            return response
 
-    list = upload_files(stream_list)
-    return {'url_list': list}
+        finally:
+            # 요청이 끝난 후, CUDA 메모리 해제
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()  # GPU 메모리 캐시 비우기
+                print("CUDA memory cleared")
+
+# 미들웨어 추가
+app.add_middleware(CustomMiddleware)
 
 
-@app.get('/delete')
-def upload():
-    key = 'temp'
-    delete_files(2, key)
-
+app.include_router(api_router)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=9755)
+
