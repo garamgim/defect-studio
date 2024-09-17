@@ -53,13 +53,13 @@ const InpaintingSidebar = () => {
     initInputPath,
     maskInputPath,
     outputPath,
-    mode
+    mode,
+    initImageList
   } = useSelector((state: RootState) => state.inpainting);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
   const [showModal, setShowModal] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
 
   const handleRandomSeedChange = () => {
     setIsRandomSeed(!isRandomSeed);
@@ -73,7 +73,6 @@ const InpaintingSidebar = () => {
       const img = new Image();
       img.onload = async () => {
         dispatch(setClipData([]));
-        setImageSrc(base64String);
         dispatch(setInitImageList([base64String]));
 
         dispatch(
@@ -104,7 +103,7 @@ const InpaintingSidebar = () => {
         {/* 이미지 업로드 */}
         <UploadImgWithMaskingParams
           handleImageUpload={handleImageUpload}
-          imagePreview={imageSrc}
+          imagePreview={initImageList[0]}
           initInputPath={initInputPath}
           maskInputPath={maskInputPath}
           outputPath={outputPath}
@@ -122,7 +121,7 @@ const InpaintingSidebar = () => {
           }}
         />
 
-        {imageSrc && (
+        {initImageList[0] && (
           <div className="px-6 pb-10">
             {/* Start Masking 버튼 */}
             {mode === 'manual' && (
@@ -136,8 +135,8 @@ const InpaintingSidebar = () => {
               </Button>
             )}
 
-            {/* 인페인팅 결과 및 다운로드 */}
-            {combinedImg && (
+            {/* 인페인팅 결과 */}
+            {mode === 'manual' && combinedImg && (
               <div className="w-full border border-dashed border-gray-300 rounded-lg mt-4 flex flex-col items-center">
                 <img src={combinedImg} alt="Inpainting Result" className="w-full h-full object-cover rounded-lg" />
               </div>
@@ -200,9 +199,9 @@ const InpaintingSidebar = () => {
       </div>
 
       {/* Masking 모달 창 */}
-      {showModal && imageSrc && (
+      {showModal && initImageList[0] && (
         <MaskingModal
-          imageSrc={imageSrc}
+          imageSrc={initImageList[0]}
           onClose={handleCloseModal}
           setInitImageList={(value: string[]) => {
             dispatch(setInitImageList(value));

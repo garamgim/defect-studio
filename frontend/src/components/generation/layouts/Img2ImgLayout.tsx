@@ -48,9 +48,11 @@ const Img2ImgLayout = () => {
   let files;
 
   const handleGenerate = async () => {
+    console.log(mode, images);
     if (mode === 'manual') {
       files = images.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
       dispatch(setUploadImgsCount(batchCount * batchSize));
+      console.log('파일: ', files);
     } else {
       const fileDataArray = await window.electron.getFilesInFolder(inputPath);
       dispatch(setUploadImgsCount(fileDataArray.length * batchCount * batchSize));
@@ -122,7 +124,7 @@ const Img2ImgLayout = () => {
   return (
     <div className="flex h-[calc(100vh-60px)] pt-4 pb-6">
       {/* 사이드바 */}
-      <div className="w-[360px] pl-8 pr-4 h-full hidden md:block">
+      <div className="w-[360px] pl-8 h-full hidden md:block">
         <Sidebar />
       </div>
 

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
 import {
@@ -43,12 +42,11 @@ const Img2ImgSidebar = () => {
     batchCount,
     batchSize,
     inputPath,
-    outputPath
+    outputPath,
+    images
   } = useSelector((state: RootState) => state.img2Img);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
-
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
 
   const handleRandomSeedChange = () => {
     dispatch(setIsRandomSeed(!isRandomSeed));
@@ -62,8 +60,8 @@ const Img2ImgSidebar = () => {
       const img = new Image();
       img.onload = () => {
         dispatch(setClipData([]));
-        setImageSrc(base64String);
         dispatch(setImages([base64String]));
+        console.log('images: ', images);
       };
       img.src = base64String;
     };
@@ -81,7 +79,7 @@ const Img2ImgSidebar = () => {
         {/* 이미지 업로드 */}
         <UploadImgParams
           handleImageUpload={handleImageUpload}
-          imagePreview={imageSrc}
+          imagePreview={images[0]}
           inputPath={inputPath}
           outputPath={outputPath}
           setInputPath={(value: string) => {

@@ -2,6 +2,7 @@ import { app, BrowserWindow, Menu, MenuItemConstructorOptions, ipcMain, dialog }
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import fs from 'fs';
+import axios from 'axios';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -105,6 +106,48 @@ ipcMain.handle('select-folder', async () => {
   }
 
   return result.filePaths[0]; // 선택된 폴더의 경로 반환
+});
+
+async function downloadImage(url: string, filePath: string): Promise<void> {
+  const response = await axios({
+    url,
+    method: 'GET',
+    responseType: 'stream' // Download as a stream
+  });
+
+  return new Promise((resolve, reject) => {
+    const writer = fs.createWriteStream(filePath);
+
+    response.data.pipe(writer);
+
+    writer.on('finish', resolve);
+    writer.on('error', reject);
+  });
+}
+
+ipcMain.handle('save-images', async (event, { images, folderPath, format }) => {
+  try {
+    // 폴더 경로가 유효한지 확인
+    if (!fs.existsSync(folderPath)) {
+      throw new Error('The folder does not exist.');
+    }
+
+    // 각 이미지 URL을 반복하며 다운로드
+    for (let i = 0; i < images.length; i++) {
+      const imageUrl = images[i];
+      const filePath = path.join(folderPath, `image_${i + 1}.${format}`);
+
+      // 이미지 다운로드 및 저장
+      await downloadImage(imageUrl, filePath);
+    }
+    return { success: true };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return { success: false, error: error.message };
+    } else {
+      return { success: false, error: 'An unknown error occurred.' };
+    }
+  }
 });
 
 ipcMain.handle('get-files-in-folder', async (_, folderPath) => {

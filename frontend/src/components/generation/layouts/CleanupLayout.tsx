@@ -71,7 +71,7 @@ const Cleanup = () => {
   return (
     <div className="flex h-[calc(100vh-60px)] pt-4 pb-6">
       {/* 사이드바 */}
-      <div className="w-[360px] pl-8 pr-4 h-full">
+      <div className="w-[360px] pl-8 h-full">
         <Sidebar />
       </div>
 
@@ -81,7 +81,7 @@ const Cleanup = () => {
       </div>
 
       {/* Generate 버튼 */}
-      <div className="fixed bottom-[60px] ml-[180px]">
+      <div className="fixed bottom-[50px] right-[56px]">
         <GenerateButton onClick={handleGenerate} disabled={isLoading} />
       </div>
     </div>
