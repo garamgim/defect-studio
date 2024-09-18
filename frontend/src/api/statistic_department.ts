@@ -1,12 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import axios, { AxiosResponse } from 'axios';
+import axiosInstance from './token/axiosInstance';
 
 // ------------- 부서 단위 별 토큰 기록 요청 -------------------
 
 // Request Type
 export interface DepartmentTokenStatisticRequestType {
-  start_date?: string;
-  end_date?: string;
+  start_date: string;
+  end_date: string;
   department_id: number;
 }
 
@@ -23,11 +24,14 @@ export const getDepartmentTokenStatistic = async (
   requestData: DepartmentTokenStatisticRequestType
 ): Promise<AxiosResponse<DepartmentTokenStatisticResponseType[]>> => {
   try {
-    const response = await axios.get(`/admin/token-logs/issue/${statisticType}`);
+    const response = await axiosInstance.get<DepartmentTokenStatisticResponseType[]>(
+      `/admin/token-logs/issue/${statisticType}`,
+      { params: requestData }
+    );
     return response;
   } catch (error) {
     if (axios.isAxiosError<DepartmentTokenStatisticResponseType[]>(error)) {
-      if (error.status === 401) {
+      if (error.response?.status === 401) {
         throw new Error('Unauthorized');
       } else {
         throw new Error('Unknown Error');
@@ -41,8 +45,8 @@ export const getDepartmentTokenStatistic = async (
 // Custom Hook - 요청
 interface UseDepartmentTokenStatisticProps {
   departmentId: number;
-  start_date?: string;
-  end_date?: string;
+  start_date: string;
+  end_date: string;
   log_type: 'distribute' | 'issue';
 }
 export const useDepartmentTokenStatistic = ({
@@ -52,12 +56,20 @@ export const useDepartmentTokenStatistic = ({
   log_type
 }: UseDepartmentTokenStatisticProps) => {
   const { data, error, isPending, isLoading, isError } = useQuery<
-    AxiosResponse<DepartmentTokenStatisticResponseType>,
+    DepartmentTokenStatisticResponseType[],
     Error,
     DepartmentTokenStatisticResponseType[],
     (string | number)[]
   >({
-    queryKey: ['departmentTokenStatistic', departmentId, start_date as string, end_date as string]
+    queryKey: ['departmentTokenStatistic', departmentId, start_date as string, end_date as string],
+    queryFn: async () => {
+      const response = await getDepartmentTokenStatistic(log_type, {
+        department_id: departmentId,
+        start_date: start_date,
+        end_date
+      });
+      return response.data;
+    }
   });
   return {
     data,

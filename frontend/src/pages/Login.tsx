@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import LoginForm from '../components/login/LoginForm';
-import OrBar from '../components/login/OrBar';
 
 const Login = () => {
   return (
@@ -22,22 +21,14 @@ const Login = () => {
       <section className="w-full lg:w-1/2 flex flex-col justify-center items-center">
         <p className="text-3xl font-black text-center text-black mb-6">Welcome to Defect Studio</p>
         <p className="text-base text-center mb-6">
+          <span className="text-base text-black">Don’t have an account? </span>
+
           <Link to="/signup">
-            <span className="text-base text-black">Don’t have an account? </span>
+            <span className="text-base font-black text-[#6200ea]">Sign up for free</span>
           </Link>
-          <span className="text-base font-black text-[#6200ea]">Sign up for free</span>
         </p>
 
         <LoginForm />
-        <OrBar />
-
-        {/* Google Login */}
-        <div className="w-[400px] h-[50px] relative">
-          <button className="w-[400px] h-[50px] absolute  rounded-[100px] border border-[#ccc] hover:border-purple-400">
-            Log in with Google
-          </button>
-          <img src={'./src/assets/google.svg'} className="w-5 h-5 absolute left-[19px] top-3.5 object-contain" />
-        </div>
       </section>
     </div>
   );

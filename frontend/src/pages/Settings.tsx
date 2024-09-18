@@ -18,14 +18,19 @@ const Settings = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-[calc(100vh-60px)] bg-gray-100 p-4 overflow-hidden">
-      <div className="w-full max-w-5xl bg-white py-10 px-12 rounded-[20px] mx-auto border border-gray-300 shadow-md h-full">
-        <h1 className="text-[24px] font-semibold mb-6 text-gray-800">Settings</h1>
+    <div className="flex justify-center items-center h-[calc(100vh-60px)] bg-gray-100 p-4 overflow-hidden dark:bg-gray-800">
+      <div className="w-full max-w-5xl bg-white py-10 px-12 rounded-[20px] mx-auto border border-gray-300 shadow-md h-full dark:bg-gray-600 dark:border-none">
+        <h1 className="text-[24px] font-semibold mb-6 text-gray-800 dark:text-gray-300">Settings</h1>
         <Form layout="vertical" onFinish={handleSave}>
           <Form.Item
             label="Default Path for Generated Images"
             name="imagePath"
-            rules={[{ required: false, message: 'Please input the path for generated images!' }]}
+            rules={[
+              {
+                required: false,
+                message: 'Please input the path for generated images!'
+              }
+            ]}
           >
             <Input
               value={imagePath}
@@ -38,7 +43,12 @@ const Settings = () => {
           <Form.Item
             label="Default Path for Generated Models"
             name="modelPath"
-            rules={[{ required: false, message: 'Please input the path for generated models!' }]}
+            rules={[
+              {
+                required: false,
+                message: 'Please input the path for generated models!'
+              }
+            ]}
           >
             <Input
               value={modelPath}

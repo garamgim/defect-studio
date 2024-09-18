@@ -1,50 +1,58 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from 'antd';
 import { FormatPainterOutlined } from '@ant-design/icons';
-import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import { useFabric } from '../../../contexts/FabricContext';
-import Model from '../parameters/Model';
-import InpaintingModal from '../masking/InpaintingModal';
-import SamplingSettings from '../parameters/SamplingSettings';
-import ImageDimensions from '../parameters/ImageDimensions';
-import GeneralSettings from '../parameters/GeneralSettings';
-import BatchSettings from '../parameters/BatchSettings';
-import UploadImagePlusMask from '../parameters/UploadImagePlusMask';
+import Model from '../params/ModelParam';
+import InpaintingModal from '../masking/MaskingModal';
+import SamplingParams from '../params/SamplingParams';
+import ImgDimensionParams from '../params/ImgDimensionParams';
+import SeedParam from '../params/SeedParam';
+import BatchParams from '../params/BatchParams';
+import StrengthParam from '../params/StrengthParam';
+import GuidanceScaleParms from '../params/GuidanceScaleParam';
+import UploadImgWithMaskingParams from '../params/UploadImgWithMaskingParams';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  setModel,
+  setScheduler,
+  setWidth,
+  setHeight,
+  setSamplingSteps,
+  setGuidanceScale,
+  setSeed,
+  setStrength,
+  setIsRandomSeed,
+  setBatchCount,
+  setBatchSize
+} from '../../../store/slices/generation/img2ImgSlice';
 
 const InpaintingSidebar: React.FC = () => {
+  const { BgImage, canvasImage, combinedImage } = useSelector((state: RootState) => state.masking);
+
+  const dispatch = useDispatch();
   const {
-    imageDownloadUrl,
-    canvasDownloadUrl,
-    setImageDownloadUrl,
-    setCanvasDownloadUrl,
-    maskingResult,
-    setMaskingResult
-  } = useFabric();
+    model,
+    scheduler,
+    width,
+    height,
+    samplingSteps,
+    seed,
+    isRandomSeed,
+    guidanceScale,
+    strength,
+    batchCount,
+    batchSize
+  } = useSelector((state: RootState) => state.img2Img);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
-  const [showModal, setShowModal] = useState(false);
-  const [height, setHeight] = useState(512);
-  const [width, setWidth] = useState(512);
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [guidanceScale, setGuidanceScale] = useState(7.5);
-  const [samplingMethod, setSamplingMethod] = useState('DPM++ 2M');
-  const [samplingSteps, setSamplingSteps] = useState(50);
-  const [model, setModel] = useState('Stable Diffusion v1-5');
-  const [seed, setSeed] = useState('-1');
-  const [isRandomSeed, setIsRandomSeed] = useState(false);
-  const [batchCount, setBatchCount] = useState('1');
-  const [batchSize, setBatchSize] = useState('1');
-  const [activeTab, setActiveTab] = useState<string>('manual');
 
-  // 탭 들어가면 MaskingResult 리셋되야함
-  useEffect(() => {
-    setMaskingResult(null);
-  }, [setMaskingResult]);
+  const [showModal, setShowModal] = useState(false);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('manual');
 
   const handleRandomSeedChange = () => {
     setIsRandomSeed(!isRandomSeed);
-    setSeed(!isRandomSeed ? '-1' : '');
+    setSeed(!isRandomSeed ? -1 : seed);
   };
 
   const handleImageUpload = (file: File) => {
@@ -52,21 +60,7 @@ const InpaintingSidebar: React.FC = () => {
     reader.onloadend = () => {
       const img = new Image();
       img.onload = () => {
-        let newWidth = img.width;
-        let newHeight = img.height;
-
-        if (img.width > img.height) {
-          newWidth = 512;
-          newHeight = (img.height / img.width) * 512;
-        } else {
-          newHeight = 512;
-          newWidth = (img.width / img.height) * 512;
-        }
-
-        setWidth(newWidth);
-        setHeight(newHeight);
         setImageSrc(reader.result as string);
-        setImageDownloadUrl(reader.result as string);
       };
       img.src = reader.result as string;
     };
@@ -84,114 +78,118 @@ const InpaintingSidebar: React.FC = () => {
     }
   };
 
-  const handleDownloadCanvasImage = () => {
-    console.log(canvasDownloadUrl)
-    handleDownloadImage(canvasDownloadUrl, 'canvas.png');
+  const handleDownloadBgImage = () => {
+    handleDownloadImage(BgImage, 'stage_image.png'); // BgImage 다운로드
   };
 
-  const handleDownloadBackgroundImage = () => {
-    handleDownloadImage(imageDownloadUrl, 'image.png');
+  const handleDownloadCanvasImage = () => {
+    handleDownloadImage(canvasImage, 'canvas_image.png'); // canvasImage 다운로드
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false); // 모달 닫기
   };
 
   return (
-    <div className="w-full lg:w-72 h-full fixed-height mr-6">
-      <div className="w-full lg:w-72 h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300">
+    <div className="w-full h-full fixed-height mr-6">
+      <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* 모델 선택 */}
         <Model model={model} setModel={setModel} />
 
-        <hr className="border-t-[2px] border-[#E6E6E6] w-full" />
+        <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
         {/* 이미지 업로드 */}
-        <UploadImagePlusMask
+        <UploadImgWithMaskingParams
           handleImageUpload={handleImageUpload}
           imagePreview={imageSrc}
-          inpaintingResult={maskingResult}
-          handleDownloadImage={handleDownloadImage}
           setActiveTab={setActiveTab}
         />
 
         {imageSrc && (
           <div className="px-6 pb-10">
-            {/* Start Masking 버튼 (배치 모드가 아닐 때만 보임) */}
+            {/* Start Masking 버튼 */}
             {activeTab === 'manual' && (
               <Button
                 type="primary"
                 icon={<FormatPainterOutlined />}
-                onClick={() => setShowModal(true)}
+                onClick={() => setShowModal(true)} // 버튼 클릭 시 모달 열기
                 className="w-full mt-2"
               >
                 Start Masking
               </Button>
             )}
 
-            {/* 인페인팅 작업 결과 이미지 표시 및 다운로드 버튼 */}
-            {activeTab === 'manual' && maskingResult && (
-              <div className="relative w-full pb-[61.8%] bg-gray-100 border border-dashed border-gray-300 rounded-lg mt-4 flex items-center justify-center">
-                <img
-                  src={maskingResult}
-                  alt="Inpainting Result"
-                  className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
-                />
-
-                {/* 다운로드 버튼 - 테스트용!!! */}
-                <div className="mt-2 flex gap-2 flex-col">
-                  <Button type="default" onClick={handleDownloadCanvasImage} className="w-full">
-                    Download Canvas Image
-                  </Button>
-
-                  <Button type="default" onClick={handleDownloadBackgroundImage} className="w-full">
-                    Download Background Image
-                  </Button>
-                </div>
+            {/* 인페인팅 결과 및 다운로드 */}
+            {combinedImage && (
+              <div className="w-full border border-dashed border-gray-300 rounded-lg mt-4 flex flex-col items-center">
+                <img src={combinedImage} alt="Inpainting Result" className="w-full h-full object-cover rounded-lg" />
               </div>
             )}
+
+            <div className="mt-4 flex flex-col space-y-2">
+              {BgImage && (
+                <Button type="default" onClick={handleDownloadBgImage} className="w-full">
+                  Download Stage Image
+                </Button>
+              )}
+
+              {canvasImage && (
+                <Button type="default" onClick={handleDownloadCanvasImage} className="w-full">
+                  Download Canvas Image
+                </Button>
+              )}
+            </div>
           </div>
         )}
 
         {level === 'Advanced' && (
           <>
-            <hr className="border-t-[2px] border-[#E6E6E6] w-full" />
+            <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 샘플링 설정 */}
-            <SamplingSettings
-              samplingMethod={samplingMethod}
+            <SamplingParams
+              scheduler={scheduler}
               samplingSteps={samplingSteps}
-              setSamplingMethod={setSamplingMethod}
+              setScheduler={setScheduler}
               setSamplingSteps={setSamplingSteps}
             />
 
-            <hr className="border-t-[2px] border-[#E6E6E6] w-full" />
+            <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 이미지 크기 설정 */}
-            <ImageDimensions width={width} height={height} setWidth={setWidth} setHeight={setHeight} />
+            <ImgDimensionParams width={width} height={height} setWidth={setWidth} setHeight={setHeight} />
 
-            <hr className="border-t-[2px] border-[#E6E6E6] w-full" />
+            <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
-            {/* 생성 설정 */}
-            <GeneralSettings
-              guidanceScale={guidanceScale}
-              setGuidanceScale={setGuidanceScale}
+            {/* guidance scale 설정 */}
+            <GuidanceScaleParms guidanceScale={guidanceScale} setGuidanceScale={setGuidanceScale} />
+
+            {/* strength 설정 */}
+            <StrengthParam strength={strength} setStrength={setStrength} />
+
+            {/* seed 설정 */}
+            <SeedParam
               seed={seed}
-              setSeed={setSeed}
+              setSeed={(value: number) => dispatch(setSeed(value))}
               isRandomSeed={isRandomSeed}
               handleRandomSeedChange={handleRandomSeedChange}
             />
 
-            <hr className="border-t-[2px] border-[#E6E6E6] w-full" />
+            <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 배치 설정 */}
-            <BatchSettings
+            <BatchParams
               batchCount={batchCount}
               batchSize={batchSize}
-              setBatchCount={setBatchCount}
-              setBatchSize={setBatchSize}
+              setBatchCount={(value: number) => dispatch(setBatchCount(value))}
+              setBatchSize={(value: number) => dispatch(setBatchSize(value))}
             />
           </>
         )}
       </div>
 
-      {/* Inpainting 모달 창 */}
-      {showModal && imageSrc && <InpaintingModal imageSrc={imageSrc} onClose={() => setShowModal(false)} />}
+      {/* Masking 모달 창 */}
+      {showModal && imageSrc && <InpaintingModal imageSrc={imageSrc} onClose={handleCloseModal} />}
     </div>
   );
 };
