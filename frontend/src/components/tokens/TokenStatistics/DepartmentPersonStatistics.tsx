@@ -3,6 +3,7 @@ import { AxiosResponse } from 'axios';
 import { DepartmentPersonType, getDepartmentPeople } from '../../../api/department';
 import { Select, Space } from 'antd';
 import { useState } from 'react';
+import PersonStatisticSection from './PersonStatisticSection';
 
 interface DepartmentPersonStatisticsProps {
   departmentId: number;
@@ -75,7 +76,11 @@ const DepartmentPersonStatistics = ({ departmentId }: DepartmentPersonStatistics
       </div>
       {
         // 선택된 사람이 있을 경우
-        selectedMember && <div className="token-content mt-3"></div>
+        selectedMember && (
+          <div className="token-content mt-3">
+            <PersonStatisticSection member_pk={selectedMember} />
+          </div>
+        )
       }
     </section>
   );

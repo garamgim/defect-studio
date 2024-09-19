@@ -5,14 +5,14 @@ type logType = 'text_to_image' | 'image_to_image' | 'inpainting' | 'remove_backg
 
 // 해당 부서 내에서 의 사람의 통계
 
-interface getPersonTokenRequiredData {
+export interface getPersonTokenRequiredData {
   member_id: number;
   start_date: string;
   end_date: string;
   use_type: logType;
 }
 
-interface PersonTokenLogType {
+export interface PersonTokenLogType {
   create_date: string;
   log_type: string;
   use_type: string;
@@ -33,6 +33,7 @@ export const getPersonTokenStatistic = async (
         use_type: data.use_type
       }
     });
+    console.log(response.data);
     return response;
   } catch (error) {
     if (axios.isAxiosError(error)) {
