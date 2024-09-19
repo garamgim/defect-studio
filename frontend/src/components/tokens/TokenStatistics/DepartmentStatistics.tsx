@@ -33,8 +33,8 @@ const DepartmentStatistics = ({ departmentId }: StatisticSectionProps) => {
   const { defaultAlgorithm, darkAlgorithm } = theme; //다크모드 테마 여부
   const { data, error, isLoading } = useDepartmentTokenStatistic({
     departmentId,
-    start_date: '2020-01-01',
-    end_date: '2025-12-31',
+    start_date: '2020-01-01T00:00:00.000Z',
+    end_date: '2025-12-31T23:59:59.000Z',
     log_type: 'distribute'
   });
   return (
