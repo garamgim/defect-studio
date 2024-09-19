@@ -11,7 +11,7 @@ const ModelParam = ({ model, setModel }: ModelParamProps) => {
   };
 
   return (
-    <div className="px-6 pt-6 pb-2">
+    <div className="px-6 pt-8 pb-2">
       <p className="text-[14px] font-semibold mb-3 text-[#222] dark:text-gray-300">Model</p>
       <Form layout="vertical">
         <Form.Item>

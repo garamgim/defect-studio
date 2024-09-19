@@ -1,7 +1,15 @@
 import axiosInstance from '../api/token/axiosInstance';
+import {
+  Txt2ImgDataType,
+  Img2ImgDataType,
+  InpaintingDataType,
+  RemoveBgDataType,
+  CleanupDataType,
+  PresetDataType
+} from '../types/generation';
 
 // scheduler 리스트 가져오는 함수
-export const getSchedulers = async (): Promise<string[]> => {
+export const getSchedulers = async () => {
   try {
     const response = await axiosInstance.get('/generation/schedulers');
 
@@ -17,23 +25,7 @@ export const getSchedulers = async (): Promise<string[]> => {
 };
 
 // text-to-image 변환 함수
-export async function postTxt2ImgGeneration(
-  gpu_env: string,
-  data: {
-    model: string;
-    scheduler: string;
-    prompt: string;
-    negative_prompt: string;
-    width: number;
-    height: number;
-    num_inference_steps: number;
-    guidance_scale: number;
-    seed: number;
-    batch_count: number;
-    batch_size: number;
-    output_path: string;
-  }
-) {
+export const postTxt2ImgGeneration = async (gpu_env: Txt2ImgDataType['gpu_env'], data: Txt2ImgDataType['data']) => {
   try {
     const formData = new FormData();
 
@@ -56,29 +48,10 @@ export async function postTxt2ImgGeneration(
     console.error(error);
     throw new Error('Failed to generate text-to-image');
   }
-}
+};
 
 // image-to-image 변환 함수
-export async function postImg2ImgGeneration(
-  gpu_env: string,
-  data: {
-    model: string;
-    scheduler: string;
-    prompt: string;
-    negative_prompt: string;
-    width: number;
-    height: number;
-    num_inference_steps: number;
-    guidance_scale: number;
-    strength: number;
-    seed: number;
-    batch_count: number;
-    batch_size: number;
-    images: File[];
-    input_path: string;
-    output_path: string;
-  }
-) {
+export const postImg2ImgGeneration = async (gpu_env: Img2ImgDataType['gpu_env'], data: Img2ImgDataType['data']) => {
   try {
     const formData = new FormData();
 
@@ -108,31 +81,13 @@ export async function postImg2ImgGeneration(
     console.error(error);
     throw new Error('Failed to generate image-to-image');
   }
-}
+};
 
 // inpainting 함수
-export async function postInpaintingGeneration(
-  gpu_env: string,
-  data: {
-    model: string;
-    scheduler: string;
-    prompt: string;
-    negative_prompt: string;
-    width: number;
-    height: number;
-    num_inference_steps: number;
-    guidance_scale: number;
-    strength: number;
-    seed: number;
-    batch_count: number;
-    batch_size: number;
-    init_image_list: File[];
-    mask_image_list: File[];
-    init_input_path: string;
-    mask_input_path: string;
-    output_path: string;
-  }
-) {
+export const postInpaintingGeneration = async (
+  gpu_env: InpaintingDataType['gpu_env'],
+  data: InpaintingDataType['data']
+) => {
   try {
     const formData = new FormData();
 
@@ -161,10 +116,10 @@ export async function postInpaintingGeneration(
     console.error(error);
     throw new Error('Failed to generate image-to-image');
   }
-}
+};
 
 // clip 함수 (image -> text 변환)
-export const getClip = async (imageFiles: File[]): Promise<string[]> => {
+export const getClip = async (imageFiles: File[]) => {
   try {
     const formData = new FormData();
 
@@ -191,14 +146,7 @@ export const getClip = async (imageFiles: File[]): Promise<string[]> => {
 };
 
 // removeBackground 함수
-export async function postRemoveBgGeneration(
-  gpu_env: string,
-  data: {
-    images: File[];
-    input_path: string;
-    output_path: string;
-  }
-) {
+export const postRemoveBgGeneration = async (gpu_env: RemoveBgDataType['gpu_env'], data: RemoveBgDataType['data']) => {
   try {
     const formData = new FormData();
 
@@ -227,16 +175,10 @@ export async function postRemoveBgGeneration(
     console.error(error);
     throw new Error('Failed to generate remove-background image');
   }
-}
+};
 
 // cleanUp 함수
-export async function postCleanupGeneration(
-  gpu_env: string,
-  data: {
-    images: File[];
-    masks: File[];
-  }
-) {
+export const postCleanupGeneration = async (gpu_env: CleanupDataType['gpu_env'], data: CleanupDataType['data']) => {
   try {
     const formData = new FormData();
 
@@ -263,4 +205,52 @@ export async function postCleanupGeneration(
     console.error(error);
     throw new Error('Failed to generate cleanup image');
   }
-}
+};
+
+// 프리셋 생성 함수
+export const postPreset = async (preset: PresetDataType) => {
+  try {
+    const response = await axiosInstance.post('/generation/presets', preset);
+
+    if (response.status === 201) {
+      return response.data;
+    } else {
+      throw new Error('Failed to post preset');
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to post preset');
+  }
+};
+
+// 프리셋 목록 조회 함수
+export const getPresetList = async () => {
+  try {
+    const response = await axiosInstance.get('/generation/presets');
+
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error('Failed to get preset-list');
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to get preset-list');
+  }
+};
+
+// 프리셋 세부 조회 함수
+export const getPresetDetail = async (preset_id: string) => {
+  try {
+    const response = await axiosInstance.get(`/generation/presets/${preset_id}`);
+
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error('Failed to get preset-detail');
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to get preset-detail');
+  }
+};

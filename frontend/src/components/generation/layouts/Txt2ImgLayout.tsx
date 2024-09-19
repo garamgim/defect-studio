@@ -105,19 +105,19 @@ const Txt2ImgLayout = () => {
 
   const handleDownloadImages = async () => {
     if (selectedImages.length === 0) {
-      message.warning('저장할 이미지를 선택하세요.');
+      message.warning('Please select at least one image to save.');
       return;
     }
     const folderPath = await window.electron.selectFolder();
     if (!folderPath) {
-      message.info('폴더 선택이 취소되었습니다.');
+      message.info('Folder selection was canceled.');
       return;
     }
     const response = await window.electron.saveImages(selectedImages, folderPath, selectedImageFormat);
     if (response.success) {
-      message.success('이미지가 성공적으로 저장되었습니다.');
+      message.success('Image saved successfully!');
     } else {
-      message.error(`이미지 저장 중 오류가 발생했습니다: ${response.error}`);
+      message.error(`Failed to save images: ${response.error}`);
     }
   };
 
@@ -186,17 +186,17 @@ const Txt2ImgLayout = () => {
               onClick={showFormatModal}
             />
             <MdMoveUp
-              className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white"
+              className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white"
               onClick={showModal}
             />
             {isIconFilled ? (
               <RiCheckboxMultipleBlankLine
-                className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white ${allSelected ? 'text-blue-500' : ''}`}
+                className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white ${allSelected ? 'text-blue-500' : ''}`}
                 onClick={handleSelectAllImages}
               />
             ) : (
               <RiCheckboxMultipleBlankFill
-                className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white ${allSelected ? 'text-blue-500' : ''}`}
+                className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white ${allSelected ? 'text-blue-500' : ''}`}
                 onClick={handleSelectAllImages}
               />
             )}
@@ -242,7 +242,7 @@ const Txt2ImgLayout = () => {
       )}
 
       {/* 이미지 형식 선택 모달 */}
-      <Modal open={isFormatModalVisible} onOk={handleFormatModalOk} onCancel={handleFormatModalCancel}>
+      <Modal open={isFormatModalVisible} closable={false} onOk={handleFormatModalOk} onCancel={handleFormatModalCancel}>
         <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">
           Select the format for saving images
         </div>
@@ -256,9 +256,10 @@ const Txt2ImgLayout = () => {
       </Modal>
 
       {/* 액션 선택 모달 */}
-      <Modal title="Select Action" open={isModalVisible} onCancel={handleCancel} footer={null}>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-4">
+      <Modal open={isModalVisible} onCancel={handleCancel} footer={null}>
+        <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Select a tab to navigate</div>
+        <div className="flex flex-col gap-4 my-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
             <Button onClick={() => goToPage('/generation/image-to-image')}>Img2Img</Button>
             <Button onClick={() => goToPage('/generation/inpainting')}>Inpainting</Button>
             <Button onClick={() => goToPage('/generation/remove-background')}>Remove Background</Button>
