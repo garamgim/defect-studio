@@ -30,6 +30,8 @@ const Tokens = () => {
     { key: '3', label: 'Token Statistics', children: <TokenStatistics /> }
   ];
 
+  const defaultActiveKey = myInfo?.role === 'super_admin' ? '1' : myInfo?.role === 'department_admin' ? '2' : '3';
+
   return (
     <div className="flex justify-center items-center h-[calc(100vh-60px)] bg-gray-100 p-4 overflow-hidden dark:bg-gray-800">
       <div className="w-full max-w-5xl bg-white py-10 px-12 rounded-[20px] mx-auto border border-gray-300 shadow-md h-full overflow-y-auto custom-scrollbar dark:bg-gray-600 dark:border-none">
@@ -37,7 +39,7 @@ const Tokens = () => {
         <hr className="border-[#E6E6E6] dark:border-gray-700" />
 
         <section>
-          <Tabs defaultActiveKey={'0'} items={items} />
+          <Tabs defaultActiveKey={defaultActiveKey} items={items} />
         </section>
       </div>
     </div>

@@ -239,13 +239,23 @@ html.dark .ant-form-item-has-error {
   @apply bg-gray-800;
 }
 
+/* Tab에 관란 CSS */
 .ant-tabs-tab-btn {
   @apply font-semibold;
 }
+
 html.dark .ant-tabs-tab-btn {
   @apply text-gray-300;
 
   &:hover {
     @apply text-white;
   }
+}
+
+/* Tab중 disable된 것 */
+.ant-tabs-tab-disabled .ant-tabs-tab-btn {
+  @apply text-gray-100;
+}
+html.dark .ant-tabs-tab-disabled .ant-tabs-tab-btn {
+  @apply text-gray-700;
 }
