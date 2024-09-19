@@ -9,6 +9,7 @@ import SearchDepartmentUsageToken from './SearchDepartmentUsageToken';
 import TokenDistributionInput from './TokenDistributionInput';
 import { TableTokenUsageType } from './SearchDepartmentUsageToken';
 import { distributeTokenRequest } from './../../../api/token';
+import { useGetMyInfo } from '../../../api/user';
 
 type departmentType = {
   department_id: number;
@@ -21,9 +22,15 @@ type SelectOptionType = {
 };
 getDepartmentTokenUsage();
 const TokenDistribution = () => {
+  // 로그인 유저 정보 호출
+  const { myInfo, myInfoPending, myInfoLoading, isGetMyInfoError, myInfoError } = useGetMyInfo({
+    isLoggedIn: localStorage.getItem('accessToken') ? true : false
+  });
+
+  // 관련 queryClient 호출
   const queryClient = useQueryClient();
 
-  const [selectedDepartment, setSelectedDepartment] = useState<number | undefined>(undefined); // 부서 선택
+  const [selectedDepartment, setSelectedDepartment] = useState<number | undefined>(myInfo?.department_id); // 부서 선택
   const [selectedDepartmentPeople, setSelectedDepartmentPeople] = useState<number[]>([]); // 분배받은 사람들 선택
   const [selectedDepartmentTokenUsage, setSelectedDepartmentTokenUsage] = useState<TableTokenUsageType[]>([]); // 부서 토큰 선택
   const [distributeTokenValue, setDistributeTokenValue] = useState<number>(0); // 분배할 토큰 값
@@ -80,7 +87,12 @@ const TokenDistribution = () => {
       })
   });
 
-  // 로그인 유저
+  if (myInfoPending || myInfoLoading) {
+    return <div>Loading...</div>;
+  }
+  if (isGetMyInfoError) {
+    return <div>Error: {myInfoError?.message || 'Please login again Please'}</div>;
+  }
 
   return (
     <div className="flex flex-col justify-center align-middle">
@@ -100,6 +112,8 @@ const TokenDistribution = () => {
             }
             onChange={(value: number) => setSelectedDepartment(value)}
             options={[...data]}
+            defaultValue={myInfo?.department_id ? myInfo.department_id : undefined}
+            disabled={myInfo?.role !== 'super_admin'}
           />
         )}
       </section>
