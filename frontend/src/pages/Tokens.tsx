@@ -1,25 +1,34 @@
 import TokenHeader from '../components/tokens/TokenHeader/TokenHeader';
-import { useMemo, useState } from 'react';
-import TokenTabs from '../components/tokens/TokenTabs/TokenTabs';
-import { TabItemType } from '../components/tokens/TokenTabs/TokenTabs';
 import TokenIssurance from '../components/tokens/TokenIssurance/TokenIssurance';
 import TokenDistribution from '../components/tokens/TokenDistribution/TokenDistribution';
 import TokenStatistics from '../components/tokens/TokenStatistics/TokenStatistics';
-
-const tabItems: TabItemType[] = [
-  { id: 'TokenIssurance', name: 'Token Issurance', value: 1 },
-  { id: 'TokenDistribution', name: 'Token Distribution', value: 2 },
-  { id: 'TokenStatistics', name: 'Token Statistics', value: 3 }
-];
+import { Tabs } from 'antd';
+import type { TabsProps } from 'antd';
+import { useGetMyInfo } from '../api/user';
 
 const Tokens = () => {
-  // Tab Items
-  const [activeTab, setActiveTab] = useState<string | number>('');
-  const memorizedSetActiveTab = useMemo(() => setActiveTab, []);
-  // //유저 정보 읽어오고 나서 권한 정보 읽어오기 -> 추후 수정
-  // useEffect(() => {
-  //   setActiveTab("");
-  // }, []);
+  const { myInfo, myInfoPending, myInfoLoading, isGetMyInfoError, myInfoError } = useGetMyInfo({
+    isLoggedIn: !!localStorage.getItem('accessToken')
+  });
+
+  if (myInfoPending || myInfoLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isGetMyInfoError) {
+    return <div>Error: {myInfoError?.message}</div>;
+  }
+
+  const items: TabsProps['items'] = [
+    { key: '1', label: 'Token Issurance', children: <TokenIssurance />, disabled: myInfo?.role !== 'super_admin' },
+    {
+      key: '2',
+      label: 'Token Distribution',
+      children: <TokenDistribution />,
+      disabled: myInfo?.role !== 'super_admin' && myInfo?.role !== 'department_admin'
+    },
+    { key: '3', label: 'Token Statistics', children: <TokenStatistics /> }
+  ];
 
   return (
     <div className="flex justify-center items-center h-[calc(100vh-60px)] bg-gray-100 p-4 overflow-hidden dark:bg-gray-800">
@@ -27,23 +36,8 @@ const Tokens = () => {
         <TokenHeader />
         <hr className="border-[#E6E6E6] dark:border-gray-700" />
 
-        <TokenTabs activeTab={activeTab} setActiveTab={memorizedSetActiveTab} tabItems={tabItems} />
         <section>
-          {activeTab === 1 && (
-            <div>
-              <TokenIssurance />
-            </div>
-          )}
-          {activeTab === 2 && (
-            <div>
-              <TokenDistribution />
-            </div>
-          )}
-          {activeTab === 3 && (
-            <div>
-              <TokenStatistics />
-            </div>
-          )}
+          <Tabs defaultActiveKey={'0'} items={items} />
         </section>
       </div>
     </div>
