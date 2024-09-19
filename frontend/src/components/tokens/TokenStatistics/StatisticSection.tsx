@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from 'antd';
 import DepartmentStatistics from './DepartmentStatistics';
+import DepartmentPersonStatistics from './DepartmentPersonStatistics';
 
 interface StatisticSectionProps {
   departmentId: number;
@@ -37,7 +38,11 @@ const StatisticSection = ({ departmentId }: StatisticSectionProps) => {
       </section>
       <section>
         {/* 선택옵션에 따라서 */}
-        {menu === 'Department' ? <DepartmentStatistics departmentId={departmentId} /> : <div>Person</div>}
+        {menu === 'Department' ? (
+          <DepartmentStatistics departmentId={departmentId} />
+        ) : (
+          <DepartmentPersonStatistics departmentId={departmentId} />
+        )}
       </section>
     </div>
   );

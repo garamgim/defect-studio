@@ -25,19 +25,22 @@ export const getDepartmentTokenStatistic = async (
 ): Promise<AxiosResponse<DepartmentTokenStatisticResponseType[]>> => {
   try {
     const response = await axiosInstance.get<DepartmentTokenStatisticResponseType[]>(
-      `/admin/token-logs/issue/${statisticType}`,
-      { params: requestData }
+      `/admin/token-logs/${statisticType}`
     );
     return response;
   } catch (error) {
     if (axios.isAxiosError<DepartmentTokenStatisticResponseType[]>(error)) {
       if (error.response?.status === 401) {
-        throw new Error('Unauthorized');
+        throw new Error('Unauthorized'); // 권한 없음
+      } else if (error.response?.status === 404) {
+        throw new Error('Not Found'); // 없음
+      } else if (error.response?.status === 422) {
+        throw new Error('Unprocessable Entity'); // 누락
       } else {
-        throw new Error('Unknown Error');
+        throw new Error('Unknown Error'); // 알수 없는 에러
       }
     } else {
-      throw new Error('Unknown Error');
+      throw new Error('Unknown Error'); // 알수 없는 에러
     }
   }
 };
@@ -65,7 +68,7 @@ export const useDepartmentTokenStatistic = ({
     queryFn: async () => {
       const response = await getDepartmentTokenStatistic(log_type, {
         department_id: departmentId,
-        start_date: start_date,
+        start_date,
         end_date
       });
       return response.data;
