@@ -28,6 +28,7 @@ const TokenDistribution = () => {
   const [selectedDepartmentTokenUsage, setSelectedDepartmentTokenUsage] = useState<TableTokenUsageType[]>([]); // 부서 토큰 선택
   const [distributeTokenValue, setDistributeTokenValue] = useState<number>(0); // 분배할 토큰 값
 
+  // ---- 만약 선택이 바뀌었으면 초기화 시키는 모든 옵션들
   useEffect(() => {
     if (!selectedDepartment) {
       setSelectedDepartmentPeople([]);
@@ -42,7 +43,9 @@ const TokenDistribution = () => {
       setDistributeTokenValue(0);
     }
   }, [selectedDepartmentPeople]);
+  //---------------------------------------------------------------------
 
+  // Distribute 함수. 성공시, 관련 쿼리들을 리프레시
   const { mutate, isPending } = useMutation({
     mutationFn: distributeTokenRequest,
     onSuccess: () => {
@@ -59,6 +62,7 @@ const TokenDistribution = () => {
     }
   });
 
+  // 부서 리스트
   const { data, isError, error, isLoading } = useQuery<
     AxiosResponse<departmentType[]>,
     AxiosError,
@@ -76,6 +80,8 @@ const TokenDistribution = () => {
       })
   });
 
+  // 로그인 유저
+
   return (
     <div className="flex flex-col justify-center align-middle">
       {/* 부서 선택 */}
@@ -92,7 +98,7 @@ const TokenDistribution = () => {
             filterSort={(optionA, optionB) =>
               (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
             }
-            onChange={(value) => setSelectedDepartment(value)}
+            onChange={(value: number) => setSelectedDepartment(value)}
             options={[...data]}
           />
         )}
