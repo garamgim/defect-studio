@@ -16,7 +16,7 @@ interface SelectDepartmentProps {
   setSelectedDepartment: React.Dispatch<React.SetStateAction<number | undefined>>;
 }
 
-const SelectDepartment = ({ setSelectedDepartment, selectedDepartment }: SelectDepartmentProps) => {
+const SelectDepartment = ({ setSelectedDepartment }: SelectDepartmentProps) => {
   // 내정보호출
   const { myInfo } = useGetMyInfo({
     isLoggedIn: !!localStorage.getItem('accessToken')
