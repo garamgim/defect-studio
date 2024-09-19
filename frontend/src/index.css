@@ -39,7 +39,6 @@ body {
   width: 10px; /* 스크롤바 너비 */
 }
 
-
 .custom-scrollbar2::-webkit-scrollbar-track {
   background-color: #ffffff;
   /* margin-top: 10px; */
@@ -48,15 +47,14 @@ body {
 }
 
 html.dark .custom-scrollbar2::-webkit-scrollbar-track {
-  background-color: #374151 ;
+  background-color: #374151;
   /* margin-top: 10px;  */
   /* margin-bottom: 10px;  */
   border-radius: 5px;
 }
 
-
 .custom-scrollbar2::-webkit-scrollbar-thumb {
-  background-color: #E6E6E6;
+  background-color: #e6e6e6;
   border-radius: 5px;
   margin-top: 0px; /* 위쪽 여백 */
   margin-bottom: 0px; /* 아래쪽 여백 */
@@ -239,4 +237,15 @@ html.dark .ant-input-outlined {
 
 html.dark .ant-form-item-has-error {
   @apply bg-gray-800;
+}
+
+.ant-tabs-tab-btn {
+  @apply font-semibold;
+}
+html.dark .ant-tabs-tab-btn {
+  @apply text-gray-300;
+
+  &:hover {
+    @apply text-white;
+  }
 }
