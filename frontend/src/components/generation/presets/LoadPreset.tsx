@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Typography, Modal, Button, message } from 'antd';
-import { getPresetList, getPresetDetail } from '../../../api/generation';
+import { getPresetList, getPresetDetail, deletePreset } from '../../../api/generation';
 import moment from 'moment';
 import { PresetDataType } from '../../../types/generation';
 import { GrPrevious, GrNext } from 'react-icons/gr';
+import { MinusSquareOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
@@ -11,9 +12,38 @@ interface LoadPresetProps {
   isModalOpen: boolean;
   closeModal: () => void;
   type: 'text_to_image' | 'image_to_image' | 'inpainting' | 'remove_background' | 'clean_up';
+
+  setModel: (value: string) => void;
+  setWidth: (value: number) => void;
+  setHeight: (value: number) => void;
+  setGuidanceScale: (value: number) => void;
+  setSamplingSteps: (value: number) => void;
+  setSeed: (value: number) => void;
+  setPrompt: (value: string) => void;
+  setNegativePrompt: (value: string) => void;
+  setBatchCount: (value: number) => void;
+  setBatchSize: (value: number) => void;
+  setScheduler: (value: string) => void;
+  setStrength?: (value: number) => void;
 }
 
-const LoadPreset = ({ isModalOpen, closeModal, type }: LoadPresetProps) => {
+const LoadPreset = ({
+  isModalOpen,
+  closeModal,
+  type,
+  setModel,
+  setWidth,
+  setHeight,
+  setGuidanceScale,
+  setSamplingSteps,
+  setSeed,
+  setPrompt,
+  setNegativePrompt,
+  setBatchCount,
+  setBatchSize,
+  setScheduler,
+  setStrength
+}: LoadPresetProps) => {
   const [, setLoading] = useState(true);
   const [filteredPresets, setFilteredPresets] = useState<PresetDataType[]>([]);
   const [selectedPreset, setSelectedPreset] = useState<PresetDataType | null>(null);
@@ -23,26 +53,27 @@ const LoadPreset = ({ isModalOpen, closeModal, type }: LoadPresetProps) => {
   const itemsPerPage = 6; // 한 페이지에 보여줄 항목 수
 
   // Preset 목록 가져오기
+  const fetchPresets = async () => {
+    try {
+      if (!isModalOpen) return;
+
+      setLoading(true);
+      const data = await getPresetList();
+
+      // type에 맞는 프리셋만 필터링
+      const filtered = data.presets.filter((preset: PresetDataType) => preset.generation_type === type);
+      setFilteredPresets(filtered);
+      setLoading(false);
+    } catch (error) {
+      message.error('Failed to load presets.');
+      setLoading(false);
+    }
+  };
+
+  // 모달이 열릴 때 목록을 가져오기
   useEffect(() => {
-    const fetchPresets = async () => {
-      try {
-        if (!isModalOpen) return;
-
-        setLoading(true);
-        const data = await getPresetList();
-
-        // type에 맞는 프리셋만 필터링
-        const filtered = data.presets.filter((preset: PresetDataType) => preset.generation_type === type);
-        setFilteredPresets(filtered);
-        setLoading(false);
-      } catch (error) {
-        message.error('Failed to load presets.');
-        setLoading(false);
-      }
-    };
-
     fetchPresets();
-  }, [isModalOpen, type]);
+  }, [isModalOpen]);
 
   // 프리셋 세부 정보 가져오기
   const fetchPresetDetail = async (preset_id: string) => {
@@ -53,6 +84,17 @@ const LoadPreset = ({ isModalOpen, closeModal, type }: LoadPresetProps) => {
       setLoading(false);
     } catch (error) {
       message.error('Failed to load preset detail.');
+      setLoading(false);
+    }
+  };
+
+  // 프리셋 삭제
+  const handleDeletePreset = async (preset_id: string) => {
+    try {
+      setLoading(true);
+      await deletePreset(preset_id);
+    } catch (error) {
+      message.error('Failed to delete preset.');
       setLoading(false);
     }
   };
@@ -70,6 +112,49 @@ const LoadPreset = ({ isModalOpen, closeModal, type }: LoadPresetProps) => {
   // 페이지 변경 함수
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  // 프리셋 로드 함수
+  const handleLoadPreset = () => {
+    if (selectedPreset) {
+      if (selectedPreset.model) {
+        setModel(selectedPreset.model);
+      }
+      if (selectedPreset.width) {
+        setWidth(selectedPreset.width);
+      }
+      if (selectedPreset.height) {
+        setHeight(selectedPreset.height);
+      }
+      if (selectedPreset.guidance_scale) {
+        setGuidanceScale(selectedPreset.guidance_scale);
+      }
+      if (selectedPreset.sampling_steps) {
+        setSamplingSteps(selectedPreset.sampling_steps);
+      }
+      if (selectedPreset.seed) {
+        setSeed(selectedPreset.seed);
+      }
+      if (selectedPreset.prompt) {
+        setPrompt(selectedPreset.prompt);
+      }
+      if (selectedPreset.negative_prompt) {
+        setNegativePrompt(selectedPreset.negative_prompt);
+      }
+      if (selectedPreset.batch_count) {
+        setBatchCount(selectedPreset.batch_count);
+      }
+      if (selectedPreset.batch_size) {
+        setBatchSize(selectedPreset.batch_size);
+      }
+      if (selectedPreset.sampling_method) {
+        setScheduler(selectedPreset.sampling_method);
+      }
+      if (selectedPreset.strength && setStrength) {
+        setStrength(selectedPreset.strength);
+      }
+    }
+    closeModal();
   };
 
   return (
@@ -104,7 +189,8 @@ const LoadPreset = ({ isModalOpen, closeModal, type }: LoadPresetProps) => {
                 <div className="flex justify-between p-4 font-semibold border-t border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-300">
                   <span className="w-1/12">No.</span>
                   <span className="w-7/12">Preset Name</span>
-                  <span className="w-4/12">Date</span>
+                  <span className="w-3/12">Date</span>
+                  <span className="w-1/12"></span>
                 </div>
 
                 {/* 목록 */}
@@ -127,7 +213,21 @@ const LoadPreset = ({ isModalOpen, closeModal, type }: LoadPresetProps) => {
                         <span className="w-7/12">{preset.preset_title}</span>
 
                         {/* 날짜 */}
-                        <span className="w-4/12">{moment(preset.date).format('YYYY-MM-DD HH:mm')}</span>
+                        <span className="w-3/12">{moment(preset.date).format('YYYY-MM-DD HH:mm')}</span>
+
+                        {/* 삭제 버튼 */}
+                        <button
+                          className="w-1/12 text-[15px] text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-white"
+                          onClick={async (event) => {
+                            event.stopPropagation(); // 부모 클릭 이벤트 전파 방지
+                            if (preset._id) {
+                              await handleDeletePreset(preset._id); // 삭제 후
+                              fetchPresets();
+                            }
+                          }}
+                        >
+                          <MinusSquareOutlined />
+                        </button>
                       </div>
                     </li>
                   ))}
@@ -243,7 +343,11 @@ const LoadPreset = ({ isModalOpen, closeModal, type }: LoadPresetProps) => {
 
       <div className="flex justify-end gap-4 p-4">
         {selectedPreset ? <Button onClick={backToList}>Back</Button> : <Button onClick={closeModal}>Cancel</Button>}
-        {selectedPreset && <Button type="primary">Load</Button>}
+        {selectedPreset && (
+          <Button type="primary" onClick={handleLoadPreset}>
+            Load
+          </Button>
+        )}
       </div>
     </Modal>
   );

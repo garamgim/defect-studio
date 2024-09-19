@@ -20,7 +20,7 @@ interface Txt2ImgState {
 }
 
 const initialState: Txt2ImgState = {
-  model: 'CompVis/stable-diffusion-v1-4',
+  model: 'stable-diffusion-2',
   scheduler: 'DPM++ 2M',
   prompt: '',
   negativePrompt: '',

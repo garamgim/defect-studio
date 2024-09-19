@@ -31,7 +31,7 @@ interface InpaintingState {
 
 const initialState: InpaintingState = {
   mode: 'manual',
-  model: 'CompVis/stable-diffusion-v1-4',
+  model: 'stable-diffusion-2',
   scheduler: 'DPM++ 2M',
   prompt: '',
   negativePrompt: '',
