@@ -1,4 +1,3 @@
-import { get } from 'react-hook-form';
 import { getPersonTokenLog } from '../../../api/statistic_person';
 
 interface DepartmentPersonStatisticsProps {
