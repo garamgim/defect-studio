@@ -1,11 +1,11 @@
-import { getPersonTokenLog } from '../../../api/statistic_person';
+import { getPersonTokenStatistic } from '../../../api/statistic_person';
 
 interface DepartmentPersonStatisticsProps {
   departmentId: number;
 }
 
 const getPersonTokenLogData = async () => {
-  const response = await getPersonTokenLog({
+  const response = await getPersonTokenStatistic({
     member_id: 1,
     start_date: '2021-01-01',
     end_date: '2024-12-31',
