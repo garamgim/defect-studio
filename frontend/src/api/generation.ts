@@ -254,3 +254,19 @@ export const getPresetDetail = async (preset_id: string) => {
     throw new Error('Failed to get preset-detail');
   }
 };
+
+// 프리셋 삭제 함수
+export const deletePreset = async (preset_id: string) => {
+  try {
+    const response = await axiosInstance.delete(`/generation/presets/${preset_id}`);
+
+    if (response.status === 204) {
+      return response.data;
+    } else {
+      throw new Error('Failed to delete preset');
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to delete preset');
+  }
+};

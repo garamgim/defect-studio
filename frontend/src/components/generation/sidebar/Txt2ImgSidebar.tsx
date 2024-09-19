@@ -14,7 +14,9 @@ import {
   setModel,
   setScheduler,
   setBatchCount,
-  setBatchSize
+  setBatchSize,
+  setPrompt,
+  setNegativePrompt
 } from '../../../store/slices/generation/txt2ImgSlice';
 import ModelParam from '../params/ModelParam';
 import ImgDimensionParams from '../params/ImgDimensionParams';
@@ -22,7 +24,7 @@ import GuidanceScaleParams from '../params/GuidanceScaleParam';
 import SeedParam from '../params/SeedParam';
 import SamplingParams from '../params/SamplingParams';
 import BatchParams from '../params/BatchParams';
-import { FileAddOutlined, FileSearchOutlined } from '@ant-design/icons';
+import { FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -39,7 +41,7 @@ const Sidebar = () => {
     batchSize,
     prompt,
     negativePrompt
-  } = useSelector((state: RootState) => state.txt2Img); // txt2Img 상태 가져오기
+  } = useSelector((state: RootState) => state.txt2Img);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
@@ -67,12 +69,13 @@ const Sidebar = () => {
   return (
     <div className="w-full h-full mr-6">
       <div className="relative w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
-        {/* preset */}
+        {/* reset parameters & preset */}
         {level === 'Advanced' && (
           <div className="absolute top-6 right-0 mx-6">
+            <UndoOutlined className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer" />
             <FileAddOutlined
               onClick={showCreatePreset}
-              className="mr-[15px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
+              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
             />
             <FileSearchOutlined
               onClick={showLoadPreset}
@@ -154,7 +157,22 @@ const Sidebar = () => {
       />
 
       {/* 프리셋 다운로드 */}
-      <LoadPreset isModalOpen={isLoadPresetOpen} closeModal={closeLoadPreset} type="text_to_image" />
+      <LoadPreset
+        isModalOpen={isLoadPresetOpen}
+        closeModal={closeLoadPreset}
+        type="text_to_image"
+        setModel={(value: string) => dispatch(setModel(value))}
+        setWidth={(value: number) => dispatch(setWidth(value))}
+        setHeight={(value: number) => dispatch(setHeight(value))}
+        setGuidanceScale={(value: number) => dispatch(setGuidanceScale(value))}
+        setSamplingSteps={(value: number) => dispatch(setSamplingSteps(value))}
+        setSeed={(value: number) => dispatch(setSeed(value))}
+        setPrompt={(value: string) => dispatch(setPrompt(value))}
+        setNegativePrompt={(value: string) => dispatch(setNegativePrompt(value))}
+        setBatchCount={(value: number) => dispatch(setBatchCount(value))}
+        setBatchSize={(value: number) => dispatch(setBatchSize(value))}
+        setScheduler={(value: string) => dispatch(setScheduler(value))}
+      />
     </div>
   );
 };
