@@ -3,6 +3,8 @@ import { Select } from 'antd';
 import { AxiosError, AxiosResponse } from 'axios';
 import { getAllDepartments } from '../../../api/department';
 import { departmentType } from '../../../api/department';
+import { useGetMyInfo } from '../../../api/user';
+import { useEffect } from 'react';
 
 interface SelectOptionType {
   value: number;
@@ -10,11 +12,19 @@ interface SelectOptionType {
 }
 
 interface SelectDepartmentProps {
+  selectedDepartment: number | undefined;
   setSelectedDepartment: React.Dispatch<React.SetStateAction<number | undefined>>;
 }
 
-const SelectDepartment = ({ setSelectedDepartment }: SelectDepartmentProps) => {
-  // T : AxiosResponse(즉 QueryFn의 반환값), V : SelectType(즉 최종리턴값)
+const SelectDepartment = ({ setSelectedDepartment, selectedDepartment }: SelectDepartmentProps) => {
+  // 내정보호출
+  const { myInfo } = useGetMyInfo({
+    isLoggedIn: !!localStorage.getItem('accessToken')
+  });
+  useEffect(() => {
+    setSelectedDepartment(myInfo?.department_id);
+  }, [myInfo?.department_id]);
+
   const { data, isError, error, isLoading } = useQuery<
     AxiosResponse<departmentType[]>,
     AxiosError,
@@ -47,6 +57,8 @@ const SelectDepartment = ({ setSelectedDepartment }: SelectDepartmentProps) => {
             (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
           }
           onChange={(value) => setSelectedDepartment(value)}
+          defaultValue={myInfo?.department_id ? myInfo.department_id : undefined}
+          disabled={myInfo?.role !== 'super_admin'}
           options={[...data]}
         />
       )}
