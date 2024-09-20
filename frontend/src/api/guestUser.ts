@@ -36,6 +36,7 @@ export const approveGuestUser = async (member_pk: number, new_role: RoleType) =>
       }
     });
     return response;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error.response?.status === 400) {
       throw Error(error.response?.data.message || 'Something went wrong');
