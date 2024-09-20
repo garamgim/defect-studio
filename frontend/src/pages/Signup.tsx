@@ -1,7 +1,11 @@
-import { Form, Input, Button, Select, message } from 'antd';
+import { Form, Input, Button, message, Select } from 'antd';
 import { signUpFormType } from '../types/user';
 import { signupHTTP } from '../api/signupHTTP';
 import { useNavigate } from 'react-router-dom';
+import { getAllDepartments } from '../api/department';
+import { useQuery } from '@tanstack/react-query';
+import { departmentType } from '../api/department';
+import { AxiosResponse } from 'axios';
 
 const initialValues: signUpFormType = {
   login_id: '',
@@ -9,28 +13,45 @@ const initialValues: signUpFormType = {
   name: '',
   nickname: '',
   email: '',
-  role: 'department_member',
   department_id: 0
 };
 
 const Signup = () => {
   const navigate = useNavigate();
+  // 제출 코드
   const onSubmit = async (data: signUpFormType) => {
     console.log(data);
     try {
       await signupHTTP(data);
       form.resetFields();
-      message.success('Successfully signed up. Try logging in now.');
+      message.success('Your registration request has been completed. Please contact the administrator for approval.');
       navigate('/login');
     } catch (error) {
       message.error('Failed to sign up. Please try again later.');
     }
   };
 
+  // 부서 정보 가져오기
+  const { data, isPending, isError, error } = useQuery<
+    AxiosResponse<departmentType[]>,
+    Error,
+    departmentType[],
+    (string | number)[]
+  >({
+    queryKey: ['departments'],
+    queryFn: getAllDepartments,
+    select: (data) => data.data
+  });
+
   const [form] = Form.useForm();
+
+  // 조건부 렌더링
+  if (isPending) return <div>Loading...</div>;
+  if (isError) return <div>Error: {error?.message}</div>;
+
   return (
     <div className="w-full h-full min-h-[1024px] relative overflow-hidden bg-white dark:bg-gray-800">
-      <p className="absolute left-1/2 top-8 transform -translate-x-1/2 text-2xl sm:text-3xl font-black text-center text-black">
+      <p className="absolute left-1/2 top-8 transform -translate-x-1/2 text-2xl sm:text-3xl font-black text-center text-black dark:text-white">
         Welcome to Defect Studio
       </p>
       <section className="absolute top-[100px] left-1/2 transform -translate-x-1/2">
@@ -109,27 +130,41 @@ const Signup = () => {
           >
             <Input />
           </Form.Item>
-          <Form.Item label="Role" name="role" rules={[{ required: true, message: 'Role is required' }]}>
-            <Select>
-              <Select.Option value="department_member">Department Member</Select.Option>
-              <Select.Option value="department_admin">Department Admin"</Select.Option>
-              <Select.Option value="super_admin">Super Admin</Select.Option>
-            </Select>
-          </Form.Item>
+
           <Form.Item
-            label="Department ID"
+            label="Department"
             name="department_id"
-            rules={[{ required: true, message: 'Department ID is required' }]}
+            rules={[
+              { required: true, message: 'Please Select Department' },
+              {
+                validator: (_, value) => {
+                  if (value === 0) {
+                    return Promise.reject('Please Select Department');
+                  }
+                  return Promise.resolve();
+                }
+              }
+            ]}
+            initialValue={1}
           >
-            <Input />
+            <Select>
+              <Select.Option value={0} disabled={true}>
+                Select Department
+              </Select.Option>
+              {data.map((department) => (
+                <Select.Option key={department.department_id} value={department.department_id}>
+                  {department.department_name}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item style={{ display: 'flex', justifyContent: 'center' }}>
             <Button
               type="primary"
               htmlType="submit"
-              className="w-[100] min-w-[400px] my-5 max-w-[400px] h-[53px] rounded-[100px] bg-[#6200ea] text-lg font-black text-center text-white focus:outline-none"
+              className="w-[100] min-w-[400px] my-5 max-w-[400px] h-[53px] rounded-[10px] bg-[#6200ea] text-lg font-black text-center text-white focus:outline-none"
             >
-              Sign Up
+              Request Signup
             </Button>
           </Form.Item>
         </Form>

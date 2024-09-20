@@ -255,3 +255,15 @@ html.dark .ant-tabs-tab-btn {
 html.dark .ant-tabs-tab-disabled .ant-tabs-tab-btn {
   @apply text-gray-700;
 }
+
+html.dark .ant-form-item-control-input-content .ant-input-status-error {
+  @apply bg-gray-700;
+
+  &:hover {
+    @apply bg-gray-600;
+  }
+}
+
+html.dark .ant-input .ant-input-outlined {
+  @apply bg-gray-700;
+}
