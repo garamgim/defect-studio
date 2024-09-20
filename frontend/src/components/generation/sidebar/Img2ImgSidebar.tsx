@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import { useState } from 'react';
+>>>>>>> feature/fe/42-token-page-ui
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
 import {
@@ -12,6 +16,7 @@ import {
   setIsRandomSeed,
   setBatchCount,
   setBatchSize,
+<<<<<<< HEAD
   setImages,
   setInputPath,
   setOutputPath,
@@ -19,6 +24,9 @@ import {
   setClipData,
   setPrompt,
   setNegativePrompt
+=======
+  setImages
+>>>>>>> feature/fe/42-token-page-ui
 } from '../../../store/slices/generation/img2ImgSlice';
 import ModelParams from '../params/ModelParam';
 import UploadImgParams from '../params/UploadImgParams';
@@ -28,10 +36,13 @@ import SamplingParams from '../params/SamplingParams';
 import SeedParam from '../params/SeedParam';
 import BatchParams from '../params/BatchParams';
 import GuidanceScaleParam from '../params/GuidanceScaleParam';
+<<<<<<< HEAD
 import { FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import CreatePreset from '../presets/CreatePreset';
 import LoadPreset from '../presets/LoadPreset';
+=======
+>>>>>>> feature/fe/42-token-page-ui
 
 const Img2ImgSidebar = () => {
   const dispatch = useDispatch();
@@ -46,6 +57,7 @@ const Img2ImgSidebar = () => {
     guidanceScale,
     strength,
     batchCount,
+<<<<<<< HEAD
     batchSize,
     inputPath,
     outputPath,
@@ -55,15 +67,25 @@ const Img2ImgSidebar = () => {
   } = useSelector((state: RootState) => state.img2Img);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
+=======
+    batchSize
+  } = useSelector((state: RootState) => state.img2Img);
+
+  const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
+
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+>>>>>>> feature/fe/42-token-page-ui
 
   const handleRandomSeedChange = () => {
     dispatch(setIsRandomSeed(!isRandomSeed));
     dispatch(setSeed(!isRandomSeed ? -1 : seed));
   };
 
+
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
+<<<<<<< HEAD
       const base64String = reader.result as string;
       const img = new Image();
       img.onload = () => {
@@ -72,10 +94,21 @@ const Img2ImgSidebar = () => {
         console.log('images: ', images);
       };
       img.src = base64String;
+=======
+      const base64String = reader.result as string; // 변환된 Base64 문자열
+      const img = new Image();
+      img.onload = () => {
+        setImageSrc(base64String);
+        console.log('Base64 String:', base64String); // Base64 문자열 출력
+        dispatch(setImages([base64String])); // Redux 상태에 Base64 문자열 저장
+      };
+      img.src = base64String; // img.src에 Base64 문자열 설정
+>>>>>>> feature/fe/42-token-page-ui
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(file); // 파일을 Base64로 변환
   };
 
+<<<<<<< HEAD
   const [isCreatePresetOpen, setIsCreatePresetOpen] = useState(false);
   const [isLoadPresetOpen, setIsLoadPresetOpen] = useState(false);
 
@@ -131,21 +164,47 @@ const Img2ImgSidebar = () => {
             dispatch(setMode(value));
           }}
         />
+=======
+  return (
+    <div className="w-full h-full fixed-height mr-6">
+      <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
+        {/* 모델 선택 */}
+        <ModelParams model={model} setModel={setModel} />
+
+        <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
+
+        {/* 이미지 업로드 */}
+        <UploadImgParams handleImageUpload={handleImageUpload} imagePreview={imageSrc} />
+>>>>>>> feature/fe/42-token-page-ui
 
         {level === 'Advanced' && (
           <>
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 이미지 크기 */}
+<<<<<<< HEAD
             <ImgDimensionParams
               width={width}
               height={height}
               setWidth={(value: number) => dispatch(setWidth(value))}
               setHeight={(value: number) => dispatch(setHeight(value))}
+=======
+            <ImgDimensionParams width={width} height={height} setWidth={setWidth} setHeight={setHeight} />
+
+            <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
+
+            {/* 샘플링 세팅 */}
+            <SamplingParams
+              scheduler={scheduler}
+              samplingSteps={samplingSteps}
+              setScheduler={setScheduler}
+              setSamplingSteps={setSamplingSteps}
+>>>>>>> feature/fe/42-token-page-ui
             />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
+<<<<<<< HEAD
             {/* 샘플링 세팅 */}
             <SamplingParams
               scheduler={scheduler}
@@ -165,6 +224,16 @@ const Img2ImgSidebar = () => {
             {/* 초기 이미지 변화 제어 */}
             <StrengthParam strength={strength} setStrength={(value: number) => dispatch(setStrength(value))} />
 
+=======
+            {/* 초기 이미지 변화 제어 */}
+            <GuidanceScaleParam guidanceScale={guidanceScale} setGuidanceScale={setGuidanceScale} />
+
+            {/* 초기 이미지 변화 제어 */}
+            <StrengthParam strength={strength} setStrength={setStrength} />
+
+            <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
+
+>>>>>>> feature/fe/42-token-page-ui
             {/* 이미지 재현/다양성 제어 */}
             <SeedParam
               seed={seed}
