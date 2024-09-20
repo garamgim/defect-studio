@@ -6,7 +6,7 @@ export type RoleType = 'guest' | 'department_member' | 'department_admin' | 'sup
 // Guest Member 정보 가져오기
 
 export type MemberRead = {
-  member_pk: number;
+  member_id: number;
   login_id: string;
   nickname: string;
   email: string;
@@ -34,7 +34,10 @@ export interface ApproveGuestUserProps {
   new_role: Omit<RoleType, 'guest'>;
 }
 
-export const approveGuestUser = async ({ member_pk, new_role }: ApproveGuestUserProps) => {
+export const approveGuestUser = async ({
+  member_pk,
+  new_role
+}: ApproveGuestUserProps): Promise<AxiosResponse<string>> => {
   try {
     const response = await axiosInstance.patch(`/admin/members/guests/${member_pk}`, null, {
       params: {

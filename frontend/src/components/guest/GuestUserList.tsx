@@ -25,7 +25,7 @@ const GuestUserList = () => {
   const { data, isPending, isError } = useQuery<AxiosResponse<MemberRead[]>, Error, TableMemberType[], string[]>({
     queryKey: ['guest_user_info'],
     queryFn: getGuestUserInfo,
-    select: (response) => response.data.map((member) => ({ ...member, key: member.member_pk })),
+    select: (response) => response.data.map((member) => ({ ...member, key: member.member_id })),
     staleTime: 1000 * 60 * 10, // 10분
     gcTime: 1000 * 60 * 20 // 20분
   });
