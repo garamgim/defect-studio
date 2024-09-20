@@ -1,10 +1,11 @@
+import { useNavigate } from 'react-router-dom';
 import { useGetMyInfo } from '../api/user';
 import { Button } from 'antd';
 const Profile = () => {
   const { myInfo, myInfoPending, isGetMyInfoError, myInfoError } = useGetMyInfo({
     isLoggedIn: !!localStorage.getItem('accessToken')
   });
-
+  const navigate = useNavigate();
   return (
     <div>
       <div className="flex justify-center items-center h-[calc(100vh-60px)] bg-gray-100 dark:bg-gray-700 p-4 overflow-hidden">
@@ -70,6 +71,15 @@ const Profile = () => {
               <section className="flex flex-row justify-end">
                 <Button className="mx-3">Edit</Button>
                 <Button className="mx-3">Delete</Button>
+
+                <Button
+                  className="mx-3"
+                  onClick={() => {
+                    navigate('/guestUserManage');
+                  }}
+                >
+                  Set Guest User
+                </Button>
               </section>
             </div>
           )}

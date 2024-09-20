@@ -12,6 +12,7 @@ import Signup from './pages/Signup';
 import PrivateRoute from './components/routing/PrivateRoute';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
+import GuestUserUpdate from './pages/GuestUserUpdate';
 
 function AppContent() {
   return (
@@ -76,6 +77,14 @@ function AppContent() {
             element={
               <PrivateRoute>
                 <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/guestUserManage"
+            element={
+              <PrivateRoute>
+                <GuestUserUpdate />
               </PrivateRoute>
             }
           />
