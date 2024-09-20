@@ -151,6 +151,7 @@ export const postRemoveBgGeneration = async (gpu_env: RemoveBgDataType['gpu_env'
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
+      console.log(key, value);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
