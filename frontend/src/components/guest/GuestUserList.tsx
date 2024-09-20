@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { getGuestUserInfo, MemberRead, RoleType } from '../../api/guestUser';
+import { getGuestUserInfo, MemberRead } from '../../api/guestUser';
 import { useQuery } from '@tanstack/react-query';
 import { Table } from 'antd';
 import React, { useRef, useState } from 'react';
@@ -9,6 +9,7 @@ import type { FilterDropdownProps } from 'antd/es/table/interface';
 import { Button, Input, Space } from 'antd';
 import type { InputRef, TableColumnsType, TableColumnType } from 'antd';
 import Highlighter from 'react-highlight-words';
+import GuestUserItem from './GuestUserItem';
 
 // 표 전용
 type TableMemberType = {
@@ -19,15 +20,13 @@ type DataIndex = keyof Pick<MemberRead, 'nickname' | 'department_name' | 'email'
 
 const GuestUserList = () => {
   // Guest Member 정보 가져오기
-  const { data, isPending, isError, error } = useQuery<AxiosResponse<MemberRead[]>, Error, TableMemberType[], string[]>(
-    {
-      queryKey: ['guest_user_info'],
-      queryFn: getGuestUserInfo,
-      select: (response) => response.data.map((member) => ({ ...member, key: member.member_pk })),
-      staleTime: 1000 * 60 * 10, // 10분
-      gcTime: 1000 * 60 * 20 // 20분
-    }
-  );
+  const { data, isPending, isError } = useQuery<AxiosResponse<MemberRead[]>, Error, TableMemberType[], string[]>({
+    queryKey: ['guest_user_info'],
+    queryFn: getGuestUserInfo,
+    select: (response) => response.data.map((member) => ({ ...member, key: member.member_pk })),
+    staleTime: 1000 * 60 * 10, // 10분
+    gcTime: 1000 * 60 * 20 // 20분
+  });
 
   //   검색 관련 필수
   const [searchText, setSearchText] = useState('');
@@ -143,19 +142,6 @@ const GuestUserList = () => {
       ...getColumnSearchProps('email'),
       sorter: (a, b) => a.email.localeCompare(b.email),
       sortDirections: ['descend', 'ascend']
-    },
-    {
-      title: 'Action',
-      dataIndex: '',
-      key: 'x',
-      width: '200px',
-      render: () => (
-        <p className="flex flex-row justify-end">
-          <Button className="text-blue-500 me-3">Approve</Button>
-
-          <Button className="text-red-500">Reject</Button>
-        </p>
-      )
     }
   ];
 
@@ -171,6 +157,10 @@ const GuestUserList = () => {
             defaultPageSize: 5,
             showSizeChanger: true,
             pageSizeOptions: ['5', '10', '15', '20']
+          }}
+          expandable={{
+            rowExpandable: (record) => record.role === 'guest',
+            expandedRowRender: (record) => <GuestUserItem guestData={record} />
           }}
         />
       )}

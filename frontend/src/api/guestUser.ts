@@ -29,7 +29,12 @@ export const getGuestUserInfo = async (): Promise<AxiosResponse<MemberRead[]>> =
 
 // 관리자 승인 함수
 
-export const approveGuestUser = async (member_pk: number, new_role: RoleType) => {
+export interface ApproveGuestUserProps {
+  member_pk: number;
+  new_role: Omit<RoleType, 'guest'>;
+}
+
+export const approveGuestUser = async ({ member_pk, new_role }: ApproveGuestUserProps) => {
   try {
     const response = await axiosInstance.patch(`/admin/members/guests/${member_pk}`, null, {
       params: {
