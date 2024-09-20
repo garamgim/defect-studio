@@ -11,6 +11,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import PrivateRoute from './components/routing/PrivateRoute';
 import Settings from './pages/Settings';
+import Profile from './pages/Profile';
 
 function AppContent() {
   return (
@@ -67,6 +68,14 @@ function AppContent() {
             element={
               <PrivateRoute>
                 <Tokens />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
               </PrivateRoute>
             }
           />
