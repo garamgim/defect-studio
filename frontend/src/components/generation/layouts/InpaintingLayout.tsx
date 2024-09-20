@@ -148,7 +148,6 @@ const InpaintingLayout = () => {
 
       {/* 메인 컨텐츠 */}
       <div className="flex-1 flex flex-col px-8 w-full h-full">
-<<<<<<< HEAD
         <div className="flex-1 mb-8 overflow-y-auto custom-scrollbar p-4">
           <InpaintingDisplay />
         </div>
@@ -172,17 +171,6 @@ const InpaintingLayout = () => {
       <div className="fixed bottom-[50px] right-[56px]">
         <GenerateButton onClick={handleGenerate} disabled={isLoading} />
       </div>
-=======
-        <div className="flex-1 mb-8 overflow-y-auto custom-scrollbar p-4 border">
-          {/* ImageDisplay가 남은 높이를 차지하도록 flex-1 적용 */}
-          <InpaintingDisplay />
-        </div>
-        <div className="w-full flex-none">
-          {/* Prompt는 고정된 높이를 가짐 */}
-          <PromptParams />
-        </div>
-      </div>
->>>>>>> feature/fe/42-token-page-ui
     </div>
   );
 };

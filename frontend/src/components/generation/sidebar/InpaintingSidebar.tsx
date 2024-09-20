@@ -3,11 +3,7 @@ import { Button } from 'antd';
 import { FormatPainterOutlined } from '@ant-design/icons';
 import { RootState } from '../../../store/store';
 import Model from '../params/ModelParam';
-<<<<<<< HEAD
 import MaskingModal from '../masking/MaskingModal';
-=======
-import InpaintingModal from '../masking/MaskingModal';
->>>>>>> feature/fe/42-token-page-ui
 import SamplingParams from '../params/SamplingParams';
 import ImgDimensionParams from '../params/ImgDimensionParams';
 import SeedParam from '../params/SeedParam';
@@ -16,10 +12,7 @@ import StrengthParam from '../params/StrengthParam';
 import GuidanceScaleParms from '../params/GuidanceScaleParam';
 import UploadImgWithMaskingParams from '../params/UploadImgWithMaskingParams';
 import { useSelector, useDispatch } from 'react-redux';
-<<<<<<< HEAD
 import { saveImages } from '../../../store/slices/generation/maskingSlice';
-=======
->>>>>>> feature/fe/42-token-page-ui
 import {
   setModel,
   setScheduler,
@@ -31,7 +24,6 @@ import {
   setStrength,
   setIsRandomSeed,
   setBatchCount,
-<<<<<<< HEAD
   setBatchSize,
   setInitImageList,
   setMaskImageList,
@@ -49,13 +41,6 @@ import LoadPreset from '../presets/LoadPreset';
 
 const InpaintingSidebar = () => {
   const { combinedImg } = useSelector((state: RootState) => state.masking);
-=======
-  setBatchSize
-} from '../../../store/slices/generation/img2ImgSlice';
-
-const InpaintingSidebar: React.FC = () => {
-  const { BgImage, canvasImage, combinedImage } = useSelector((state: RootState) => state.masking);
->>>>>>> feature/fe/42-token-page-ui
 
   const dispatch = useDispatch();
   const {
@@ -69,7 +54,6 @@ const InpaintingSidebar: React.FC = () => {
     guidanceScale,
     strength,
     batchCount,
-<<<<<<< HEAD
     batchSize,
     initInputPath,
     maskInputPath,
@@ -79,19 +63,10 @@ const InpaintingSidebar: React.FC = () => {
     prompt,
     negativePrompt
   } = useSelector((state: RootState) => state.inpainting);
-=======
-    batchSize
-  } = useSelector((state: RootState) => state.img2Img);
->>>>>>> feature/fe/42-token-page-ui
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
   const [showModal, setShowModal] = useState(false);
-<<<<<<< HEAD
-=======
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('manual');
->>>>>>> feature/fe/42-token-page-ui
 
   const handleRandomSeedChange = () => {
     setIsRandomSeed(!isRandomSeed);
@@ -103,7 +78,6 @@ const InpaintingSidebar: React.FC = () => {
     reader.onloadend = () => {
       const base64String = reader.result as string;
       const img = new Image();
-<<<<<<< HEAD
       img.onload = async () => {
         dispatch(setClipData([]));
         dispatch(setInitImageList([base64String]));
@@ -115,10 +89,6 @@ const InpaintingSidebar: React.FC = () => {
             combinedImg: null
           })
         );
-=======
-      img.onload = () => {
-        setImageSrc(reader.result as string);
->>>>>>> feature/fe/42-token-page-ui
       };
       img.src = base64String;
     };
@@ -129,7 +99,6 @@ const InpaintingSidebar: React.FC = () => {
     setShowModal(false);
   };
 
-<<<<<<< HEAD
   const [isCreatePresetOpen, setIsCreatePresetOpen] = useState(false);
   const [isLoadPresetOpen, setIsLoadPresetOpen] = useState(false);
 
@@ -164,23 +133,6 @@ const InpaintingSidebar: React.FC = () => {
           </div>
         )}
 
-=======
-  const handleDownloadBgImage = () => {
-    handleDownloadImage(BgImage, 'stage_image.png'); // BgImage 다운로드
-  };
-
-  const handleDownloadCanvasImage = () => {
-    handleDownloadImage(canvasImage, 'canvas_image.png'); // canvasImage 다운로드
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false); // 모달 닫기
-  };
-
-  return (
-    <div className="w-full h-full fixed-height mr-6">
-      <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
->>>>>>> feature/fe/42-token-page-ui
         {/* 모델 선택 */}
         <Model model={model} setModel={setModel} />
 
@@ -189,7 +141,6 @@ const InpaintingSidebar: React.FC = () => {
         {/* 이미지 업로드 */}
         <UploadImgWithMaskingParams
           handleImageUpload={handleImageUpload}
-<<<<<<< HEAD
           imagePreview={initImageList[0]}
           initInputPath={initInputPath}
           maskInputPath={maskInputPath}
@@ -206,20 +157,12 @@ const InpaintingSidebar: React.FC = () => {
           setMode={(value: 'manual' | 'batch') => {
             dispatch(setMode(value));
           }}
-=======
-          imagePreview={imageSrc}
-          setActiveTab={setActiveTab}
->>>>>>> feature/fe/42-token-page-ui
         />
 
         {initImageList[0] && (
           <div className="px-6 pb-10">
             {/* Start Masking 버튼 */}
-<<<<<<< HEAD
             {mode === 'manual' && (
-=======
-            {activeTab === 'manual' && (
->>>>>>> feature/fe/42-token-page-ui
               <Button
                 type="primary"
                 icon={<FormatPainterOutlined />}
@@ -230,33 +173,12 @@ const InpaintingSidebar: React.FC = () => {
               </Button>
             )}
 
-<<<<<<< HEAD
             {/* 인페인팅 결과 */}
             {mode === 'manual' && combinedImg && (
               <div className="w-full border border-dashed border-gray-300 rounded-lg mt-4 flex flex-col items-center">
                 <img src={combinedImg} alt="Inpainting Result" className="w-full h-full object-cover rounded-lg" />
-=======
-            {/* 인페인팅 결과 및 다운로드 */}
-            {combinedImage && (
-              <div className="w-full border border-dashed border-gray-300 rounded-lg mt-4 flex flex-col items-center">
-                <img src={combinedImage} alt="Inpainting Result" className="w-full h-full object-cover rounded-lg" />
->>>>>>> feature/fe/42-token-page-ui
               </div>
             )}
-
-            <div className="mt-4 flex flex-col space-y-2">
-              {BgImage && (
-                <Button type="default" onClick={handleDownloadBgImage} className="w-full">
-                  Download Stage Image
-                </Button>
-              )}
-
-              {canvasImage && (
-                <Button type="default" onClick={handleDownloadCanvasImage} className="w-full">
-                  Download Canvas Image
-                </Button>
-              )}
-            </div>
           </div>
         )}
 
@@ -268,33 +190,23 @@ const InpaintingSidebar: React.FC = () => {
             <SamplingParams
               scheduler={scheduler}
               samplingSteps={samplingSteps}
-<<<<<<< HEAD
               setSamplingSteps={(value: number) => dispatch(setSamplingSteps(value))}
               setScheduler={(value: string) => dispatch(setScheduler(value))}
-=======
-              setScheduler={setScheduler}
-              setSamplingSteps={setSamplingSteps}
->>>>>>> feature/fe/42-token-page-ui
             />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 이미지 크기 설정 */}
-<<<<<<< HEAD
             <ImgDimensionParams
               width={width}
               height={height}
               setWidth={(value: number) => dispatch(setWidth(value))}
               setHeight={(value: number) => dispatch(setHeight(value))}
             />
-=======
-            <ImgDimensionParams width={width} height={height} setWidth={setWidth} setHeight={setHeight} />
->>>>>>> feature/fe/42-token-page-ui
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* guidance scale 설정 */}
-<<<<<<< HEAD
             <GuidanceScaleParms
               guidanceScale={guidanceScale}
               setGuidanceScale={(value: number) => dispatch(setGuidanceScale(value))}
@@ -302,12 +214,6 @@ const InpaintingSidebar: React.FC = () => {
 
             {/* strength 설정 */}
             <StrengthParam strength={strength} setStrength={(value: number) => dispatch(setStrength(value))} />
-=======
-            <GuidanceScaleParms guidanceScale={guidanceScale} setGuidanceScale={setGuidanceScale} />
-
-            {/* strength 설정 */}
-            <StrengthParam strength={strength} setStrength={setStrength} />
->>>>>>> feature/fe/42-token-page-ui
 
             {/* seed 설정 */}
             <SeedParam
@@ -331,7 +237,6 @@ const InpaintingSidebar: React.FC = () => {
       </div>
 
       {/* Masking 모달 창 */}
-<<<<<<< HEAD
       {showModal && initImageList[0] && (
         <MaskingModal
           imageSrc={initImageList[0]}
@@ -382,9 +287,6 @@ const InpaintingSidebar: React.FC = () => {
         setScheduler={(value: string) => dispatch(setScheduler(value))}
         setStrength={(value: number) => dispatch(setStrength(value))}
       />
-=======
-      {showModal && imageSrc && <InpaintingModal imageSrc={imageSrc} onClose={handleCloseModal} />}
->>>>>>> feature/fe/42-token-page-ui
     </div>
   );
 };
