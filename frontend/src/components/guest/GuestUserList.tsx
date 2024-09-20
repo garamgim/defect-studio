@@ -47,7 +47,7 @@ const GuestUserList = () => {
   };
 
   //   검색 전용
-  const getColumnSearchProps = (dataIndex: DataIndex): TableColumnType<DataType> => ({
+  const getColumnSearchProps = (dataIndex: DataIndex): TableColumnType<TableMemberType> => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
         <Input
@@ -143,6 +143,19 @@ const GuestUserList = () => {
       ...getColumnSearchProps('email'),
       sorter: (a, b) => a.email.localeCompare(b.email),
       sortDirections: ['descend', 'ascend']
+    },
+    {
+      title: 'Action',
+      dataIndex: '',
+      key: 'x',
+      width: '200px',
+      render: () => (
+        <p className="flex flex-row justify-end">
+          <Button className="text-blue-500 me-3">Approve</Button>
+
+          <Button className="text-red-500">Reject</Button>
+        </p>
+      )
     }
   ];
 
