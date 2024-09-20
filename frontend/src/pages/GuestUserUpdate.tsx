@@ -22,7 +22,7 @@ const GuestUserUpdate = () => {
       <div className="w-full max-w-5xl bg-white py-10 px-12 rounded-[20px] mx-auto border border-gray-300 shadow-md h-full overflow-y-auto custom-scrollbar dark:bg-gray-600 dark:border-none text-black dark:text-white">
         {myInfoPending && <p>Loading...</p>}
         {isGetMyInfoError && <p>Error: {myInfoError?.message || 'Something went Wrong. Try again later'}</p>}
-        {myInfo && (
+        {myInfo && myInfo.role === 'super_admin' && (
           <>
             <header>
               <h1 className="text-[30px] font-bold mb-2 dark:text-gray-300">Guest User Management</h1>

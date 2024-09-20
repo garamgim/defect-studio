@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import axiosInstance from './token/axiosInstance';
 
-type RoleType = 'guest' | 'department_member' | 'department_admin' | 'super_admin';
+export type RoleType = 'guest' | 'department_member' | 'department_admin' | 'super_admin';
 
 // Guest Member 정보 가져오기
 
