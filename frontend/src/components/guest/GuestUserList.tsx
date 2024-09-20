@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { getGuestUserInfo, MemberRead } from '../../api/guestUser';
 import { useQuery } from '@tanstack/react-query';
-import { Table } from 'antd';
+import { ConfigProvider, Table, theme } from 'antd';
 import React, { useRef, useState } from 'react';
 
 import { SearchOutlined } from '@ant-design/icons';
@@ -10,6 +10,8 @@ import { Button, Input, Space } from 'antd';
 import type { InputRef, TableColumnsType, TableColumnType } from 'antd';
 import Highlighter from 'react-highlight-words';
 import GuestUserItem from './GuestUserItem';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 
 // 표 전용
 type TableMemberType = {
@@ -145,24 +147,33 @@ const GuestUserList = () => {
     }
   ];
 
+  const setThemeMode = useSelector((state: RootState) => state.theme.mode);
+  const { defaultAlgorithm, darkAlgorithm } = theme;
+
   return (
     <main className="flex flex-col  w-full content-box">
       {isPending && <div>Loading...</div>}
       {isError && <div>Error</div>}
       {data && (
-        <Table
-          columns={columns}
-          dataSource={data}
-          pagination={{
-            defaultPageSize: 5,
-            showSizeChanger: true,
-            pageSizeOptions: ['5', '10', '15', '20']
+        <ConfigProvider
+          theme={{
+            algorithm: setThemeMode === 'dark' ? darkAlgorithm : defaultAlgorithm
           }}
-          expandable={{
-            rowExpandable: (record) => record.role === 'guest',
-            expandedRowRender: (record) => <GuestUserItem guestData={record} />
-          }}
-        />
+        >
+          <Table
+            columns={columns}
+            dataSource={data}
+            pagination={{
+              defaultPageSize: 5,
+              showSizeChanger: true,
+              pageSizeOptions: ['5', '10', '15', '20']
+            }}
+            expandable={{
+              rowExpandable: (record) => record.role === 'guest',
+              expandedRowRender: (record) => <GuestUserItem guestData={record} />
+            }}
+          />
+        </ConfigProvider>
       )}
     </main>
   );
