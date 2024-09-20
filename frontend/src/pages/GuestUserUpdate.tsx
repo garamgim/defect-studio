@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useGetMyInfo } from '../api/user';
 import { message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import GuestUserList from '../components/guest/GuestUserList';
 
 const GuestUserUpdate = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const GuestUserUpdate = () => {
               <h1 className="text-[30px] font-bold mb-2 dark:text-gray-300">Guest User Management</h1>
               <p className="mb-2 dark:text-gray-300">Please approve or reject the registration request. </p>
             </header>
-            <main></main>
+            <GuestUserList />
           </>
         )}
       </div>

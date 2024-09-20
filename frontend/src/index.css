@@ -215,6 +215,15 @@ html.dark .ant-table-tbody .ant-table-row .ant-table-cell-row-hover {
   @apply border-2 border-gray-300 rounded-lg w-full h-full text-[222222] dark:text-white font-samsung;
 }
 
+/* 컨텐트 박스 */
+.content-box {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+
+  @apply border-2 border-gray-300 rounded-lg w-full h-full text-[222222] dark:text-white font-samsung;
+}
+
 /* 회원가입 페이지에 대한 입력 설정 */
 html.dark .ant-form-item-control-input-content .ant-input-affix-wrapper {
   @apply bg-gray-700;

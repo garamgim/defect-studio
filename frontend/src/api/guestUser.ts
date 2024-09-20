@@ -20,6 +20,7 @@ export type MemberRead = {
 export const getGuestUserInfo = async (): Promise<AxiosResponse<MemberRead[]>> => {
   try {
     const response = await axiosInstance.get<MemberRead[]>('/admin/members/guests');
+    console.log(response.data);
     return response;
   } catch (error) {
     throw Error('Unexpected error occurred');
