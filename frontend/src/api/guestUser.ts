@@ -1,0 +1,50 @@
+import { AxiosResponse } from 'axios';
+import axiosInstance from './token/axiosInstance';
+
+type RoleType = 'guest' | 'department_member' | 'department_admin' | 'super_admin';
+
+// Guest Member 정보 가져오기
+
+export type MemberRead = {
+  member_pk: number;
+  login_id: string;
+  nickname: string;
+  email: string;
+  role: RoleType;
+  department_id: number;
+  department_name: string;
+  token_quantity: number;
+};
+
+// 정보 요청
+export const getGuestUserInfo = async (): Promise<AxiosResponse<MemberRead[]>> => {
+  try {
+    const response = await axiosInstance.get<MemberRead[]>('/admin/members/guests');
+    return response;
+  } catch (error) {
+    throw Error('Unexpected error occurred');
+  }
+};
+
+// 관리자 승인 함수
+
+export const approveGuestUser = async (member_pk: number, new_role: RoleType) => {
+  try {
+    const response = await axiosInstance.patch(`/admin/members/guests/${member_pk}`, null, {
+      params: {
+        new_role
+      }
+    });
+    return response;
+  } catch (error: any) {
+    if (error.response?.status === 400) {
+      throw Error(error.response?.data.message || 'Something went wrong');
+    } else if (error.response?.status === 404) {
+      throw Error('해당 임시 회원을 찾을 수 없습니다.');
+    } else if (error.response?.status === 403) {
+      throw Error('권한이 없습니다.');
+    } else {
+      throw new Error('Unexpected error occurred');
+    }
+  }
+};
