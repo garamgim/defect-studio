@@ -6,7 +6,7 @@ const TokenStatistics = () => {
   const [selectedDepartment, setSelectedDepartment] = useState<number | undefined>(); // 선택된 부서, 단 1개 혹은 선택없음
   return (
     <article className="flex flex-col justify-center align-middle">
-      <SelectDepartment setSelectedDepartment={setSelectedDepartment} />
+      <SelectDepartment setSelectedDepartment={setSelectedDepartment} selectedDepartment={selectedDepartment} />
       <div className="token-content mt-3">
         {selectedDepartment ? (
           <StatisticSection departmentId={selectedDepartment} />
