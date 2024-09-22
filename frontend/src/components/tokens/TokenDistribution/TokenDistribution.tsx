@@ -9,6 +9,7 @@ import SearchDepartmentUsageToken from './SearchDepartmentUsageToken';
 import TokenDistributionInput from './TokenDistributionInput';
 import { TableTokenUsageType } from './SearchDepartmentUsageToken';
 import { distributeTokenRequest } from './../../../api/token';
+import { useGetMyInfo } from '../../../api/user';
 
 type departmentType = {
   department_id: number;
@@ -21,13 +22,20 @@ type SelectOptionType = {
 };
 getDepartmentTokenUsage();
 const TokenDistribution = () => {
+  // 로그인 유저 정보 호출
+  const { myInfo, myInfoPending, myInfoLoading, isGetMyInfoError, myInfoError } = useGetMyInfo({
+    isLoggedIn: localStorage.getItem('accessToken') ? true : false
+  });
+
+  // 관련 queryClient 호출
   const queryClient = useQueryClient();
 
-  const [selectedDepartment, setSelectedDepartment] = useState<number | undefined>(undefined); // 부서 선택
+  const [selectedDepartment, setSelectedDepartment] = useState<number | undefined>(myInfo?.department_id); // 부서 선택
   const [selectedDepartmentPeople, setSelectedDepartmentPeople] = useState<number[]>([]); // 분배받은 사람들 선택
   const [selectedDepartmentTokenUsage, setSelectedDepartmentTokenUsage] = useState<TableTokenUsageType[]>([]); // 부서 토큰 선택
   const [distributeTokenValue, setDistributeTokenValue] = useState<number>(0); // 분배할 토큰 값
 
+  // ---- 만약 선택이 바뀌었으면 초기화 시키는 모든 옵션들
   useEffect(() => {
     if (!selectedDepartment) {
       setSelectedDepartmentPeople([]);
@@ -42,7 +50,9 @@ const TokenDistribution = () => {
       setDistributeTokenValue(0);
     }
   }, [selectedDepartmentPeople]);
+  //---------------------------------------------------------------------
 
+  // Distribute 함수. 성공시, 관련 쿼리들을 리프레시
   const { mutate, isPending } = useMutation({
     mutationFn: distributeTokenRequest,
     onSuccess: () => {
@@ -59,6 +69,7 @@ const TokenDistribution = () => {
     }
   });
 
+  // 부서 리스트
   const { data, isError, error, isLoading } = useQuery<
     AxiosResponse<departmentType[]>,
     AxiosError,
@@ -76,6 +87,13 @@ const TokenDistribution = () => {
       })
   });
 
+  if (myInfoPending || myInfoLoading) {
+    return <div>Loading...</div>;
+  }
+  if (isGetMyInfoError) {
+    return <div>Error: {myInfoError?.message || 'Please login again Please'}</div>;
+  }
+
   return (
     <div className="flex flex-col justify-center align-middle">
       {/* 부서 선택 */}
@@ -92,8 +110,10 @@ const TokenDistribution = () => {
             filterSort={(optionA, optionB) =>
               (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
             }
-            onChange={(value) => setSelectedDepartment(value)}
+            onChange={(value: number) => setSelectedDepartment(value)}
             options={[...data]}
+            defaultValue={myInfo?.department_id ? myInfo.department_id : undefined}
+            disabled={myInfo?.role !== 'super_admin'}
           />
         )}
       </section>
