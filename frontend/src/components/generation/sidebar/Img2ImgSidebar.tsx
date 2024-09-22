@@ -72,7 +72,7 @@ const Img2ImgSidebar = () => {
       };
       img.src = base64String;
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(file); // 파일을 Base64로 변환
   };
 
   const [isCreatePresetOpen, setIsCreatePresetOpen] = useState(false);

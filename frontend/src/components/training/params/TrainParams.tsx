@@ -15,8 +15,80 @@
 // seed: 재현성을 위한 시드 값
 // train_text_encoder: 텍스트 인코더를 학습할지 여부
 
-const TrainingParams = () => {
-  return <div>trainingParams</div>;
+import React from 'react';
+import { InputNumber, Checkbox, Form, Input } from 'antd';
+
+const TrainParams = () => {
+  return (
+    <div>
+      <h3 className="text-lg font-bold mb-4">Training Parameters</h3>
+      <Form layout="vertical">
+        <Form.Item label="Train Batch Size">
+          <InputNumber placeholder="Train Batch Size" className="w-full" />
+        </Form.Item>
+
+        <Form.Item label="Number of Epochs">
+          <InputNumber placeholder="Number of Epochs" className="w-full" />
+        </Form.Item>
+
+        <Form.Item label="Learning Rate">
+          <InputNumber placeholder="Learning Rate" className="w-full" />
+        </Form.Item>
+
+        <Form.Item label="Max Train Steps">
+          <InputNumber placeholder="Max Train Steps" className="w-full" />
+        </Form.Item>
+
+        <Form.Item label="Gradient Accumulation Steps">
+          <InputNumber placeholder="Gradient Accumulation Steps" className="w-full" />
+        </Form.Item>
+
+        <Form.Item label="Scale Learning Rate" valuePropName="checked">
+          <Checkbox />
+        </Form.Item>
+
+        <Form.Item label="Learning Rate Scheduler">
+          <Input placeholder="LR Scheduler" className="w-full" />
+        </Form.Item>
+
+        <Form.Item label="LR Warmup Steps">
+          <InputNumber placeholder="LR Warmup Steps" className="w-full" />
+        </Form.Item>
+
+        <Form.Item label="LR Cycles">
+          <InputNumber placeholder="LR Cycles" className="w-full" />
+        </Form.Item>
+
+        <Form.Item label="LR Power">
+          <InputNumber placeholder="LR Power" className="w-full" />
+        </Form.Item>
+
+        <Form.Item label="Use 8-bit Adam Optimizer" valuePropName="checked">
+          <Checkbox />
+        </Form.Item>
+
+        <Form.Item label="Gradient Checkpointing" valuePropName="checked">
+          <Checkbox />
+        </Form.Item>
+
+        <Form.Item label="With Prior Preservation" valuePropName="checked">
+          <Checkbox />
+        </Form.Item>
+
+        <Form.Item label="Prior Loss Weight">
+          <InputNumber placeholder="Prior Loss Weight" className="w-full" />
+        </Form.Item>
+
+        <Form.Item label="Seed">
+          <InputNumber placeholder="Seed" className="w-full" />
+        </Form.Item>
+
+        <Form.Item label="Train Text Encoder" valuePropName="checked">
+          <Checkbox />
+        </Form.Item>
+      </Form>
+    </div>
+  );
 };
 
-export default TrainingParams;
+export default React.memo(TrainParams);

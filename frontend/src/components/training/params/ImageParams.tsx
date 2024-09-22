@@ -8,42 +8,59 @@
 // validation_images: 검증 이미지 세트
 // class_labels_conditioning: 클래스 레이블 조건
 
-import { Form, InputNumber, Input } from 'antd';
+import React from 'react';
+import { Input, Checkbox, Form, Upload, Button } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 
-const { TextArea } = Input;
-
-const ImgaeParams = () => {
+const ImageParams = () => {
   return (
-    <>
-      <Form.Item label="Instance Prompt" name="instance_prompt" rules={[{ required: true }]}>
-        <TextArea rows={2} placeholder="Enter Instance Prompt" />
-      </Form.Item>
+    <div>
+      <h3 className="text-lg font-bold mb-4">Image Parameters</h3>
+      <Form layout="vertical">
+        <Form.Item label="Instance Prompt" required>
+          <Input placeholder="Enter instance prompt" />
+        </Form.Item>
 
-      <Form.Item label="Class Prompt" name="class_prompt" rules={[{ required: true }]}>
-        <TextArea rows={2} placeholder="Enter Class Prompt" />
-      </Form.Item>
+        <Form.Item label="Class Prompt" required>
+          <Input placeholder="Enter class prompt" />
+        </Form.Item>
 
-      <Form.Item label="*resolution" name="*resolution" rules={[{ required: true }]}>
-        <InputNumber placeholder="Enter Class Prompt" />
-      </Form.Item>
+        <Form.Item label="Resolution">
+          <Input type="number" placeholder="Enter resolution (e.g., 512)" />
+        </Form.Item>
 
-      {/* 체크박스 */}
+        <Form.Item label="Center Crop" valuePropName="checked">
+          <Checkbox>Enable center crop</Checkbox>
+        </Form.Item>
 
-      <Form.Item label="sample_batch_size" name="sample_batch_size" rules={[{ required: true }]}>
-        <InputNumber placeholder="Enter Class Prompt" />
-      </Form.Item>
+        <Form.Item label="Sample Batch Size">
+          <Input type="number" placeholder="Enter sample batch size" />
+        </Form.Item>
 
-      <Form.Item label="sample_batch_size" name="sample_batch_size" rules={[{ required: true }]}>
-        <InputNumber placeholder="Enter Class Prompt" />
-      </Form.Item>
-      <Form.Item label="sample_batch_size" name="sample_batch_size" rules={[{ required: true }]}>
-        <InputNumber placeholder="Enter Class Prompt" />
-      </Form.Item>
-      <Form.Item label="sample_batch_size" name="sample_batch_size" rules={[{ required: true }]}>
-        <InputNumber placeholder="Enter Class Prompt" />
-      </Form.Item>
-    </>
+        <Form.Item label="Instance Image List" required>
+          <Upload multiple listType="picture" beforeUpload={() => false}>
+            <Button icon={<UploadOutlined />}>Upload Instance Images</Button>
+          </Upload>
+        </Form.Item>
+
+        <Form.Item label="Class Image List" required>
+          <Upload multiple listType="picture" beforeUpload={() => false}>
+            <Button icon={<UploadOutlined />}>Upload Class Images</Button>
+          </Upload>
+        </Form.Item>
+
+        <Form.Item label="Validation Images">
+          <Upload multiple listType="picture" beforeUpload={() => false}>
+            <Button icon={<UploadOutlined />}>Upload Validation Images</Button>
+          </Upload>
+        </Form.Item>
+
+        <Form.Item label="Class Labels Conditioning" valuePropName="checked">
+          <Checkbox>Enable class labels conditioning</Checkbox>
+        </Form.Item>
+      </Form>
+    </div>
   );
 };
 
-export default ImgaeParams;
+export default React.memo(ImageParams);
