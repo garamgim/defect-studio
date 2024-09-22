@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from 'antd';
 import { FormatPainterOutlined, FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
-import Model from '../params/ModelParam';
+import Model from '../params/InpaintingModelParam';
 import MaskingModal from '../masking/MaskingModal';
 import SamplingParams from '../params/SamplingParams';
 import ImgDimensionParams from '../params/ImgDimensionParams';
