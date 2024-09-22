@@ -1,14 +1,12 @@
-// Txt2Img, Img2Img 에서 사용
-
 import { Select, Form } from 'antd';
 import React from 'react';
 
-interface ModelParamProps {
+interface InpaintingModelParamsProps {
   model: string;
   setModel: (model: string) => void;
 }
 
-const ModelParam = ({ model, setModel }: ModelParamProps) => {
+const InpaintingModelParams = ({ model, setModel }: InpaintingModelParamsProps) => {
   const handleChange = (value: string) => {
     setModel(value);
   };
@@ -23,14 +21,14 @@ const ModelParam = ({ model, setModel }: ModelParamProps) => {
             onChange={handleChange}
             options={[
               {
-                value: 'stable-diffusion-2',
-                label: 'stable-diffusion-2'
+                value: 'diffusers/stable-diffusion-xl-1.0-inpainting-0.1',
+                label: 'diffusers/stable-diffusion-xl-1.0-inpainting-0.1'
               },
               {
-                value: 'CompVis/stable-diffusion-v1-4',
-                label: 'CompVis/stable-diffusion-v1-4'
+                value: 'stabilityai/stable-diffusion-2-inpainting',
+                label: 'stabilityai/stable-diffusion-2-inpainting'
               },
-              { value: 'model3', label: 'model3' }
+              { value: 'stable-diffusion-2-inpainting', label: 'stable-diffusion-2-inpainting' }
             ]}
             placeholder="Select a model"
           />
@@ -40,4 +38,4 @@ const ModelParam = ({ model, setModel }: ModelParamProps) => {
   );
 };
 
-export default React.memo(ModelParam);
+export default React.memo(InpaintingModelParams);

@@ -1,6 +1,7 @@
 import { Tabs, Upload, Input, Button } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { FiFolderPlus } from 'react-icons/fi';
+import React from 'react';
 
 interface UploadImgWithMaskingParamsProps {
   handleImageUpload: (file: File) => void;
@@ -173,4 +174,4 @@ const UploadImgWithMasking = ({
   );
 };
 
-export default UploadImgWithMasking;
+export default React.memo(UploadImgWithMasking);

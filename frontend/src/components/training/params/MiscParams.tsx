@@ -13,7 +13,6 @@
 // skip_save_text_encoder: 텍스트 인코더 저장 여부
 // prior_generation_precision: 사전 생성 정밀도 (fp16, fp32, bf16)
 // mixed_precision: 혼합 정밀도 설정 (fp16, bf16)
-const { TextArea } = Input;
 
 const MiscParams = () => {
   return <div>miscellaneousParams</div>;

@@ -1,6 +1,7 @@
 import { Tabs, Upload, Input, Button } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { FiFolderPlus } from 'react-icons/fi';
+import React from 'react';
 
 interface UploadImgParamsProps {
   handleImageUpload: (file: File) => void;
@@ -141,4 +142,4 @@ const UploadImgParams = ({
   );
 };
 
-export default UploadImgParams;
+export default React.memo(UploadImgParams);

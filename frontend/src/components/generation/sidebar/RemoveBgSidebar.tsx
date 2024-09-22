@@ -1,12 +1,16 @@
 import UploadImage from '../params/UploadImgParams';
-import { useDispatch } from 'react-redux';
-import { setImages, setInputPath, setOutputPath, setMode } from '../../../store/slices/generation/removeBgSlice';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../store/store';
+import { useRemoveBgParams } from '../../../hooks/generation/useRemoveBgParams';
 
 const RemoveBgSidebar = () => {
-  const dispatch = useDispatch();
-  const { inputPath, outputPath, images } = useSelector((state: RootState) => state.removeBg);
+  const {
+    inputPath,
+    outputPath,
+    imageList,
+    handleSetInputPath,
+    handleSetOutputPath,
+    handleSetImageList,
+    handleSetMode
+  } = useRemoveBgParams();
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
@@ -14,7 +18,7 @@ const RemoveBgSidebar = () => {
       const base64String = reader.result as string;
       const img = new Image();
       img.onload = () => {
-        dispatch(setImages([base64String]));
+        handleSetImageList([base64String]);
       };
       img.src = reader.result as string;
     };
@@ -27,18 +31,12 @@ const RemoveBgSidebar = () => {
         {/* 이미지 업로드 */}
         <UploadImage
           handleImageUpload={handleImageUpload}
-          imagePreview={images[0]}
+          imagePreview={imageList[0]}
           inputPath={inputPath}
           outputPath={outputPath}
-          setInputPath={(value: string) => {
-            dispatch(setInputPath(value));
-          }}
-          setOutputPath={(value: string) => {
-            dispatch(setOutputPath(value));
-          }}
-          setMode={(value: 'manual' | 'batch') => {
-            dispatch(setMode(value));
-          }}
+          setInputPath={handleSetInputPath}
+          setOutputPath={handleSetOutputPath}
+          setMode={handleSetMode}
         />
       </div>
     </div>

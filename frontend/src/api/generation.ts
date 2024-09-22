@@ -40,7 +40,7 @@ export const postTxt2ImgGeneration = async (gpu_env: Txt2ImgDataType['gpu_env'],
     });
 
     if (response.status === 201) {
-      return response.data.image_list; // image_list 배열 반환
+      return response.data.image_list;
     } else {
       throw new Error('Failed to generate text-to-image');
     }
@@ -92,6 +92,7 @@ export const postInpaintingGeneration = async (
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
+      console.log(key, value);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);

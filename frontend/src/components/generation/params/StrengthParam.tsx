@@ -1,4 +1,5 @@
 import { Form, Slider, Row, Col, InputNumber } from 'antd';
+import React from 'react';
 
 interface StrengthParamsProps {
   strength: number;
@@ -45,4 +46,4 @@ const StrengthParam = ({ strength, setStrength }: StrengthParamsProps) => {
   );
 };
 
-export default StrengthParam;
+export default React.memo(StrengthParam);

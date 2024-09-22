@@ -1,80 +1,90 @@
 export interface Txt2ImgDataType {
   gpu_env: 'local' | 'remote';
-  data: {
-    model: string;
-    scheduler: string;
-    prompt: string;
-    negative_prompt: string;
-    width: number;
-    height: number;
-    num_inference_steps: number;
-    guidance_scale: number;
-    seed: number;
-    batch_count: number;
-    batch_size: number;
-    output_path: string;
-  };
+  data: Txt2ImgParams;
+}
+
+export interface Txt2ImgParams {
+  model: string;
+  scheduler: string;
+  prompt: string;
+  negative_prompt: string;
+  width: number;
+  height: number;
+  num_inference_steps: number;
+  guidance_scale: number;
+  seed: number;
+  batch_count: number;
+  batch_size: number;
+  output_path: string;
 }
 
 export interface Img2ImgDataType {
-  gpu_env: string;
-  data: {
-    model: string;
-    scheduler: string;
-    prompt: string;
-    negative_prompt: string;
-    width: number;
-    height: number;
-    num_inference_steps: number;
-    guidance_scale: number;
-    strength: number;
-    seed: number;
-    batch_count: number;
-    batch_size: number;
-    images: File[];
-    input_path: string;
-    output_path: string;
-  };
+  gpu_env: 'local' | 'remote';
+  data: Img2ImgParams;
+}
+
+export interface Img2ImgParams {
+  model: string;
+  scheduler: string;
+  prompt: string;
+  negative_prompt: string;
+  width: number;
+  height: number;
+  num_inference_steps: number;
+  guidance_scale: number;
+  strength: number;
+  seed: number;
+  batch_count: number;
+  batch_size: number;
+  image_list: File[];
+  input_path: string;
+  output_path: string;
 }
 
 export interface InpaintingDataType {
-  gpu_env: string;
-  data: {
-    model: string;
-    scheduler: string;
-    prompt: string;
-    negative_prompt: string;
-    width: number;
-    height: number;
-    num_inference_steps: number;
-    guidance_scale: number;
-    strength: number;
-    seed: number;
-    batch_count: number;
-    batch_size: number;
-    init_image_list: File[];
-    mask_image_list: File[];
-    init_input_path: string;
-    mask_input_path: string;
-    output_path: string;
-  };
+  gpu_env: 'local' | 'remote';
+  data: InpaintingParams;
+}
+
+export interface InpaintingParams {
+  model: string;
+  scheduler: string;
+  prompt: string;
+  negative_prompt: string;
+  width: number;
+  height: number;
+  num_inference_steps: number;
+  guidance_scale: number;
+  strength: number;
+  seed: number;
+  batch_count: number;
+  batch_size: number;
+  init_image_list: File[];
+  mask_image_list: File[];
+  init_input_path: string;
+  mask_input_path: string;
+  output_path: string;
 }
 
 export interface RemoveBgDataType {
-  gpu_env: string;
-  data: {
-    images: File[];
-    input_path: string;
-    output_path: string;
-  };
+  gpu_env: 'local' | 'remote';
+  data: RemoveBgParams;
+}
+
+export interface RemoveBgParams {
+  image_list: File[];
+  input_path: string;
+  output_path: string;
 }
 
 export interface CleanupDataType {
-  gpu_env: string;
-  data: {
-    images: File[];
-    masks: File[];
-  };
+  gpu_env: 'local' | 'remote';
+  data: CleanupParams;
+}
+
+export interface CleanupParams {
+  init_image_list: File[];
+  mask_image_list: File[];
 }
 
 export interface PresetDataType {

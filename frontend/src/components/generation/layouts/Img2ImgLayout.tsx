@@ -1,21 +1,19 @@
 import Sidebar from '../sidebar/Img2ImgSidebar';
 import PromptParams from '../params/PromptParams';
 import Img2ImgDisplay from '../outputDisplay/Img2ImgDisplay';
-import { RootState } from '../../../store/store';
 import {
-  setPrompt,
-  setNegativePrompt,
   setIsNegativePrompt,
   setOutputImgUrls,
   setIsLoading,
   setUploadImgsCount,
   setClipData
 } from '../../../store/slices/generation/img2ImgSlice';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { postImg2ImgGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import GenerateButton from '../../common/GenerateButton';
 import { getClip } from '../../../api/generation';
+import { useImg2ImgParams } from '../../../hooks/generation/useImg2ImgParams';
 
 const Img2ImgLayout = () => {
   const dispatch = useDispatch();
@@ -23,14 +21,14 @@ const Img2ImgLayout = () => {
     prompt,
     negativePrompt,
     isNegativePrompt,
-    images,
+    imageList,
     strength,
     inputPath,
     model,
     scheduler,
     width,
     height,
-    samplingSteps,
+    numInferenceSteps,
     guidanceScale,
     seed,
     batchCount,
@@ -38,8 +36,10 @@ const Img2ImgLayout = () => {
     outputPath,
     clipData,
     mode,
-    isLoading
-  } = useSelector((state: RootState) => state.img2Img);
+    isLoading,
+    handleSetPrompt,
+    handleSetNegativePrompt
+  } = useImg2ImgParams();
 
   const handleNegativePromptChange = () => {
     dispatch(setIsNegativePrompt(!isNegativePrompt));
@@ -48,9 +48,8 @@ const Img2ImgLayout = () => {
   let files;
 
   const handleGenerate = async () => {
-    console.log(mode, images);
     if (mode === 'manual') {
-      files = images.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+      files = imageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
       dispatch(setUploadImgsCount(batchCount * batchSize));
       console.log('파일: ', files);
     } else {
@@ -79,14 +78,14 @@ const Img2ImgLayout = () => {
       negative_prompt: negativePrompt,
       width,
       height,
-      num_inference_steps: samplingSteps,
+      num_inference_steps: numInferenceSteps,
       guidance_scale: guidanceScale,
       seed,
       batch_count: batchCount,
       batch_size: batchSize,
       output_path: outputPath,
       strength,
-      images: files,
+      image_list: files,
       input_path: inputPath
     };
 
@@ -106,8 +105,8 @@ const Img2ImgLayout = () => {
     // clipData가 빈 배열일 때만 getClip 실행
     if (clipData.length === 0) {
       try {
-        if (images.length > 0) {
-          const file = convertStringToFile(images[0], 'image.png');
+        if (imageList.length > 0) {
+          const file = convertStringToFile(imageList[0], 'image.png');
 
           const generatedPrompts = await getClip([file]);
           dispatch(setClipData(generatedPrompts));
@@ -138,12 +137,8 @@ const Img2ImgLayout = () => {
           <PromptParams
             prompt={prompt}
             negativePrompt={negativePrompt}
-            setPrompt={(value: string) => {
-              dispatch(setPrompt(value));
-            }}
-            setNegativePrompt={(value: string) => {
-              dispatch(setNegativePrompt(value));
-            }}
+            setPrompt={handleSetPrompt}
+            setNegativePrompt={handleSetNegativePrompt}
             isNegativePrompt={isNegativePrompt}
             handleNegativePromptChange={handleNegativePromptChange}
             // 메뉴얼 모드일 때만 props로 전달(batch에서는 clip실행 안함)

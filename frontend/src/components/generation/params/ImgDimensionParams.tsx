@@ -1,4 +1,5 @@
 import { Slider, InputNumber, Row, Col, Form } from 'antd';
+import React from 'react';
 
 interface ImageDimensionParamsProps {
   width: number;
@@ -60,4 +61,4 @@ const ImageDimensionParams = ({ width, height, setWidth, setHeight }: ImageDimen
   );
 };
 
-export default ImageDimensionParams;
+export default React.memo(ImageDimensionParams);

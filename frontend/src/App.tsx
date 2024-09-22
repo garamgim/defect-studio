@@ -9,7 +9,7 @@ import Model from './pages/Model';
 import Tokens from './pages/Tokens';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-// import PrivateRoute from './components/routing/PrivateRoute';
+import PrivateRoute from './components/routing/PrivateRoute';
 import Settings from './pages/Settings';
 
 function AppContent() {
@@ -25,49 +25,49 @@ function AppContent() {
           <Route
             path="/"
             element={
-              // <PrivateRoute>
-              <Home />
-              // </PrivateRoute>
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
             }
           />
           <Route
             path="/generation/*"
             element={
-              // <PrivateRoute>
-              <Generation />
-              // </PrivateRoute>
+              <PrivateRoute>
+                <Generation />
+              </PrivateRoute>
             }
           />
           <Route
             path="/training"
             element={
-              // <PrivateRoute>
-              <Training />
-              // </PrivateRoute>
+              <PrivateRoute>
+                <Training />
+              </PrivateRoute>
             }
           />
           <Route
             path="/model"
             element={
-              // <PrivateRoute>
-              <Model />
-              // </PrivateRoute>
+              <PrivateRoute>
+                <Model />
+              </PrivateRoute>
             }
           />
           <Route
             path="/settings"
             element={
-              // <PrivateRoute>
-              <Settings />
-              // </PrivateRoute>
+              <PrivateRoute>
+                <Settings />
+              </PrivateRoute>
             }
           />
           <Route
             path="/tokens"
             element={
-              // <PrivateRoute>
-              <Tokens />
-              // </PrivateRoute>
+              <PrivateRoute>
+                <Tokens />
+              </PrivateRoute>
             }
           />
         </Routes>

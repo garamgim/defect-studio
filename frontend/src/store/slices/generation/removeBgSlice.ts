@@ -1,18 +1,18 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SnakeToCamel } from '../../../utils/snakeToCamel';
+import { RemoveBgParams } from '../../../types/generation';
 
-interface RemoveBgState {
+interface RemoveBgState extends Omit<SnakeToCamel<RemoveBgParams>, 'imageList'> {
   mode: 'manual' | 'batch';
-  images: string[];
-  inputPath: string;
-  outputPath: string;
-  outputImgUrls: string[];
+  imageList: string[];
 
+  outputImgUrls: string[];
   isLoading: boolean;
 }
 
 const initialState: RemoveBgState = {
   mode: 'manual',
-  images: [],
+  imageList: [],
   inputPath: '',
   outputPath: '',
   outputImgUrls: [],
@@ -27,8 +27,8 @@ const removeBgSlice = createSlice({
     setMode: (state, action: PayloadAction<'manual' | 'batch'>) => {
       state.mode = action.payload;
     },
-    setImages: (state, action: PayloadAction<string[]>) => {
-      state.images = action.payload;
+    setImageList: (state, action: PayloadAction<string[]>) => {
+      state.imageList = action.payload;
     },
     setInputPath: (state, action: PayloadAction<string>) => {
       state.inputPath = action.payload;
@@ -45,7 +45,7 @@ const removeBgSlice = createSlice({
   }
 });
 
-export const { setImages, setInputPath, setOutputPath, setOutputImgUrls, setMode, setIsLoading } =
+export const { setImageList, setInputPath, setOutputPath, setOutputImgUrls, setMode, setIsLoading } =
   removeBgSlice.actions;
 
 export default removeBgSlice.reducer;

@@ -1,21 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SnakeToCamel } from '../../../utils/snakeToCamel';
+import { Txt2ImgParams } from '../../../types/generation';
 
-interface Txt2ImgState {
-  model: string;
-  scheduler: string;
-  prompt: string;
-  negativePrompt: string;
-  width: number;
-  height: number;
-  samplingSteps: number;
-  guidanceScale: number;
-  seed: number;
+export interface Txt2ImgState extends SnakeToCamel<Txt2ImgParams> {
   isRandomSeed: boolean;
-  batchCount: number;
-  batchSize: number;
-  outputPath: string;
   isNegativePrompt: boolean;
-  outputImgUrls: string[]; // 생성된 이미지 URL 리스트
+
+  outputImgUrls: string[];
   isLoading: boolean;
 }
 
@@ -26,7 +17,7 @@ const initialState: Txt2ImgState = {
   negativePrompt: '',
   width: 512,
   height: 512,
-  samplingSteps: 50,
+  numInferenceSteps: 50,
   guidanceScale: 7.5,
   seed: -1,
   isRandomSeed: false,
@@ -60,8 +51,8 @@ const txt2ImgSlice = createSlice({
     setHeight: (state, action: PayloadAction<number>) => {
       state.height = action.payload;
     },
-    setSamplingSteps: (state, action: PayloadAction<number>) => {
-      state.samplingSteps = action.payload;
+    setNumInferenceSteps: (state, action: PayloadAction<number>) => {
+      state.numInferenceSteps = action.payload;
     },
     setGuidanceScale: (state, action: PayloadAction<number>) => {
       state.guidanceScale = action.payload;
@@ -95,6 +86,9 @@ const txt2ImgSlice = createSlice({
     },
     setIsLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
+    },
+    resetState: (state) => {
+      Object.assign(state, initialState);
     }
   }
 });
@@ -106,7 +100,7 @@ export const {
   setNegativePrompt,
   setWidth,
   setHeight,
-  setSamplingSteps,
+  setNumInferenceSteps,
   setGuidanceScale,
   setSeed,
   setIsRandomSeed,
@@ -115,7 +109,8 @@ export const {
   setOutputPath,
   setIsNegativePrompt,
   setOutputImgUrls,
-  setIsLoading
+  setIsLoading,
+  resetState
 } = txt2ImgSlice.actions;
 
 export default txt2ImgSlice.reducer;
