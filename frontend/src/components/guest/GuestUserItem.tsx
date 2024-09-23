@@ -80,7 +80,7 @@ const GuestUserItem = ({ guestData }: GuestUserItemProps) => {
               }}
               className="mx-3 disabled:hidden"
             >
-              Approve
+              Reject
             </Button>
           </>
         )}
