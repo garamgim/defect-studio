@@ -6,7 +6,7 @@ interface InpaintingModelParamsProps {
   setModel: (model: string) => void;
 }
 
-const InpaintingModelParams = ({ model, setModel }: InpaintingModelParamsProps) => {
+const InpaintingModelParam = ({ model, setModel }: InpaintingModelParamsProps) => {
   const handleChange = (value: string) => {
     setModel(value);
   };
@@ -38,4 +38,4 @@ const InpaintingModelParams = ({ model, setModel }: InpaintingModelParamsProps) 
   );
 };
 
-export default React.memo(InpaintingModelParams);
+export default React.memo(InpaintingModelParam);

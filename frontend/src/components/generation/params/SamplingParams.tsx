@@ -16,7 +16,7 @@ const SamplingParams = ({ setScheduler, numInferenceSteps, setNumInferenceSteps,
     queryFn: getSchedulers
   });
 
-  const handlenumInferenceStepsChange = (value: number | null) => {
+  const handleNumInferenceStepsChange = (value: number | null) => {
     if (value !== null) {
       setNumInferenceSteps(value);
     }
@@ -50,7 +50,7 @@ const SamplingParams = ({ setScheduler, numInferenceSteps, setNumInferenceSteps,
                 min={10}
                 max={150}
                 value={numInferenceSteps}
-                onChange={handlenumInferenceStepsChange}
+                onChange={handleNumInferenceStepsChange}
                 className="w-full"
               />
             </Col>
