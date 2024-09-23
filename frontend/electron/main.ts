@@ -125,7 +125,7 @@ async function downloadImage(url: string, filePath: string): Promise<void> {
   });
 }
 
-ipcMain.handle('save-images', async (event, { images, folderPath, format }) => {
+ipcMain.handle('save-images', async (_, { images, folderPath, format }) => {
   try {
     // 폴더 경로가 유효한지 확인
     if (!fs.existsSync(folderPath)) {

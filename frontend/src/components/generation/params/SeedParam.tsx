@@ -1,17 +1,22 @@
 import { Form, InputNumber, Checkbox } from 'antd';
+import React from 'react';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 interface SeedParamProps {
   seed: number;
   setSeed: (value: number) => void;
   isRandomSeed: boolean;
-  handleRandomSeedChange: (event: CheckboxChangeEvent) => void;
+  handleRandomSeedChange: (checked: boolean) => void;
 }
 
-const SeetParam = ({ seed, isRandomSeed, setSeed, handleRandomSeedChange }: SeedParamProps) => {
+const SeedParam = ({ seed, isRandomSeed, setSeed, handleRandomSeedChange }: SeedParamProps) => {
+  // Checkbox의 onChange 핸들러에서 checked 값을 추출하여 전달
+  const onCheckboxChange = (e: CheckboxChangeEvent) => {
+    handleRandomSeedChange(e.target.checked); // checked 값만 전달
+  };
+
   return (
     <div className="px-6">
-      {/* <p className="text-[14px] font-semibold text-[#222] mb-3 dark:text-gray-300">Seed</p> */}
       <Form layout="vertical" className="space-y-5">
         <Form.Item label="Seed">
           <InputNumber
@@ -25,7 +30,7 @@ const SeetParam = ({ seed, isRandomSeed, setSeed, handleRandomSeedChange }: Seed
             placeholder="Enter seed"
             className="w-full"
           />
-          <Checkbox checked={isRandomSeed} onChange={handleRandomSeedChange} className="mt-2">
+          <Checkbox checked={isRandomSeed} onChange={onCheckboxChange} className="mt-2">
             Random
           </Checkbox>
         </Form.Item>
@@ -34,4 +39,4 @@ const SeetParam = ({ seed, isRandomSeed, setSeed, handleRandomSeedChange }: Seed
   );
 };
 
-export default SeetParam;
+export default React.memo(SeedParam);

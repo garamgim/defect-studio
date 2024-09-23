@@ -1,25 +1,5 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../../store/store';
-import {
-  setModel,
-  setScheduler,
-  setWidth,
-  setHeight,
-  setSamplingSteps,
-  setGuidanceScale,
-  setSeed,
-  setStrength,
-  setIsRandomSeed,
-  setBatchCount,
-  setBatchSize,
-  setImages,
-  setInputPath,
-  setOutputPath,
-  setMode,
-  setClipData,
-  setPrompt,
-  setNegativePrompt
-} from '../../../store/slices/generation/img2ImgSlice';
+import { useState } from 'react';
+import { FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
 import ModelParams from '../params/ModelParam';
 import UploadImgParams from '../params/UploadImgParams';
 import StrengthParam from '../params/StrengthParam';
@@ -28,19 +8,21 @@ import SamplingParams from '../params/SamplingParams';
 import SeedParam from '../params/SeedParam';
 import BatchParams from '../params/BatchParams';
 import GuidanceScaleParam from '../params/GuidanceScaleParam';
-import { FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
-import { useState } from 'react';
 import CreatePreset from '../presets/CreatePreset';
 import LoadPreset from '../presets/LoadPreset';
+import { useImg2ImgParams } from '../../../hooks/generation/useImg2ImgParams';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
+import { useDispatch } from 'react-redux';
+import { resetState } from '../../../store/slices/generation/img2ImgSlice';
 
 const Img2ImgSidebar = () => {
-  const dispatch = useDispatch();
   const {
     model,
     scheduler,
     width,
     height,
-    samplingSteps,
+    numInferenceSteps,
     seed,
     isRandomSeed,
     guidanceScale,
@@ -49,16 +31,34 @@ const Img2ImgSidebar = () => {
     batchSize,
     inputPath,
     outputPath,
-    images,
+    imageList,
     prompt,
-    negativePrompt
-  } = useSelector((state: RootState) => state.img2Img);
+    negativePrompt,
+    handleSetModel,
+    handleSetScheduler,
+    handleSetWidth,
+    handleSetHeight,
+    handleSetNumInferenceSteps,
+    handleSetGuidanceScale,
+    handleSetSeed,
+    handleSetStrength,
+    handleSetIsRandomSeed,
+    handleSetBatchCount,
+    handleSetBatchSize,
+    handleSetImageList,
+    handleSetInputPath,
+    handleSetOutputPath,
+    handleSetMode,
+    handleSetClipData,
+    handleSetPrompt,
+    handleSetNegativePrompt
+  } = useImg2ImgParams();
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
   const handleRandomSeedChange = () => {
-    dispatch(setIsRandomSeed(!isRandomSeed));
-    dispatch(setSeed(!isRandomSeed ? -1 : seed));
+    handleSetIsRandomSeed(!isRandomSeed);
+    handleSetSeed(!isRandomSeed ? -1 : seed);
   };
 
   const handleImageUpload = (file: File) => {
@@ -67,13 +67,12 @@ const Img2ImgSidebar = () => {
       const base64String = reader.result as string;
       const img = new Image();
       img.onload = () => {
-        dispatch(setClipData([]));
-        dispatch(setImages([base64String]));
-        console.log('images: ', images);
+        handleSetClipData([]);
+        handleSetImageList([base64String]);
       };
       img.src = base64String;
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(file); // 파일을 Base64로 변환
   };
 
   const [isCreatePresetOpen, setIsCreatePresetOpen] = useState(false);
@@ -92,13 +91,21 @@ const Img2ImgSidebar = () => {
     setIsLoadPresetOpen(false);
   };
 
+  const dispatch = useDispatch();
+  const handleReset = () => {
+    dispatch(resetState());
+  };
+
   return (
     <div className="w-full h-full mr-6">
       <div className="relative w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* reset parameters & preset */}
         {level === 'Advanced' && (
           <div className="absolute top-6 right-0 mx-6">
-            <UndoOutlined className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer" />
+            <UndoOutlined
+              onClick={handleReset}
+              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
+            />
             <FileAddOutlined
               onClick={showCreatePreset}
               className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
@@ -111,25 +118,19 @@ const Img2ImgSidebar = () => {
         )}
 
         {/* 모델 선택 */}
-        <ModelParams model={model} setModel={setModel} />
+        <ModelParams model={model} setModel={handleSetModel} />
 
         <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
         {/* 이미지 업로드 */}
         <UploadImgParams
           handleImageUpload={handleImageUpload}
-          imagePreview={images[0]}
+          imagePreview={imageList[0]}
           inputPath={inputPath}
           outputPath={outputPath}
-          setInputPath={(value: string) => {
-            dispatch(setInputPath(value));
-          }}
-          setOutputPath={(value: string) => {
-            dispatch(setOutputPath(value));
-          }}
-          setMode={(value: 'manual' | 'batch') => {
-            dispatch(setMode(value));
-          }}
+          setInputPath={handleSetInputPath}
+          setOutputPath={handleSetOutputPath}
+          setMode={handleSetMode}
         />
 
         {level === 'Advanced' && (
@@ -137,39 +138,31 @@ const Img2ImgSidebar = () => {
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 이미지 크기 */}
-            <ImgDimensionParams
-              width={width}
-              height={height}
-              setWidth={(value: number) => dispatch(setWidth(value))}
-              setHeight={(value: number) => dispatch(setHeight(value))}
-            />
+            <ImgDimensionParams width={width} height={height} setWidth={handleSetWidth} setHeight={handleSetHeight} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 샘플링 세팅 */}
             <SamplingParams
               scheduler={scheduler}
-              samplingSteps={samplingSteps}
-              setSamplingSteps={(value: number) => dispatch(setSamplingSteps(value))}
-              setScheduler={(value: string) => dispatch(setScheduler(value))}
+              numInferenceSteps={numInferenceSteps}
+              setNumInferenceSteps={handleSetNumInferenceSteps}
+              setScheduler={handleSetScheduler}
             />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 초기 이미지 변화 제어 */}
-            <GuidanceScaleParam
-              guidanceScale={guidanceScale}
-              setGuidanceScale={(value: number) => dispatch(setGuidanceScale(value))}
-            />
+            <GuidanceScaleParam guidanceScale={guidanceScale} setGuidanceScale={handleSetGuidanceScale} />
 
             {/* 초기 이미지 변화 제어 */}
-            <StrengthParam strength={strength} setStrength={(value: number) => dispatch(setStrength(value))} />
+            <StrengthParam strength={strength} setStrength={handleSetStrength} />
 
             {/* 이미지 재현/다양성 제어 */}
             <SeedParam
               seed={seed}
               isRandomSeed={isRandomSeed}
-              setSeed={(value: number) => dispatch(setSeed(value))}
+              setSeed={handleSetSeed}
               handleRandomSeedChange={handleRandomSeedChange}
             />
 
@@ -179,8 +172,8 @@ const Img2ImgSidebar = () => {
             <BatchParams
               batchCount={batchCount}
               batchSize={batchSize}
-              setBatchCount={(value: number) => dispatch(setBatchCount(value))}
-              setBatchSize={(value: number) => dispatch(setBatchSize(value))}
+              setBatchCount={handleSetBatchCount}
+              setBatchSize={handleSetBatchSize}
             />
           </>
         )}
@@ -192,7 +185,7 @@ const Img2ImgSidebar = () => {
         width={width}
         height={height}
         guidanceScale={guidanceScale}
-        samplingSteps={samplingSteps}
+        numInferenceSteps={numInferenceSteps}
         seed={seed}
         prompt={prompt}
         negativePrompt={negativePrompt}
@@ -209,18 +202,18 @@ const Img2ImgSidebar = () => {
         isModalOpen={isLoadPresetOpen}
         closeModal={closeLoadPreset}
         type="image_to_image"
-        setModel={(value: string) => dispatch(setModel(value))}
-        setWidth={(value: number) => dispatch(setWidth(value))}
-        setHeight={(value: number) => dispatch(setHeight(value))}
-        setGuidanceScale={(value: number) => dispatch(setGuidanceScale(value))}
-        setSamplingSteps={(value: number) => dispatch(setSamplingSteps(value))}
-        setSeed={(value: number) => dispatch(setSeed(value))}
-        setPrompt={(value: string) => dispatch(setPrompt(value))}
-        setNegativePrompt={(value: string) => dispatch(setNegativePrompt(value))}
-        setBatchCount={(value: number) => dispatch(setBatchCount(value))}
-        setBatchSize={(value: number) => dispatch(setBatchSize(value))}
-        setScheduler={(value: string) => dispatch(setScheduler(value))}
-        setStrength={(value: number) => dispatch(setStrength(value))}
+        setModel={handleSetModel}
+        setWidth={handleSetWidth}
+        setHeight={handleSetHeight}
+        setGuidanceScale={handleSetGuidanceScale}
+        setNumInferenceSteps={handleSetNumInferenceSteps}
+        setSeed={handleSetSeed}
+        setPrompt={handleSetPrompt}
+        setNegativePrompt={handleSetNegativePrompt}
+        setBatchCount={handleSetBatchCount}
+        setBatchSize={handleSetBatchSize}
+        setScheduler={handleSetScheduler}
+        setStrength={handleSetStrength}
       />
     </div>
   );

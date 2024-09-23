@@ -8,42 +8,127 @@
 // validation_images: 검증 이미지 세트
 // class_labels_conditioning: 클래스 레이블 조건
 
-import { Form, InputNumber, Input } from 'antd';
+import React from 'react';
+import { Input, Checkbox, Form, Upload, Button } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../../store/store';
+import {
+  setInstancePrompt,
+  setClassPrompt,
+  setResolution,
+  setCenterCrop,
+  setSampleBatchSize,
+  setInstanceImageList,
+  setClassImageList,
+  setValidationImages,
+  setClassLabelsConditioning
+} from '../../../store/slices/training/trainingSlice';
 
-const { TextArea } = Input;
+const ImageParams = () => {
+  const dispatch = useDispatch();
 
-const ImgaeParams = () => {
+  const {
+    instancePrompt,
+    classPrompt,
+    resolution,
+    centerCrop,
+    sampleBatchSize,
+    instanceImageList,
+    classImageList,
+    validationImages,
+    classLabelsConditioning
+  } = useSelector((state: RootState) => state.training);
+
+  // 이미지 리스트를 Redux로 관리하는 핸들러
+  const handleUpload = (actionCreator: (files: File[]) => void) => (fileList: any) => {
+    const files = fileList.fileList.map((file: any) => file.originFileObj);
+    dispatch(actionCreator(files));
+    return false;
+  };
+
   return (
-    <>
-      <Form.Item label="Instance Prompt" name="instance_prompt" rules={[{ required: true }]}>
-        <TextArea rows={2} placeholder="Enter Instance Prompt" />
-      </Form.Item>
+    <div>
+      <h3 className="text-lg font-bold mb-4 dark:text-gray-300">Image Parameters</h3>
+      <Form layout="vertical">
+        {/* Instance Prompt */}
+        <Form.Item label="Instance Prompt" required>
+          <Input
+            placeholder="Enter instance prompt"
+            value={instancePrompt}
+            onChange={(e) => dispatch(setInstancePrompt(e.target.value))}
+          />
+        </Form.Item>
 
-      <Form.Item label="Class Prompt" name="class_prompt" rules={[{ required: true }]}>
-        <TextArea rows={2} placeholder="Enter Class Prompt" />
-      </Form.Item>
+        {/* Class Prompt */}
+        <Form.Item label="Class Prompt" required>
+          <Input
+            placeholder="Enter class prompt"
+            value={classPrompt}
+            onChange={(e) => dispatch(setClassPrompt(e.target.value))}
+          />
+        </Form.Item>
 
-      <Form.Item label="*resolution" name="*resolution" rules={[{ required: true }]}>
-        <InputNumber placeholder="Enter Class Prompt" />
-      </Form.Item>
+        {/* Resolution */}
+        <Form.Item label="Resolution">
+          <Input
+            type="number"
+            placeholder="Enter resolution (e.g., 512)"
+            value={resolution}
+            onChange={(e) => dispatch(setResolution(Number(e.target.value)))}
+          />
+        </Form.Item>
 
-      {/* 체크박스 */}
+        {/* Center Crop */}
+        <Form.Item label="Center Crop" valuePropName="checked">
+          <Checkbox checked={centerCrop} onChange={(e) => dispatch(setCenterCrop(e.target.checked))}>
+            Enable center crop
+          </Checkbox>
+        </Form.Item>
 
-      <Form.Item label="sample_batch_size" name="sample_batch_size" rules={[{ required: true }]}>
-        <InputNumber placeholder="Enter Class Prompt" />
-      </Form.Item>
+        {/* Sample Batch Size */}
+        <Form.Item label="Sample Batch Size">
+          <Input
+            type="number"
+            placeholder="Enter sample batch size"
+            value={sampleBatchSize}
+            onChange={(e) => dispatch(setSampleBatchSize(Number(e.target.value)))}
+          />
+        </Form.Item>
 
-      <Form.Item label="sample_batch_size" name="sample_batch_size" rules={[{ required: true }]}>
-        <InputNumber placeholder="Enter Class Prompt" />
-      </Form.Item>
-      <Form.Item label="sample_batch_size" name="sample_batch_size" rules={[{ required: true }]}>
-        <InputNumber placeholder="Enter Class Prompt" />
-      </Form.Item>
-      <Form.Item label="sample_batch_size" name="sample_batch_size" rules={[{ required: true }]}>
-        <InputNumber placeholder="Enter Class Prompt" />
-      </Form.Item>
-    </>
+        {/* Instance Image List */}
+        <Form.Item label="Instance Image List" required>
+          <Upload multiple listType="picture" beforeUpload={handleUpload(setInstanceImageList)}>
+            <Button icon={<UploadOutlined />}>Upload Instance Images</Button>
+          </Upload>
+        </Form.Item>
+
+        {/* Class Image List */}
+        <Form.Item label="Class Image List" required>
+          <Upload multiple listType="picture" beforeUpload={handleUpload(setClassImageList)}>
+            <Button icon={<UploadOutlined />}>Upload Class Images</Button>
+          </Upload>
+        </Form.Item>
+
+        {/* Validation Images */}
+        <Form.Item label="Validation Images">
+          <Upload multiple listType="picture" beforeUpload={handleUpload(setValidationImages)}>
+            <Button icon={<UploadOutlined />}>Upload Validation Images</Button>
+          </Upload>
+        </Form.Item>
+
+        {/* Class Labels Conditioning */}
+        <Form.Item label="Class Labels Conditioning" valuePropName="checked">
+          <Checkbox
+            checked={classLabelsConditioning}
+            onChange={(e) => dispatch(setClassLabelsConditioning(e.target.checked))}
+          >
+            Enable class labels conditioning
+          </Checkbox>
+        </Form.Item>
+      </Form>
+    </div>
   );
 };
 
-export default ImgaeParams;
+export default React.memo(ImageParams);

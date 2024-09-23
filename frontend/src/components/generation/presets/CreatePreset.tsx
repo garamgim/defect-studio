@@ -1,6 +1,6 @@
 import { Typography, Row, Col, Divider, Checkbox, Input, Modal, Button, message } from 'antd';
 import { PresetDataType } from '../../../types/generation';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { postPreset } from '../../../api/generation';
 
 const { Title, Text } = Typography;
@@ -10,7 +10,7 @@ interface CreatePresetProps {
   width: number;
   height: number;
   guidanceScale: number;
-  samplingSteps: number;
+  numInferenceSteps: number;
   seed: number;
   prompt: string;
   negativePrompt: string;
@@ -28,7 +28,7 @@ const CreatePreset = ({
   width,
   height,
   guidanceScale,
-  samplingSteps,
+  numInferenceSteps,
   seed,
   prompt,
   negativePrompt,
@@ -48,7 +48,7 @@ const CreatePreset = ({
     width: false,
     height: false,
     guidanceScale: false,
-    samplingSteps: false,
+    numInferenceSteps: false,
     seed: false,
     prompt: false,
     negativePrompt: false,
@@ -82,7 +82,7 @@ const CreatePreset = ({
       if (selectedFields.batchCount) presetData.batch_count = batchCount;
       if (selectedFields.batchSize) presetData.batch_size = batchSize;
       if (selectedFields.guidanceScale) presetData.guidance_scale = guidanceScale;
-      if (selectedFields.samplingSteps) presetData.sampling_steps = samplingSteps;
+      if (selectedFields.numInferenceSteps) presetData.sampling_steps = numInferenceSteps;
       if (selectedFields.scheduler) presetData.sampling_method = scheduler;
       if (selectedFields.seed) presetData.seed = seed;
       if (selectedFields.strength) presetData.strength = strength;
@@ -177,13 +177,16 @@ const CreatePreset = ({
               </div>
             </div>
             <div className="mt-3">
-              <Checkbox checked={selectedFields.samplingSteps} onChange={() => handleCheckboxChange('samplingSteps')}>
+              <Checkbox
+                checked={selectedFields.numInferenceSteps}
+                onChange={() => handleCheckboxChange('numInferenceSteps')}
+              >
                 <Text strong>Sampling Steps</Text>
               </Checkbox>
               <br />
               <div className="ml-[24px]">
                 <Text type="secondary" className="dark:text-gray-400">
-                  {samplingSteps}
+                  {numInferenceSteps}
                 </Text>
               </div>
             </div>
@@ -283,4 +286,4 @@ const CreatePreset = ({
   );
 };
 
-export default CreatePreset;
+export default React.memo(CreatePreset);

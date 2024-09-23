@@ -10,14 +10,13 @@ import { HiOutlinePaintBrush } from 'react-icons/hi2';
 import { Stage, Layer, Line, Image as KonvaImage, Circle } from 'react-konva';
 import useImage from 'use-image';
 import Konva from 'konva';
-import { useDispatch } from 'react-redux';
-import { saveImages } from '../../../store/slices/generation/maskingSlice';
 
 interface MaskingModalProps {
   onClose: () => void;
   imageSrc: string;
   setInitImageList: (value: string[]) => void;
   setMaskImageList: (value: string[]) => void;
+  setCombinedImg: (value: string) => void;
 }
 
 interface LineObject {
@@ -27,7 +26,7 @@ interface LineObject {
   fill?: string;
 }
 
-const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }: MaskingModalProps) => {
+const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList, setCombinedImg }: MaskingModalProps) => {
   const [tool, setTool] = useState<'brush' | 'polygon' | 'select' | null>(null);
   const [isMovingPoints, setIsMovingPoints] = useState(false);
   const [brushSize, setBrushSize] = useState<number>(10);
@@ -47,8 +46,6 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }:
   const [imagePos, setImagePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [imageSize, setImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
   const [minImageSize, setMinImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
-
-  const dispatch = useDispatch();
 
   // 캔버스를 흑백으로 변환
   const convertCanvasToGrayscale = async (imageBase64: string): Promise<string> => {
@@ -165,17 +162,9 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }:
         pixelRatio: 1
       });
 
-      // Redux에 저장
-      dispatch(
-        saveImages({
-          backgroundImg: backgroundImgBase64, // 배경 이미지
-          canvasImg: canvasImgBase64, // 캔버스 이미지 (흑백 변환 포함)
-          combinedImg: combinedImgBase64 // 배경 + 캔버스 합친 이미지
-        })
-      );
-
       setInitImageList([backgroundImgBase64]);
       setMaskImageList([canvasImgBase64]);
+      setCombinedImg(combinedImgBase64);
     } catch (error) {
       console.error('Error saving images:', error);
     } finally {

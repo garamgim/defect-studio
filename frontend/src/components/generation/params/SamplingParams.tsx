@@ -1,24 +1,24 @@
 import { Form, Select, Slider, Row, Col, InputNumber } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { getSchedulers } from '../../../api/generation';
+import React from 'react';
 
 interface SamplingParamsProps {
   setScheduler: (value: string) => void;
-  samplingSteps: number;
-  setSamplingSteps: (value: number) => void;
+  numInferenceSteps: number;
+  setNumInferenceSteps: (value: number) => void;
   scheduler: string;
 }
 
-const SamplingParams = ({ setScheduler, samplingSteps, setSamplingSteps, scheduler }: SamplingParamsProps) => {
-
+const SamplingParams = ({ setScheduler, numInferenceSteps, setNumInferenceSteps, scheduler }: SamplingParamsProps) => {
   const { data: schedulerList } = useQuery<string[], Error>({
     queryKey: ['schedulers'],
-    queryFn: getSchedulers,
+    queryFn: getSchedulers
   });
 
-  const handleSamplingStepsChange = (value: number | null) => {
+  const handleNumInferenceStepsChange = (value: number | null) => {
     if (value !== null) {
-      setSamplingSteps(value);
+      setNumInferenceSteps(value);
     }
   };
 
@@ -28,9 +28,9 @@ const SamplingParams = ({ setScheduler, samplingSteps, setSamplingSteps, schedul
       <Form layout="vertical" className="space-y-5">
         <Form.Item label="Scheduler">
           <Select
-            value={scheduler} 
+            value={scheduler}
             onChange={(value) => setScheduler(value)}
-            options={schedulerList?.map((scheduler) => ({ value: scheduler, label: scheduler })) } 
+            options={schedulerList?.map((scheduler) => ({ value: scheduler, label: scheduler }))}
           />
         </Form.Item>
 
@@ -40,8 +40,8 @@ const SamplingParams = ({ setScheduler, samplingSteps, setSamplingSteps, schedul
               <Slider
                 min={10}
                 max={150}
-                value={samplingSteps}
-                onChange={(value) => setSamplingSteps(value as number)}
+                value={numInferenceSteps}
+                onChange={(value) => setNumInferenceSteps(value as number)}
                 tooltip={{ open: undefined }}
               />
             </Col>
@@ -49,8 +49,8 @@ const SamplingParams = ({ setScheduler, samplingSteps, setSamplingSteps, schedul
               <InputNumber
                 min={10}
                 max={150}
-                value={samplingSteps}
-                onChange={handleSamplingStepsChange}
+                value={numInferenceSteps}
+                onChange={handleNumInferenceStepsChange}
                 className="w-full"
               />
             </Col>
@@ -61,4 +61,4 @@ const SamplingParams = ({ setScheduler, samplingSteps, setSamplingSteps, schedul
   );
 };
 
-export default SamplingParams;
+export default React.memo(SamplingParams);

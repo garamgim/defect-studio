@@ -1,15 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SnakeToCamel } from '../../../utils/snakeToCamel';
+import { CleanupParams } from '../../../types/generation';
 
-interface CleanupState {
+interface CleanupState extends Omit<SnakeToCamel<CleanupParams>, 'initImageList' | 'maskImageList'> {
   mode: 'manual' | 'batch';
   initImageList: string[];
   maskImageList: string[];
   outputImgUrls: string[];
   initInputPath: string;
   maskInputPath: string;
-  outputPath: string;
 
+  outputPath: string;
   isLoading: boolean;
+
+  combinedImg: string | null;
 }
 
 const initialState: CleanupState = {
@@ -19,9 +23,11 @@ const initialState: CleanupState = {
   outputImgUrls: [],
   initInputPath: '',
   maskInputPath: '',
-  outputPath: '',
 
-  isLoading: false
+  outputPath: '',
+  isLoading: false,
+
+  combinedImg: null
 };
 
 const cleanupSlice = createSlice({
@@ -51,6 +57,9 @@ const cleanupSlice = createSlice({
     },
     setIsLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
+    },
+    setCombinedImg: (state, action: PayloadAction<string | null>) => {
+      state.combinedImg = action.payload;
     }
   }
 });
@@ -63,7 +72,8 @@ export const {
   setMaskInputPath,
   setOutputPath,
   setIsLoading,
-  setMode
+  setMode,
+  setCombinedImg
 } = cleanupSlice.actions;
 
 export default cleanupSlice.reducer;

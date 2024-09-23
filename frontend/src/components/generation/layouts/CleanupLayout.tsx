@@ -1,17 +1,21 @@
 import GenerateButton from '../../common/GenerateButton';
 import Sidebar from '../sidebar/CleanupSidebar';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store/store';
 import { postCleanupGeneration } from '../../../api/generation';
-import { setOutputImgUrls, setIsLoading } from '../../../store/slices/generation/cleanupSlice';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import CleanupDisplay from '../outputDisplay/CleanupDisplay';
+import { useCleanupParams } from '../../../hooks/generation/useCleanupParams';
 
 const Cleanup = () => {
-  const dispatch = useDispatch();
-  const { initImageList, maskImageList, mode, initInputPath, maskInputPath, isLoading } = useSelector(
-    (state: RootState) => state.cleanup
-  );
+  const {
+    initImageList,
+    maskImageList,
+    mode,
+    initInputPath,
+    maskInputPath,
+    isLoading,
+    handleSetIsLoading,
+    handleSetOutputImgUrls
+  } = useCleanupParams();
 
   let bgFiles;
   let canvasFiles;
@@ -53,23 +57,23 @@ const Cleanup = () => {
     }
 
     const data = {
-      images: bgFiles,
-      masks: canvasFiles
+      init_image_list: bgFiles,
+      mask_image_list: canvasFiles
     };
 
     try {
-      dispatch(setIsLoading(true));
+      handleSetIsLoading(true);
       const outputImgUrls = await postCleanupGeneration('remote', data);
-      dispatch(setOutputImgUrls(outputImgUrls));
+      handleSetOutputImgUrls(outputImgUrls);
     } catch (error) {
       console.error('Error cleaning up image:', error);
     } finally {
-      dispatch(setIsLoading(false));
+      handleSetIsLoading(false);
     }
   };
 
   return (
-    <div className="flex h-[calc(100vh-60px)] pt-4 pb-6">
+    <div className="flex h-full pt-4 pb-6">
       {/* 사이드바 */}
       <div className="w-[360px] pl-8 h-full">
         <Sidebar />

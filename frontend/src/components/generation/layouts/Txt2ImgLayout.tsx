@@ -1,22 +1,16 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Modal, Button, Select, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../sidebar/Txt2ImgSidebar';
 import PromptParams from '../params/PromptParams';
 import Txt2ImgDisplay from '../outputDisplay/Txt2ImgDisplay';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  setPrompt,
-  setNegativePrompt,
-  setIsNegativePrompt,
-  setOutputImgUrls,
-  setIsLoading
-} from '../../../store/slices/generation/txt2ImgSlice';
-import { setImages as setImg2ImgImages } from '../../../store/slices/generation/img2ImgSlice';
+import { useDispatch } from 'react-redux';
+import { setIsNegativePrompt, setOutputImgUrls, setIsLoading } from '../../../store/slices/generation/txt2ImgSlice';
+import { setImageList as setImg2ImgImages } from '../../../store/slices/generation/img2ImgSlice';
 import { setInitImageList as setInpaintingImages } from '../../../store/slices/generation/inpaintingSlice';
-import { setImages as setRemoveBgImages } from '../../../store/slices/generation/removeBgSlice';
+import { setImageList as setRemoveBgImages } from '../../../store/slices/generation/removeBgSlice';
 import { setInitImageList as setCleanupImages } from '../../../store/slices/generation/cleanupSlice';
-import { RootState } from '../../../store/store';
+import { useTxt2ImgParams } from '../../../hooks/generation/useTxt2ImgParams';
 import GenerateButton from '../../common/GenerateButton';
 import { RiFolderDownloadLine } from 'react-icons/ri';
 import { MdMoveUp } from 'react-icons/md';
@@ -27,16 +21,12 @@ import { postTxt2ImgGeneration } from '../../../api/generation';
 const Txt2ImgLayout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const {
-    prompt,
-    negativePrompt,
-    isNegativePrompt,
     model,
     scheduler,
     width,
     height,
-    samplingSteps,
+    numInferenceSteps,
     guidanceScale,
     seed,
     batchCount,
@@ -44,7 +34,8 @@ const Txt2ImgLayout = () => {
     outputPath,
     isLoading,
     outputImgUrls
-  } = useSelector((state: RootState) => state.txt2Img);
+  } = useTxt2ImgParams();
+  const { prompt, negativePrompt, isNegativePrompt, handleSetPrompt, handleSetNegativePrompt } = useTxt2ImgParams();
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
@@ -61,9 +52,9 @@ const Txt2ImgLayout = () => {
     { value: 'bmp', label: 'BMP' }
   ];
 
-  const handleNegativePromptChange = () => {
+  const handleNegativePromptChange = useCallback(() => {
     dispatch(setIsNegativePrompt(!isNegativePrompt));
-  };
+  }, [isNegativePrompt, dispatch]);
 
   const handleGenerate = async () => {
     const data = {
@@ -73,7 +64,7 @@ const Txt2ImgLayout = () => {
       negative_prompt: negativePrompt,
       width,
       height,
-      num_inference_steps: samplingSteps,
+      num_inference_steps: numInferenceSteps,
       guidance_scale: guidanceScale,
       seed,
       batch_count: batchCount,
@@ -92,8 +83,7 @@ const Txt2ImgLayout = () => {
     }
   };
 
-  const handleSelectAllImages = () => {
-    console.log(outputImgUrls); //
+  const handleSelectAllImages = useCallback(() => {
     if (allSelected) {
       setSelectedImages([]);
     } else {
@@ -101,7 +91,7 @@ const Txt2ImgLayout = () => {
     }
     setAllSelected(!allSelected);
     setIsIconFilled(!isIconFilled);
-  };
+  }, [allSelected, outputImgUrls]);
 
   const handleDownloadImages = async () => {
     if (selectedImages.length === 0) {
@@ -121,9 +111,9 @@ const Txt2ImgLayout = () => {
     }
   };
 
-  const toggleSidebarAndPrompt = () => {
+  const toggleSidebarAndPrompt = useCallback(() => {
     setIsSidebarVisible(!isSidebarVisible);
-  };
+  }, [isSidebarVisible]);
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -153,17 +143,20 @@ const Txt2ImgLayout = () => {
     '/generation/cleanup': (images) => dispatch(setCleanupImages(images))
   };
 
-  const goToPage = (path: string) => {
-    const action = routeToActionMap[path];
-    if (action) {
-      action(selectedImages);
-    }
-    navigate(path);
-    setIsModalVisible(false);
-  };
+  const goToPage = useCallback(
+    (path: string) => {
+      const action = routeToActionMap[path];
+      if (action) {
+        action(selectedImages);
+      }
+      navigate(path);
+      setIsModalVisible(false);
+    },
+    [navigate, selectedImages]
+  );
 
   return (
-    <div className="flex h-[calc(100vh-60px)] pt-4 pb-6">
+    <div className="flex h-full pt-4 pb-6">
       {/* 사이드바 */}
       {isSidebarVisible && (
         <div className="w-[360px] pl-8 h-full hidden md:block">
@@ -221,12 +214,8 @@ const Txt2ImgLayout = () => {
             <PromptParams
               prompt={prompt}
               negativePrompt={negativePrompt}
-              setPrompt={(value) => {
-                dispatch(setPrompt(value));
-              }}
-              setNegativePrompt={(value) => {
-                dispatch(setNegativePrompt(value));
-              }}
+              setPrompt={handleSetPrompt}
+              setNegativePrompt={handleSetNegativePrompt}
               isNegativePrompt={isNegativePrompt}
               handleNegativePromptChange={handleNegativePromptChange}
             />

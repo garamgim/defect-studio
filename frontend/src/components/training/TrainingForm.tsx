@@ -1,4 +1,4 @@
-import { Form, Input, Button, Collapse } from 'antd';
+import { Form, Button, Collapse } from 'antd';
 import ModelParams from './params/ModelParams';
 import ImageParams from './params/ImageParams';
 import TrainParams from './params/TrainParams';
@@ -6,16 +6,14 @@ import OptimizerParams from './params/OptimizerParams';
 import CheckpointParams from './params/CheckpointParams';
 import ValidationParams from './params/ValidationParams';
 import MiscParams from './params/MiscParams';
-
-import { RootState } from '../../store/store';
+import { TrainingState } from '../../store/slices/training/trainingSlice';
 
 const { Panel } = Collapse;
-const { TextArea } = Input;
 
 const TrainingForm = () => {
   const [form] = Form.useForm();
 
-  const handleSubmit = (values: any) => {
+  const handleSubmit = (values: TrainingState) => {
     console.log('Form Values:', values);
   };
 
