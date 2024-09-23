@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { Tabs } from 'antd';
 import TrainingStartTab from '../components/training/tabs/TrainingStartTab';
 import TrainingStatusTab from '../components/training/tabs/TrainingStatusTab';
+import styled from 'styled-components';
 
 const { TabPane } = Tabs;
 
 const Training = () => {
   // 진행상황 dummyData
-  const [trainProgress, setTrainProgress] = useState([
+  const [trainProgress] = useState([
     { name: 'model1', progress: 45 },
     { name: 'model2', progress: 75 }
   ]);
@@ -16,9 +17,15 @@ const Training = () => {
     console.log(`${modelName} training stopped.`);
   };
 
+  const CustomTabs = styled(Tabs)`
+    .ant-tabs-nav::before {
+      border-bottom: none !important;
+    }
+  `;
+
   return (
-    <div className="w-full h-[calc(100vh-60px)] bg-gray-100 py-4 px-8 overflow-hidden dark:bg-gray-800">
-      <Tabs defaultActiveKey="1" className="h-full">
+    <div className="w-full h-[calc(100vh-60px)] bg-gray-100 px-8 pt-4 pb-8 dark:bg-gray-800">
+      <CustomTabs defaultActiveKey="1" className="h-full">
         {/* 모델 훈련 */}
         <TabPane tab="Model Training" key="1" className="h-full">
           <div className="h-full">
@@ -32,7 +39,7 @@ const Training = () => {
             <TrainingStatusTab trainProgress={trainProgress} />
           </div>
         </TabPane>
-      </Tabs>
+      </CustomTabs>
     </div>
   );
 };

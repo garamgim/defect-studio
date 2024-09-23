@@ -12,8 +12,8 @@ interface CurrentTrainingsProps {
 
 const CurrentTrainings = ({ trainProgress, handleStopTraining }: CurrentTrainingsProps) => {
   return (
-    <div className="bg-white rounded-lg p-4 shadow-lg">
-      <h3 className="text-lg font-bold mb-4">Current Trainings</h3>
+    <div className="h-full bg-white rounded-lg p-4 shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
+      <h3 className="text-lg font-bold mb-4 dark:text-gray-300">Current Trainings</h3>
       {trainProgress.map((training) => (
         <div key={training.name} className="mb-4">
           <div className="flex justify-between items-center">
@@ -25,7 +25,7 @@ const CurrentTrainings = ({ trainProgress, handleStopTraining }: CurrentTraining
               Stop
             </Button>
           </div>
-          <Button type="default" className="mt-2 w-full">
+          <Button type="default" className="mt-2 w-full dark:bg-gray-500 dark:border-none dark:text-gray-300">
             View Details
           </Button>
         </div>

@@ -20,7 +20,7 @@ interface InpaintingState extends Omit<SnakeToCamel<InpaintingParams>, 'initImag
 
 const initialState: InpaintingState = {
   mode: 'manual',
-  model: 'diffusers/stable-diffusion-xl-1.0-inpainting-0.1',
+  model: 'stable-diffusion-2-inpainting',
   scheduler: 'DPM++ 2M',
   prompt: '',
   negativePrompt: '',

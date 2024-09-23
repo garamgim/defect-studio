@@ -272,3 +272,19 @@ export const deletePreset = async (preset_id: string) => {
     throw new Error('Failed to delete preset');
   }
 };
+
+// 모델 리스트 가져오는 함수
+export const getModelList = async (member_id: number) => {
+  try {
+    const response = await axiosInstance.get(`/model/${member_id}`);
+
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error('Failed to get model-list');
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to get model-list');
+  }
+};
