@@ -60,7 +60,11 @@ export const approveGuestUser = async ({
 };
 
 // 관리자 거절 함수
-export const rejectGuestUser = async (member_pk: number): Promise<AxiosResponse<string>> => {
+
+export interface RejectGuestUserProps {
+  member_pk: number;
+}
+export const rejectGuestUser = async ({ member_pk }: RejectGuestUserProps): Promise<AxiosResponse<string>> => {
   try {
     const response = await axiosInstance.delete(`/admin/members/guests/${member_pk}`);
     return response;

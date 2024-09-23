@@ -2,7 +2,7 @@ import { Button, Select, message } from 'antd';
 import { ApproveGuestUserProps, MemberRead, RoleType } from '../../api/guestUser';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { approveGuestUser } from '../../api/guestUser';
+import { approveGuestUser, rejectGuestUser, RejectGuestUserProps } from '../../api/guestUser';
 import { AxiosResponse } from 'axios';
 // 표 전용
 type TableMemberType = {
@@ -18,9 +18,9 @@ const GuestUserItem = ({ guestData }: GuestUserItemProps) => {
   const queryClient = useQueryClient();
   const [newRole, setNewRole] = useState<RoleType>('guest');
 
-  //   요청함수
+  //   승인요청함수
   const { mutate: approveMutate, isPending: approveIsPending } = useMutation<
-    AxiosResponse<unknown>,
+    AxiosResponse<string>,
     Error,
     ApproveGuestUserProps
   >({
@@ -36,6 +36,21 @@ const GuestUserItem = ({ guestData }: GuestUserItemProps) => {
     }
   });
 
+  // 거절 요청 함수
+  const { mutate: rejectMutate, isPending: rejectIsPending } = useMutation<
+    AxiosResponse<string>,
+    Error,
+    RejectGuestUserProps
+  >({
+    mutationFn: rejectGuestUser,
+    onSuccess: () => {
+      message.success('Rejected Guest User');
+      queryClient.invalidateQueries({
+        queryKey: ['guest_user_info']
+      });
+    }
+  });
+
   return (
     <div className="flex flex-row justify-between">
       <div>
@@ -46,7 +61,7 @@ const GuestUserItem = ({ guestData }: GuestUserItemProps) => {
         </Select>
       </div>
       <div className="flex flex-row ">
-        {!approveIsPending && (
+        {!approveIsPending && !rejectIsPending && (
           <>
             <Button
               onClick={() => {
@@ -58,10 +73,18 @@ const GuestUserItem = ({ guestData }: GuestUserItemProps) => {
             >
               Approve
             </Button>
-            <Button>Reject</Button>
+            <Button
+              onClick={() => {
+                // console.log(guestData, newRole);
+                rejectMutate({ member_pk: guestData.member_id });
+              }}
+              className="mx-3 disabled:hidden"
+            >
+              Approve
+            </Button>
           </>
         )}
-        {approveIsPending && <p>Loading...</p>}
+        {(approveIsPending || rejectIsPending) && <p>Loading...</p>}
       </div>
     </div>
   );
