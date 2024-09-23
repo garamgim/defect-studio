@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { useGetMyInfo } from '../api/user';
+import { useGetMyInfo } from '../../api/user';
 import { Button } from 'antd';
-const Profile = () => {
+const EditProfile = () => {
   // 자기 정보 가져오기
   const { myInfo, myInfoPending, isGetMyInfoError, myInfoError } = useGetMyInfo({
     isLoggedIn: !!localStorage.getItem('accessToken')
@@ -18,17 +18,11 @@ const Profile = () => {
           {myInfo && (
             <div>
               {/* 프로필 헤더 */}
-              <p className="text-3xl text-left mb-8 font-bold">{myInfo.nickname}'s Profile</p>
+              <p className="text-3xl text-left mb-8 font-bold">Edit Profile</p>
 
               {/* 다른 세부정보 */}
               <section className="flex items-center justify-between mb-8 relative w-full">
                 <div className="w-full">
-                  <div className="relative w-[100%] mb-4">
-                    <p className="text-base text-left  mb-1">Department</p>
-                    <div className="w-full h-10 p-2 border border-[#3A3A5A] dark:border-slate-200 rounded-lg">
-                      <p className="text-base text-left w-[100%] ">{myInfo.department_name}</p>
-                    </div>
-                  </div>
                   <div className="relative w-[100%] mb-4">
                     <p className="text-base text-left  mb-1">Email</p>
                     <div className="w-full h-10 p-2 border border-[#3A3A5A] dark:border-slate-200 rounded-lg">
@@ -74,4 +68,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default EditProfile;
