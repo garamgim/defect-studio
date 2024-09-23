@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { useGetMyInfo } from '../api/user';
-import { Button } from 'antd';
+import { useGetMyInfo, deleteProfile } from '../api/user';
+import { Button, message } from 'antd';
+
 const Profile = () => {
   // 자기 정보 가져오기
   const { myInfo, myInfoPending, isGetMyInfoError, myInfoError } = useGetMyInfo({
@@ -60,7 +61,21 @@ const Profile = () => {
                 >
                   Edit
                 </Button>
-                <Button className="mx-3">Delete</Button>
+                <Button
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to delete this account?')) {
+                      try {
+                        deleteProfile();
+                        navigate('/login');
+                      } catch (error) {
+                        message.error('Failed to delete account');
+                      }
+                    }
+                  }}
+                  className="mx-3"
+                >
+                  Delete
+                </Button>
 
                 {myInfo.role === 'super_admin' && (
                   <Button

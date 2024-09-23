@@ -129,3 +129,18 @@ export const editProfile = async (data: EditProfileInputs) => {
     throw error;
   }
 };
+
+// 회원탈퇴
+export const deleteProfile = async () => {
+  try {
+    const response = await axiosInstance.delete('/members');
+    localStorage.removeItem('accessToken');
+    queryClient.removeQueries({
+      queryKey: ['myInfo']
+    });
+    return response;
+  } catch (error) {
+    console.error('Error deleting profile:', error);
+    throw error;
+  }
+};
