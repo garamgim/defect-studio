@@ -52,7 +52,14 @@ const Profile = () => {
 
               {/* 수정 삭제 */}
               <section className="flex flex-row justify-end">
-                <Button className="mx-3">Edit</Button>
+                <Button
+                  onClick={() => {
+                    navigate('edit');
+                  }}
+                  className="mx-3"
+                >
+                  Edit
+                </Button>
                 <Button className="mx-3">Delete</Button>
 
                 {myInfo.role === 'super_admin' && (

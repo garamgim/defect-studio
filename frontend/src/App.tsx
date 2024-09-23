@@ -13,6 +13,7 @@ import PrivateRoute from './components/routing/PrivateRoute';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import GuestUserUpdate from './pages/GuestUserUpdate';
+import EditProfile from './pages/EditProfile';
 
 function AppContent() {
   return (
@@ -77,6 +78,14 @@ function AppContent() {
             element={
               <PrivateRoute>
                 <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile/edit"
+            element={
+              <PrivateRoute>
+                <EditProfile />
               </PrivateRoute>
             }
           />
