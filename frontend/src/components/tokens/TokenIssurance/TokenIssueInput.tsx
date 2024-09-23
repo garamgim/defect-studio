@@ -1,4 +1,3 @@
-import './TokenIssueInput.css';
 import { DatePicker, InputNumber } from 'antd';
 import dayjs from 'dayjs';
 
