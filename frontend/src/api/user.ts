@@ -135,6 +135,10 @@ export const deleteProfile = async () => {
   try {
     const response = await axiosInstance.delete('/members');
     localStorage.removeItem('accessToken');
+    queryClient.invalidateQueries({
+      queryKey: ['myInfo'],
+      refetchType: 'none'
+    });
     queryClient.removeQueries({
       queryKey: ['myInfo']
     });
