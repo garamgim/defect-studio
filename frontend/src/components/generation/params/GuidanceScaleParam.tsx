@@ -1,4 +1,5 @@
 import { Form, Slider, Row, Col, InputNumber } from 'antd';
+import React from 'react';
 
 interface GuidanceScaleParamsProps {
   guidanceScale: number;
@@ -45,4 +46,4 @@ const ControlParams = ({ guidanceScale, setGuidanceScale }: GuidanceScaleParamsP
   );
 };
 
-export default ControlParams;
+export default React.memo(ControlParams);

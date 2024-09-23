@@ -1,4 +1,5 @@
 import { InputNumber, Form, Row, Col } from 'antd';
+import React from 'react';
 
 interface BatchParamsProps {
   batchCount: number;
@@ -49,4 +50,4 @@ const BatchParams = ({ batchCount, batchSize, setBatchCount, setBatchSize }: Bat
   );
 };
 
-export default BatchParams;
+export default React.memo(BatchParams);

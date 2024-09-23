@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Button } from 'antd';
-import { FormatPainterOutlined } from '@ant-design/icons';
-import { RootState } from '../../../store/store';
+import { FormatPainterOutlined, FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
 import Model from '../params/ModelParam';
 import MaskingModal from '../masking/MaskingModal';
 import SamplingParams from '../params/SamplingParams';
@@ -11,44 +10,21 @@ import BatchParams from '../params/BatchParams';
 import StrengthParam from '../params/StrengthParam';
 import GuidanceScaleParms from '../params/GuidanceScaleParam';
 import UploadImgWithMaskingParams from '../params/UploadImgWithMaskingParams';
-import { useSelector, useDispatch } from 'react-redux';
-import { saveImages } from '../../../store/slices/generation/maskingSlice';
-import {
-  setModel,
-  setScheduler,
-  setWidth,
-  setHeight,
-  setSamplingSteps,
-  setGuidanceScale,
-  setSeed,
-  setStrength,
-  setIsRandomSeed,
-  setBatchCount,
-  setBatchSize,
-  setInitImageList,
-  setMaskImageList,
-  setClipData,
-  setInitInputPath,
-  setMaskInputPath,
-  setOutputPath,
-  setMode,
-  setPrompt,
-  setNegativePrompt
-} from '../../../store/slices/generation/inpaintingSlice';
-import { FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
+import { useInpaintingParams } from '../../../hooks/generation/useInpaintingParams';
 import CreatePreset from '../presets/CreatePreset';
 import LoadPreset from '../presets/LoadPreset';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
+import { setCombinedImg, resetState } from '../../../store/slices/generation/inpaintingSlice';
+import { useDispatch } from 'react-redux';
 
 const InpaintingSidebar = () => {
-  const { combinedImg } = useSelector((state: RootState) => state.masking);
-
-  const dispatch = useDispatch();
   const {
     model,
     scheduler,
     width,
     height,
-    samplingSteps,
+    numInferenceSteps,
     seed,
     isRandomSeed,
     guidanceScale,
@@ -60,17 +36,39 @@ const InpaintingSidebar = () => {
     outputPath,
     mode,
     initImageList,
+    combinedImg,
     prompt,
-    negativePrompt
-  } = useSelector((state: RootState) => state.inpainting);
+    negativePrompt,
+    handleSetModel,
+    handleSetScheduler,
+    handleSetWidth,
+    handleSetHeight,
+    handleSetNumInferenceSteps,
+    handleSetGuidanceScale,
+    handleSetSeed,
+    handleSetStrength,
+    handleSetIsRandomSeed,
+    handleSetBatchCount,
+    handleSetBatchSize,
+    handleSetInitImageList,
+    handleSetMaskImageList,
+    handleSetClipData,
+    handleSetInitInputPath,
+    handleSetMaskInputPath,
+    handleSetOutputPath,
+    handleSetMode,
+    handleSetPrompt,
+    handleSetNegativePrompt,
+    handleSetCombinedImg
+  } = useInpaintingParams();
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
   const [showModal, setShowModal] = useState(false);
 
   const handleRandomSeedChange = () => {
-    setIsRandomSeed(!isRandomSeed);
-    setSeed(!isRandomSeed ? -1 : seed);
+    handleSetIsRandomSeed(!isRandomSeed);
+    handleSetSeed(!isRandomSeed ? -1 : seed);
   };
 
   const handleImageUpload = (file: File) => {
@@ -79,16 +77,10 @@ const InpaintingSidebar = () => {
       const base64String = reader.result as string;
       const img = new Image();
       img.onload = async () => {
-        dispatch(setClipData([]));
-        dispatch(setInitImageList([base64String]));
+        handleSetClipData([]);
+        handleSetInitImageList([base64String]);
 
-        dispatch(
-          saveImages({
-            backgroundImg: null,
-            canvasImg: null,
-            combinedImg: null
-          })
-        );
+        setCombinedImg(null);
       };
       img.src = base64String;
     };
@@ -115,13 +107,21 @@ const InpaintingSidebar = () => {
     setIsLoadPresetOpen(false);
   };
 
+  const dispatch = useDispatch();
+  const handleReset = () => {
+    dispatch(resetState());
+  };
+
   return (
     <div className="w-full h-full mr-6">
       <div className="relative w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* reset parameters & preset */}
         {level === 'Advanced' && (
           <div className="absolute top-6 right-0 mx-6">
-            <UndoOutlined className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer" />
+            <UndoOutlined
+              onClick={handleReset}
+              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
+            />
             <FileAddOutlined
               onClick={showCreatePreset}
               className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
@@ -134,7 +134,7 @@ const InpaintingSidebar = () => {
         )}
 
         {/* 모델 선택 */}
-        <Model model={model} setModel={setModel} />
+        <Model model={model} setModel={handleSetModel} />
 
         <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
@@ -145,18 +145,10 @@ const InpaintingSidebar = () => {
           initInputPath={initInputPath}
           maskInputPath={maskInputPath}
           outputPath={outputPath}
-          setInitInputPath={(value: string) => {
-            dispatch(setInitInputPath(value));
-          }}
-          setMaskInputPath={(value: string) => {
-            dispatch(setMaskInputPath(value));
-          }}
-          setOutputPath={(value: string) => {
-            dispatch(setOutputPath(value));
-          }}
-          setMode={(value: 'manual' | 'batch') => {
-            dispatch(setMode(value));
-          }}
+          setInitInputPath={handleSetInitInputPath}
+          setMaskInputPath={handleSetMaskInputPath}
+          setOutputPath={handleSetOutputPath}
+          setMode={handleSetMode}
         />
 
         {initImageList[0] && (
@@ -189,36 +181,28 @@ const InpaintingSidebar = () => {
             {/* 샘플링 설정 */}
             <SamplingParams
               scheduler={scheduler}
-              samplingSteps={samplingSteps}
-              setSamplingSteps={(value: number) => dispatch(setSamplingSteps(value))}
-              setScheduler={(value: string) => dispatch(setScheduler(value))}
+              numInferenceSteps={numInferenceSteps}
+              setNumInferenceSteps={handleSetNumInferenceSteps}
+              setScheduler={handleSetScheduler}
             />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 이미지 크기 설정 */}
-            <ImgDimensionParams
-              width={width}
-              height={height}
-              setWidth={(value: number) => dispatch(setWidth(value))}
-              setHeight={(value: number) => dispatch(setHeight(value))}
-            />
+            <ImgDimensionParams width={width} height={height} setWidth={handleSetWidth} setHeight={handleSetHeight} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* guidance scale 설정 */}
-            <GuidanceScaleParms
-              guidanceScale={guidanceScale}
-              setGuidanceScale={(value: number) => dispatch(setGuidanceScale(value))}
-            />
+            <GuidanceScaleParms guidanceScale={guidanceScale} setGuidanceScale={handleSetGuidanceScale} />
 
             {/* strength 설정 */}
-            <StrengthParam strength={strength} setStrength={(value: number) => dispatch(setStrength(value))} />
+            <StrengthParam strength={strength} setStrength={handleSetStrength} />
 
             {/* seed 설정 */}
             <SeedParam
               seed={seed}
-              setSeed={(value: number) => dispatch(setSeed(value))}
+              setSeed={handleSetSeed}
               isRandomSeed={isRandomSeed}
               handleRandomSeedChange={handleRandomSeedChange}
             />
@@ -229,8 +213,8 @@ const InpaintingSidebar = () => {
             <BatchParams
               batchCount={batchCount}
               batchSize={batchSize}
-              setBatchCount={(value: number) => dispatch(setBatchCount(value))}
-              setBatchSize={(value: number) => dispatch(setBatchSize(value))}
+              setBatchCount={handleSetBatchCount}
+              setBatchSize={handleSetBatchSize}
             />
           </>
         )}
@@ -241,12 +225,9 @@ const InpaintingSidebar = () => {
         <MaskingModal
           imageSrc={initImageList[0]}
           onClose={handleCloseModal}
-          setInitImageList={(value: string[]) => {
-            dispatch(setInitImageList(value));
-          }}
-          setMaskImageList={(value: string[]) => {
-            dispatch(setMaskImageList(value));
-          }}
+          setInitImageList={handleSetInitImageList}
+          setMaskImageList={handleSetMaskImageList}
+          setCombinedImg={handleSetCombinedImg}
         />
       )}
 
@@ -256,7 +237,7 @@ const InpaintingSidebar = () => {
         width={width}
         height={height}
         guidanceScale={guidanceScale}
-        samplingSteps={samplingSteps}
+        numInferenceSteps={numInferenceSteps}
         seed={seed}
         prompt={prompt}
         negativePrompt={negativePrompt}
@@ -274,18 +255,18 @@ const InpaintingSidebar = () => {
         isModalOpen={isLoadPresetOpen}
         closeModal={closeLoadPreset}
         type="inpainting"
-        setModel={(value: string) => dispatch(setModel(value))}
-        setWidth={(value: number) => dispatch(setWidth(value))}
-        setHeight={(value: number) => dispatch(setHeight(value))}
-        setGuidanceScale={(value: number) => dispatch(setGuidanceScale(value))}
-        setSamplingSteps={(value: number) => dispatch(setSamplingSteps(value))}
-        setSeed={(value: number) => dispatch(setSeed(value))}
-        setPrompt={(value: string) => dispatch(setPrompt(value))}
-        setNegativePrompt={(value: string) => dispatch(setNegativePrompt(value))}
-        setBatchCount={(value: number) => dispatch(setBatchCount(value))}
-        setBatchSize={(value: number) => dispatch(setBatchSize(value))}
-        setScheduler={(value: string) => dispatch(setScheduler(value))}
-        setStrength={(value: number) => dispatch(setStrength(value))}
+        setModel={handleSetModel}
+        setWidth={handleSetWidth}
+        setHeight={handleSetHeight}
+        setGuidanceScale={handleSetGuidanceScale}
+        setNumInferenceSteps={handleSetNumInferenceSteps}
+        setSeed={handleSetSeed}
+        setPrompt={handleSetPrompt}
+        setNegativePrompt={handleSetNegativePrompt}
+        setBatchCount={handleSetBatchCount}
+        setBatchSize={handleSetBatchSize}
+        setScheduler={handleSetScheduler}
+        setStrength={handleSetStrength}
       />
     </div>
   );

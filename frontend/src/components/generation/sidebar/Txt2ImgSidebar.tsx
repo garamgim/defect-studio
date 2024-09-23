@@ -1,23 +1,6 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store/store';
+import { useState, useCallback } from 'react';
 import CreatePreset from '../presets/CreatePreset';
 import LoadPreset from '../presets/LoadPreset';
-import { useState } from 'react';
-
-import {
-  setWidth,
-  setHeight,
-  setGuidanceScale,
-  setSamplingSteps,
-  setSeed,
-  setIsRandomSeed,
-  setModel,
-  setScheduler,
-  setBatchCount,
-  setBatchSize,
-  setPrompt,
-  setNegativePrompt
-} from '../../../store/slices/generation/txt2ImgSlice';
 import ModelParam from '../params/ModelParam';
 import ImgDimensionParams from '../params/ImgDimensionParams';
 import GuidanceScaleParams from '../params/GuidanceScaleParam';
@@ -25,14 +8,18 @@ import SeedParam from '../params/SeedParam';
 import SamplingParams from '../params/SamplingParams';
 import BatchParams from '../params/BatchParams';
 import { FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
+import { useTxt2ImgParams } from '../../../hooks/generation/useTxt2ImgParams';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
+import { resetState } from '../../../store/slices/generation/txt2ImgSlice';
+import { useDispatch } from 'react-redux';
 
 const Sidebar = () => {
-  const dispatch = useDispatch();
   const {
     width,
     height,
     guidanceScale,
-    samplingSteps,
+    numInferenceSteps,
     seed,
     isRandomSeed,
     model,
@@ -40,30 +27,45 @@ const Sidebar = () => {
     batchCount,
     batchSize,
     prompt,
-    negativePrompt
-  } = useSelector((state: RootState) => state.txt2Img);
+    negativePrompt,
+    handleSetWidth,
+    handleSetHeight,
+    handleSetBatchCount,
+    handleSetGuidanceScale,
+    handleSetNumInferenceSteps,
+    handleSetSeed,
+    handleSetIsRandomSeed,
+    handleSetModel,
+    handleSetScheduler,
+    handleSetPrompt,
+    handleSetNegativePrompt,
+    handleSetBatchSize
+  } = useTxt2ImgParams();
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
-
-  const handleRandomSeedChange = () => {
-    dispatch(setIsRandomSeed(!isRandomSeed));
-    dispatch(setSeed(!isRandomSeed ? -1 : seed));
-  };
 
   const [isCreatePresetOpen, setIsCreatePresetOpen] = useState(false);
   const [isLoadPresetOpen, setIsLoadPresetOpen] = useState(false);
 
-  const showCreatePreset = () => {
+  const showCreatePreset = useCallback(() => {
     setIsCreatePresetOpen(true);
-  };
-  const closeCreatePreset = () => {
+  }, []);
+
+  const closeCreatePreset = useCallback(() => {
     setIsCreatePresetOpen(false);
-  };
-  const showLoadPreset = () => {
+  }, []);
+
+  const showLoadPreset = useCallback(() => {
     setIsLoadPresetOpen(true);
-  };
-  const closeLoadPreset = () => {
+  }, []);
+
+  const closeLoadPreset = useCallback(() => {
     setIsLoadPresetOpen(false);
+  }, []);
+
+  const dispatch = useDispatch();
+  const handleReset = () => {
+    dispatch(resetState());
   };
 
   return (
@@ -72,7 +74,10 @@ const Sidebar = () => {
         {/* reset parameters & preset */}
         {level === 'Advanced' && (
           <div className="absolute top-6 right-0 mx-6">
-            <UndoOutlined className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer" />
+            <UndoOutlined
+              onClick={handleReset}
+              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
+            />
             <FileAddOutlined
               onClick={showCreatePreset}
               className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
@@ -84,45 +89,37 @@ const Sidebar = () => {
           </div>
         )}
 
-        {/* 모델 */}
-        <ModelParam model={model} setModel={(value: string) => dispatch(setModel(value))} />
+        {/* 모델 파라미터 */}
+        <ModelParam model={model} setModel={handleSetModel} />
 
         {level === 'Advanced' && (
           <>
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
-            {/* 이미지 크기 */}
-            <ImgDimensionParams
-              width={width}
-              height={height}
-              setWidth={(value: number) => dispatch(setWidth(value))}
-              setHeight={(value: number) => dispatch(setHeight(value))}
-            />
+            {/* 이미지 크기 파라미터 */}
+            <ImgDimensionParams width={width} height={height} setWidth={handleSetWidth} setHeight={handleSetHeight} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
-            {/* 샘플링 세팅 */}
+            {/* 샘플링 세팅 파라미터 */}
             <SamplingParams
               scheduler={scheduler}
-              samplingSteps={samplingSteps}
-              setSamplingSteps={(value: number) => dispatch(setSamplingSteps(value))}
-              setScheduler={(value: string) => dispatch(setScheduler(value))}
+              numInferenceSteps={numInferenceSteps}
+              setNumInferenceSteps={handleSetNumInferenceSteps}
+              setScheduler={handleSetScheduler}
             />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 초기 이미지에서의 변화 세팅 */}
-            <GuidanceScaleParams
-              guidanceScale={guidanceScale}
-              setGuidanceScale={(value: number) => dispatch(setGuidanceScale(value))}
-            />
+            <GuidanceScaleParams guidanceScale={guidanceScale} setGuidanceScale={handleSetGuidanceScale} />
 
             {/* 이미지 재현 & 다양성 세팅 */}
             <SeedParam
               seed={seed}
-              setSeed={(value: number) => dispatch(setSeed(value))}
+              setSeed={handleSetSeed}
               isRandomSeed={isRandomSeed}
-              handleRandomSeedChange={handleRandomSeedChange}
+              handleRandomSeedChange={handleSetIsRandomSeed}
             />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
@@ -131,8 +128,8 @@ const Sidebar = () => {
             <BatchParams
               batchCount={batchCount}
               batchSize={batchSize}
-              setBatchCount={(value: number) => dispatch(setBatchCount(value))}
-              setBatchSize={(value: number) => dispatch(setBatchSize(value))}
+              setBatchCount={handleSetBatchCount}
+              setBatchSize={handleSetBatchSize}
             />
           </>
         )}
@@ -144,7 +141,7 @@ const Sidebar = () => {
         width={width}
         height={height}
         guidanceScale={guidanceScale}
-        samplingSteps={samplingSteps}
+        numInferenceSteps={numInferenceSteps}
         seed={seed}
         prompt={prompt}
         negativePrompt={negativePrompt}
@@ -161,17 +158,17 @@ const Sidebar = () => {
         isModalOpen={isLoadPresetOpen}
         closeModal={closeLoadPreset}
         type="text_to_image"
-        setModel={(value: string) => dispatch(setModel(value))}
-        setWidth={(value: number) => dispatch(setWidth(value))}
-        setHeight={(value: number) => dispatch(setHeight(value))}
-        setGuidanceScale={(value: number) => dispatch(setGuidanceScale(value))}
-        setSamplingSteps={(value: number) => dispatch(setSamplingSteps(value))}
-        setSeed={(value: number) => dispatch(setSeed(value))}
-        setPrompt={(value: string) => dispatch(setPrompt(value))}
-        setNegativePrompt={(value: string) => dispatch(setNegativePrompt(value))}
-        setBatchCount={(value: number) => dispatch(setBatchCount(value))}
-        setBatchSize={(value: number) => dispatch(setBatchSize(value))}
-        setScheduler={(value: string) => dispatch(setScheduler(value))}
+        setModel={handleSetModel}
+        setWidth={handleSetWidth}
+        setHeight={handleSetHeight}
+        setGuidanceScale={handleSetGuidanceScale}
+        setNumInferenceSteps={handleSetNumInferenceSteps}
+        setSeed={handleSetSeed}
+        setPrompt={handleSetPrompt}
+        setNegativePrompt={handleSetNegativePrompt}
+        setBatchCount={handleSetBatchCount}
+        setBatchSize={handleSetBatchSize}
+        setScheduler={handleSetScheduler}
       />
     </div>
   );

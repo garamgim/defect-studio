@@ -1,21 +1,17 @@
 import Sidebar from '../sidebar/InpaintingSidebar';
 import PromptParams from '../params/PromptParams';
 import InpaintingDisplay from '../outputDisplay/InpaintingDisplay';
-import { RootState } from '../../../store/store';
-import {
-  setPrompt,
-  setNegativePrompt,
-  setIsNegativePrompt,
-  setOutputImgUrls,
-  setClipData,
-  setIsLoading,
-  setUploadImgsCount
-} from '../../../store/slices/generation/inpaintingSlice';
-import { useSelector, useDispatch } from 'react-redux';
-import { postInpaintingGeneration } from '../../../api/generation';
+import { useInpaintingParams } from '../../../hooks/generation/useInpaintingParams';
+import { useDispatch } from 'react-redux';
+import { postInpaintingGeneration, getClip } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import GenerateButton from '../../common/GenerateButton';
-import { getClip } from '../../../api/generation';
+import {
+  setClipData,
+  setIsLoading,
+  setOutputImgUrls,
+  setUploadImgsCount
+} from '../../../store/slices/generation/inpaintingSlice';
 
 const InpaintingLayout = () => {
   const dispatch = useDispatch();
@@ -32,7 +28,7 @@ const InpaintingLayout = () => {
     scheduler,
     width,
     height,
-    samplingSteps,
+    numInferenceSteps,
     guidanceScale,
     seed,
     batchCount,
@@ -40,11 +36,14 @@ const InpaintingLayout = () => {
     outputPath,
     clipData,
     mode,
-    isLoading
-  } = useSelector((state: RootState) => state.inpainting);
+    isLoading,
+    handleSetPrompt,
+    handleSetNegativePrompt,
+    handleSetIsNegativePrompt
+  } = useInpaintingParams();
 
   const handleNegativePromptChange = () => {
-    dispatch(setIsNegativePrompt(!isNegativePrompt));
+    handleSetIsNegativePrompt(!isNegativePrompt);
   };
 
   let bgFiles;
@@ -95,7 +94,7 @@ const InpaintingLayout = () => {
       negative_prompt: negativePrompt,
       width,
       height,
-      num_inference_steps: samplingSteps,
+      num_inference_steps: numInferenceSteps,
       guidance_scale: guidanceScale,
       seed,
       batch_count: batchCount,
@@ -121,15 +120,12 @@ const InpaintingLayout = () => {
 
   // Clip아이콘 클릭
   const handleClipClick = async () => {
-    // clipData가 빈 배열일 때만 getClip 실행
     if (clipData.length === 0) {
       try {
         if (initImageList.length > 0) {
           const file = convertStringToFile(initImageList[0], 'image.png');
-
           const generatedPrompts = await getClip([file]);
           dispatch(setClipData(generatedPrompts));
-          console.log('clip 갱신: ', clipData);
         } else {
           console.error('No image available for clip generation');
         }
@@ -157,10 +153,9 @@ const InpaintingLayout = () => {
             prompt={prompt}
             negativePrompt={negativePrompt}
             isNegativePrompt={isNegativePrompt}
-            setPrompt={(value) => dispatch(setPrompt(value))}
-            setNegativePrompt={(value) => dispatch(setNegativePrompt(value))}
+            setPrompt={handleSetPrompt}
+            setNegativePrompt={handleSetNegativePrompt}
             handleNegativePromptChange={handleNegativePromptChange}
-            // 메뉴얼 모드일 때만 props로 전달(batch에서는 clip실행 안함)
             clipData={mode === 'manual' ? clipData : []}
             handleClipClick={mode === 'manual' ? handleClipClick : undefined}
           />

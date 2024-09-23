@@ -1,28 +1,28 @@
 import { useState } from 'react';
 import { Button } from 'antd';
-import { useSelector, useDispatch } from 'react-redux';
 import { FormatPainterOutlined } from '@ant-design/icons';
-import { RootState } from '../../../store/store';
 import MaskingModal from '../masking/MaskingModal';
 import UploadImagePlusMask from '../params/UploadImgWithMaskingParams';
-import {
-  setInitImageList,
-  setMaskImageList,
-  setInitInputPath,
-  setMaskInputPath,
-  setOutputPath,
-  setMode
-} from '../../../store/slices/generation/cleanupSlice';
-import { saveImages } from '../../../store/slices/generation/maskingSlice';
+import { useCleanupParams } from '../../../hooks/generation/useCleanupParams';
+import { setCombinedImg } from '../../../store/slices/generation/inpaintingSlice';
 
 const CleanupSidebar = () => {
-  const { initInputPath, maskInputPath, outputPath, mode, initImageList } = useSelector(
-    (state: RootState) => state.cleanup
-  );
+  const {
+    initInputPath,
+    maskInputPath,
+    outputPath,
+    mode,
+    initImageList,
+    combinedImg,
+    handleSetInitInputPath,
+    handleSetMaskInputPath,
+    handleSetOutputPath,
+    handleSetMode,
+    handleSetInitImageList,
+    handleSetMaskImageList,
+    handleSetCombinedImg
+  } = useCleanupParams();
 
-  const { combinedImg } = useSelector((state: RootState) => state.masking);
-
-  const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
 
   const handleImageUpload = (file: File) => {
@@ -31,15 +31,10 @@ const CleanupSidebar = () => {
       const base64String = reader.result as string;
       const img = new Image();
       img.onload = () => {
-        dispatch(setInitImageList([base64String]));
+        handleSetInitImageList([base64String]);
 
-        dispatch(
-          saveImages({
-            backgroundImg: null,
-            canvasImg: null,
-            combinedImg: null
-          })
-        );
+        // 초기 이미지와 마스크 이미지 저장
+        setCombinedImg(null);
       };
       img.src = reader.result as string;
     };
@@ -60,18 +55,10 @@ const CleanupSidebar = () => {
           initInputPath={initInputPath}
           maskInputPath={maskInputPath}
           outputPath={outputPath}
-          setInitInputPath={(value: string) => {
-            dispatch(setInitInputPath(value));
-          }}
-          setMaskInputPath={(value: string) => {
-            dispatch(setMaskInputPath(value));
-          }}
-          setOutputPath={(value: string) => {
-            dispatch(setOutputPath(value));
-          }}
-          setMode={(value: 'manual' | 'batch') => {
-            dispatch(setMode(value));
-          }}
+          setInitInputPath={handleSetInitInputPath}
+          setMaskInputPath={handleSetMaskInputPath}
+          setOutputPath={handleSetOutputPath}
+          setMode={handleSetMode}
         />
 
         {initImageList[0] && (
@@ -103,12 +90,9 @@ const CleanupSidebar = () => {
         <MaskingModal
           imageSrc={initImageList[0]}
           onClose={handleCloseModal}
-          setInitImageList={(value: string[]) => {
-            dispatch(setInitImageList(value));
-          }}
-          setMaskImageList={(value: string[]) => {
-            dispatch(setMaskImageList(value));
-          }}
+          setInitImageList={handleSetInitImageList}
+          setMaskImageList={handleSetMaskImageList}
+          setCombinedImg={handleSetCombinedImg}
         />
       )}
     </div>

@@ -1,21 +1,19 @@
 import Sidebar from '../sidebar/RemoveBgSidebar';
 import GenerateButton from '../../common/GenerateButton';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store/store';
 import { postRemoveBgGeneration } from '../../../api/generation';
-import { setOutputImgUrls, setIsLoading } from '../../../store/slices/generation/removeBgSlice';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import RemoveBgDisplay from '../outputDisplay/RemoveBgDisplay';
+import { useRemoveBgParams } from '../../../hooks/generation/useRemoveBgParams';
 
 const RemoveBackground = () => {
-  const dispatch = useDispatch();
-  const { images, inputPath, outputPath, isLoading, mode } = useSelector((state: RootState) => state.removeBg);
+  const { imageList, inputPath, outputPath, isLoading, mode, handleSetIsLoading, handleSetOutputImgUrls } =
+    useRemoveBgParams();
 
   let files;
 
   const handleGenerate = async () => {
     if (mode === 'manual') {
-      files = images.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+      files = imageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
     } else {
       const fileDataArray = await window.electron.getFilesInFolder(inputPath);
 
@@ -35,19 +33,19 @@ const RemoveBackground = () => {
     }
 
     const data = {
-      images: files,
+      image_list: files,
       input_path: inputPath,
       output_path: outputPath
     };
 
     try {
-      dispatch(setIsLoading(true));
+      handleSetIsLoading(true);
       const outputImgUrls = await postRemoveBgGeneration('remote', data);
-      dispatch(setOutputImgUrls(outputImgUrls));
+      handleSetOutputImgUrls(outputImgUrls);
     } catch (error) {
       console.error('Error removing background:', error);
     } finally {
-      dispatch(setIsLoading(false));
+      handleSetIsLoading(false);
     }
   };
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Typography, Modal, Button, message } from 'antd';
 import { getPresetList, getPresetDetail, deletePreset } from '../../../api/generation';
 import moment from 'moment';
@@ -17,7 +17,7 @@ interface LoadPresetProps {
   setWidth: (value: number) => void;
   setHeight: (value: number) => void;
   setGuidanceScale: (value: number) => void;
-  setSamplingSteps: (value: number) => void;
+  setNumInferenceSteps: (value: number) => void;
   setSeed: (value: number) => void;
   setPrompt: (value: string) => void;
   setNegativePrompt: (value: string) => void;
@@ -35,7 +35,7 @@ const LoadPreset = ({
   setWidth,
   setHeight,
   setGuidanceScale,
-  setSamplingSteps,
+  setNumInferenceSteps,
   setSeed,
   setPrompt,
   setNegativePrompt,
@@ -130,7 +130,7 @@ const LoadPreset = ({
         setGuidanceScale(selectedPreset.guidance_scale);
       }
       if (selectedPreset.sampling_steps) {
-        setSamplingSteps(selectedPreset.sampling_steps);
+        setNumInferenceSteps(selectedPreset.sampling_steps);
       }
       if (selectedPreset.seed) {
         setSeed(selectedPreset.seed);
@@ -353,4 +353,4 @@ const LoadPreset = ({
   );
 };
 
-export default LoadPreset;
+export default React.memo(LoadPreset);

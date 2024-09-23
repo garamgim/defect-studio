@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
+import React from 'react';
 
 interface Txt2ImgDisplayProps {
   selectedImages: string[];
@@ -91,4 +92,4 @@ const Txt2ImgDisplay = ({ selectedImages, setSelectedImages }: Txt2ImgDisplayPro
   );
 };
 
-export default Txt2ImgDisplay;
+export default React.memo(Txt2ImgDisplay);
