@@ -10,14 +10,13 @@ import { HiOutlinePaintBrush } from 'react-icons/hi2';
 import { Stage, Layer, Line, Image as KonvaImage, Circle } from 'react-konva';
 import useImage from 'use-image';
 import Konva from 'konva';
-import { useDispatch } from 'react-redux';
-import { saveImages } from '../../../store/slices/generation/maskingSlice';
 
 interface MaskingModalProps {
   onClose: () => void;
   imageSrc: string;
   setInitImageList: (value: string[]) => void;
   setMaskImageList: (value: string[]) => void;
+  setCombinedImg: (value: string) => void;
 }
 
 interface LineObject {
@@ -27,7 +26,7 @@ interface LineObject {
   fill?: string;
 }
 
-const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }: MaskingModalProps) => {
+const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList, setCombinedImg }: MaskingModalProps) => {
   const [tool, setTool] = useState<'brush' | 'polygon' | 'select' | null>(null);
   const [isMovingPoints, setIsMovingPoints] = useState(false);
   const [brushSize, setBrushSize] = useState<number>(10);
@@ -47,8 +46,6 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }:
   const [imagePos, setImagePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [imageSize, setImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
   const [minImageSize, setMinImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
-
-  const dispatch = useDispatch();
 
   // 캔버스를 흑백으로 변환
   const convertCanvasToGrayscale = async (imageBase64: string): Promise<string> => {
@@ -97,7 +94,6 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }:
   };
   const handleSaveImages = async () => {
     if (!stageRef.current) {
-      console.log('Stage reference is missing');
       return;
     }
 
@@ -109,14 +105,12 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }:
     // 1. Stage와 Canvas를 축소 상태로 설정
     stage.scale({ x: 1, y: 1 });
     stage.batchDraw(); // 축소 상태로 다시 그리기
-    console.log('Stage scaled to 1');
 
     try {
       // 1. backgroundImg: 배경 이미지 레이어만 저장
       const imageNode = stage.findOne((node: Konva.Node) => node instanceof Konva.Image) as Konva.Image;
 
       if (!imageNode) {
-        console.log('Image node not found');
         return; // 이미지 노드가 없으면 리턴
       }
 
@@ -129,23 +123,18 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }:
         height: imageSize.height,
         pixelRatio: 1 // 원래 크기로 저장
       });
-      console.log('Stage image saved');
 
       // 2. canvasImg: 투명한 캔버스를 흑백 이미지로 변환하여 저장
       const canvasLayer = stageRef.current.findOne('#canvas-layer');
 
       if (!canvasLayer) {
-        console.log('Canvas layer not found');
         return; // 캔버스 레이어가 없으면 리턴
       }
-
-      console.log('Canvas layer found:', canvasLayer);
 
       // 배경 이미지 숨기고 캔버스만 보이도록 설정
       imageNode.visible(false); // 배경 이미지 비활성화
       canvasLayer.visible(true); // 캔버스만 보이게 설정
       stage.batchDraw();
-      console.log('Canvas layer visible');
 
       // 캔버스에서 색칠된 부분만 흑백으로 변환
       const canvasImgBase64 = await convertCanvasToGrayscale(
@@ -158,7 +147,6 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }:
           pixelRatio: 1 // 축소 상태로 저장
         })
       );
-      console.log('Canvas image saved and converted to grayscale');
 
       // 원래 상태로 복원
       imageNode.visible(true); // 배경 이미지 다시 보이게 설정
@@ -173,21 +161,10 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList }:
         height: imageSize.height,
         pixelRatio: 1
       });
-      console.log('Combined image saved');
-
-      // Redux에 저장
-      dispatch(
-        saveImages({
-          backgroundImg: backgroundImgBase64, // 배경 이미지
-          canvasImg: canvasImgBase64, // 캔버스 이미지 (흑백 변환 포함)
-          combinedImg: combinedImgBase64 // 배경 + 캔버스 합친 이미지
-        })
-      );
 
       setInitImageList([backgroundImgBase64]);
       setMaskImageList([canvasImgBase64]);
-
-      console.log('Images saved to Redux store');
+      setCombinedImg(combinedImgBase64);
     } catch (error) {
       console.error('Error saving images:', error);
     } finally {

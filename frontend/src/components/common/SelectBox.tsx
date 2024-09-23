@@ -1,4 +1,4 @@
-import { Select, Form } from "antd";
+import { Select, Form } from 'antd';
 
 interface SelectBoxProps {
   value: string;
@@ -8,7 +8,7 @@ interface SelectBoxProps {
   labelFontWeight?: string;
 }
 
-const SelectBox = ({ value, onChange, options, label, labelFontWeight = "font-semibold" }: SelectBoxProps) => {
+const SelectBox = ({ value, onChange, options, label, labelFontWeight = 'font-semibold' }: SelectBoxProps) => {
   return (
     <div className="mb-5">
       <Form.Item label={<span className={`text-[14px] ${labelFontWeight} text-[#222]`}>{label}</span>}>

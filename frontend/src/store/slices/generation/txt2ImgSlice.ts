@@ -1,31 +1,23 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SnakeToCamel } from '../../../utils/snakeToCamel';
+import { Txt2ImgParams } from '../../../types/generation';
 
-interface Txt2ImgState {
-  model: string;
-  scheduler: string;
-  prompt: string;
-  negativePrompt: string;
-  width: number;
-  height: number;
-  samplingSteps: number;
-  guidanceScale: number;
-  seed: number;
+export interface Txt2ImgState extends SnakeToCamel<Txt2ImgParams> {
   isRandomSeed: boolean;
-  batchCount: number;
-  batchSize: number;
-  outputPath: string;
   isNegativePrompt: boolean;
-  outputImgUrls: string[]; // 생성된 이미지 URL 리스트
+
+  outputImgUrls: string[];
+  isLoading: boolean;
 }
 
 const initialState: Txt2ImgState = {
-  model: 'CompVis/stable-diffusion-v1-4',
+  model: 'stable-diffusion-2',
   scheduler: 'DPM++ 2M',
   prompt: '',
   negativePrompt: '',
   width: 512,
   height: 512,
-  samplingSteps: 50,
+  numInferenceSteps: 50,
   guidanceScale: 7.5,
   seed: -1,
   isRandomSeed: false,
@@ -33,7 +25,8 @@ const initialState: Txt2ImgState = {
   batchSize: 1,
   outputPath: '',
   isNegativePrompt: false,
-  outputImgUrls: []
+  outputImgUrls: [],
+  isLoading: false
 };
 
 const txt2ImgSlice = createSlice({
@@ -58,8 +51,8 @@ const txt2ImgSlice = createSlice({
     setHeight: (state, action: PayloadAction<number>) => {
       state.height = action.payload;
     },
-    setSamplingSteps: (state, action: PayloadAction<number>) => {
-      state.samplingSteps = action.payload;
+    setNumInferenceSteps: (state, action: PayloadAction<number>) => {
+      state.numInferenceSteps = action.payload;
     },
     setGuidanceScale: (state, action: PayloadAction<number>) => {
       state.guidanceScale = action.payload;
@@ -90,6 +83,12 @@ const txt2ImgSlice = createSlice({
     },
     setOutputImgUrls: (state, action: PayloadAction<string[]>) => {
       state.outputImgUrls = action.payload;
+    },
+    setIsLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
+    resetState: (state) => {
+      Object.assign(state, initialState);
     }
   }
 });
@@ -101,7 +100,7 @@ export const {
   setNegativePrompt,
   setWidth,
   setHeight,
-  setSamplingSteps,
+  setNumInferenceSteps,
   setGuidanceScale,
   setSeed,
   setIsRandomSeed,
@@ -109,7 +108,9 @@ export const {
   setBatchSize,
   setOutputPath,
   setIsNegativePrompt,
-  setOutputImgUrls
+  setOutputImgUrls,
+  setIsLoading,
+  resetState
 } = txt2ImgSlice.actions;
 
 export default txt2ImgSlice.reducer;

@@ -1,57 +1,51 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SnakeToCamel } from '../../../utils/snakeToCamel';
+import { Img2ImgParams } from '../../../types/generation';
 
-interface Img2ImgState {
-  mode: 'manual' | 'batch'; // 메뉴얼/배치 모두 구분
-  model: string;
-  scheduler: string;
-  prompt: string;
-  negativePrompt: string;
-  width: number;
-  height: number;
-  samplingSteps: number;
-  guidanceScale: number;
-  strength: number;
-  seed: number;
+interface Img2ImgState extends Omit<SnakeToCamel<Img2ImgParams>, 'imageList'> {
+  mode: 'manual' | 'batch';
   isRandomSeed: boolean;
-  batchCount: number;
-  batchSize: number;
-  images: string[]; // 초기 이미지 배열
-  inputPath: string;
-  outputPath: string;
   isNegativePrompt: boolean;
   outputImgUrls: string[]; // 생성된 이미지 배열
   clipData: string[];
+  imageList: string[]; // string[]으로 재정의
+
+  // skeleton ui에 이용
+  isLoading: boolean;
+  uploadImgsCount: number;
 }
 
 const initialState: Img2ImgState = {
   mode: 'manual',
-  model: 'CompVis/stable-diffusion-v1-4',
+  model: 'stable-diffusion-2',
   scheduler: 'DPM++ 2M',
   prompt: '',
   negativePrompt: '',
   width: 512,
   height: 512,
-  samplingSteps: 50,
+  numInferenceSteps: 50,
   guidanceScale: 7.5,
   strength: 0.75,
   seed: -1,
   isRandomSeed: false,
   batchCount: 1,
   batchSize: 1,
-  images: [],
+  imageList: [],
   inputPath: '',
   outputPath: '',
   isNegativePrompt: false,
   outputImgUrls: [],
-  clipData: []
+  clipData: [],
+  isLoading: false,
+  uploadImgsCount: 1
 };
 
 const img2ImgSlice = createSlice({
   name: 'img2Img',
   initialState,
   reducers: {
-    setMode: (state, action: PayloadAction<'maual' | 'batch'>) => {
-      state.model = action.payload;
+    setMode: (state, action: PayloadAction<'manual' | 'batch'>) => {
+      state.mode = action.payload;
     },
     setModel: (state, action: PayloadAction<string>) => {
       state.model = action.payload;
@@ -71,8 +65,8 @@ const img2ImgSlice = createSlice({
     setHeight: (state, action: PayloadAction<number>) => {
       state.height = action.payload;
     },
-    setSamplingSteps: (state, action: PayloadAction<number>) => {
-      state.samplingSteps = action.payload;
+    setNumInferenceSteps: (state, action: PayloadAction<number>) => {
+      state.numInferenceSteps = action.payload;
     },
     setGuidanceScale: (state, action: PayloadAction<number>) => {
       state.guidanceScale = action.payload;
@@ -101,8 +95,8 @@ const img2ImgSlice = createSlice({
     setBatchSize: (state, action: PayloadAction<number>) => {
       state.batchSize = action.payload;
     },
-    setImages: (state, action: PayloadAction<string[]>) => {
-      state.images = action.payload;
+    setImageList: (state, action: PayloadAction<string[]>) => {
+      state.imageList = action.payload;
     },
     setInputPath: (state, action: PayloadAction<string>) => {
       state.inputPath = action.payload;
@@ -115,18 +109,28 @@ const img2ImgSlice = createSlice({
     },
     setClipData: (state, action: PayloadAction<string[]>) => {
       state.clipData = action.payload;
+    },
+    setIsLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
+    setUploadImgsCount: (state, action: PayloadAction<number>) => {
+      state.uploadImgsCount = action.payload;
+    },
+    resetState: (state) => {
+      Object.assign(state, initialState);
     }
   }
 });
 
 export const {
+  setMode,
   setModel,
   setScheduler,
   setPrompt,
   setNegativePrompt,
   setWidth,
   setHeight,
-  setSamplingSteps,
+  setNumInferenceSteps,
   setGuidanceScale,
   setStrength,
   setSeed,
@@ -134,11 +138,14 @@ export const {
   setIsNegativePrompt,
   setBatchCount,
   setBatchSize,
-  setImages,
+  setImageList,
   setInputPath,
   setOutputPath,
   setOutputImgUrls,
-  setClipData
+  setClipData,
+  setIsLoading,
+  setUploadImgsCount,
+  resetState
 } = img2ImgSlice.actions;
 
 export default img2ImgSlice.reducer;

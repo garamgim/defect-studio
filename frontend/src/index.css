@@ -215,6 +215,15 @@ html.dark .ant-table-tbody .ant-table-row .ant-table-cell-row-hover {
   @apply border-2 border-gray-300 rounded-lg w-full h-full text-[222222] dark:text-white font-samsung;
 }
 
+/* 컨텐트 박스 */
+.content-box {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+
+  @apply border-2 border-gray-300 rounded-lg w-full h-full text-[222222] dark:text-white font-samsung;
+}
+
 /* 회원가입 페이지에 대한 입력 설정 */
 html.dark .ant-form-item-control-input-content .ant-input-affix-wrapper {
   @apply bg-gray-700;
@@ -233,4 +242,37 @@ html.dark .ant-input-outlined {
 
 html.dark .ant-form-item-has-error {
   @apply bg-gray-800;
+}
+
+/* Tab에 관란 CSS */
+.ant-tabs-tab-btn {
+  @apply font-semibold;
+}
+
+html.dark .ant-tabs-tab-btn {
+  @apply text-gray-300;
+
+  &:hover {
+    @apply text-white;
+  }
+}
+
+/* Tab중 disable된 것 */
+.ant-tabs-tab-disabled .ant-tabs-tab-btn {
+  @apply text-gray-100;
+}
+html.dark .ant-tabs-tab-disabled .ant-tabs-tab-btn {
+  @apply text-gray-700;
+}
+
+html.dark .ant-form-item-control-input-content .ant-input-status-error {
+  @apply bg-gray-700;
+
+  &:hover {
+    @apply bg-gray-600;
+  }
+}
+
+html.dark .ant-input .ant-input-outlined {
+  @apply bg-gray-700;
 }

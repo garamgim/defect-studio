@@ -1,17 +1,17 @@
 import Sidebar from '../sidebar/InpaintingSidebar';
 import PromptParams from '../params/PromptParams';
 import InpaintingDisplay from '../outputDisplay/InpaintingDisplay';
-import { RootState } from '../../../store/store';
-import {
-  setPrompt,
-  setNegativePrompt,
-  setIsNegativePrompt,
-  setOutputImgUrls
-} from '../../../store/slices/generation/inpaintingSlice';
-import { useSelector, useDispatch } from 'react-redux';
-import { postInpaintingGeneration } from '../../../api/generation';
+import { useInpaintingParams } from '../../../hooks/generation/useInpaintingParams';
+import { useDispatch } from 'react-redux';
+import { postInpaintingGeneration, getClip } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import GenerateButton from '../../common/GenerateButton';
+import {
+  setClipData,
+  setIsLoading,
+  setOutputImgUrls,
+  setUploadImgsCount
+} from '../../../store/slices/generation/inpaintingSlice';
 
 const InpaintingLayout = () => {
   const dispatch = useDispatch();
@@ -28,25 +28,64 @@ const InpaintingLayout = () => {
     scheduler,
     width,
     height,
-    samplingSteps,
+    numInferenceSteps,
     guidanceScale,
     seed,
     batchCount,
     batchSize,
     outputPath,
-    clipData
-  } = useSelector((state: RootState) => state.inpainting);
+    clipData,
+    mode,
+    isLoading,
+    handleSetPrompt,
+    handleSetNegativePrompt,
+    handleSetIsNegativePrompt
+  } = useInpaintingParams();
 
   const handleNegativePromptChange = () => {
-    dispatch(setIsNegativePrompt(!isNegativePrompt));
+    handleSetIsNegativePrompt(!isNegativePrompt);
   };
 
+  let bgFiles;
+  let canvasFiles;
+
   const handleGenerate = async () => {
-    // Base64 문자열을 파일로 변환
-    const bgfiles = initImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
-    const canvasfiles = maskImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
-    console.log('배경: ', bgfiles);
-    console.log('캔버스: ', canvasfiles);
+    if (mode === 'manual') {
+      bgFiles = initImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+      canvasFiles = maskImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+      dispatch(setUploadImgsCount(batchCount * batchSize));
+    } else {
+      const bgFileDataArray = await window.electron.getFilesInFolder(initInputPath);
+      const maskFileDataArray = await window.electron.getFilesInFolder(maskInputPath);
+      dispatch(setUploadImgsCount(bgFileDataArray.length * batchCount * batchSize));
+
+      // base64 데이터를 Blob으로 변환하고 File 객체로 생성
+      bgFiles = bgFileDataArray.map((fileData) => {
+        const byteString = atob(fileData.data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uintArray = new Uint8Array(arrayBuffer);
+
+        for (let i = 0; i < byteString.length; i++) {
+          uintArray[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([arrayBuffer], { type: fileData.type });
+        return new File([blob], fileData.name, { type: fileData.type });
+      });
+
+      canvasFiles = maskFileDataArray.map((fileData) => {
+        const byteString = atob(fileData.data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uintArray = new Uint8Array(arrayBuffer);
+
+        for (let i = 0; i < byteString.length; i++) {
+          uintArray[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([arrayBuffer], { type: fileData.type });
+        return new File([blob], fileData.name, { type: fileData.type });
+      });
+    }
 
     const data = {
       model,
@@ -55,34 +94,51 @@ const InpaintingLayout = () => {
       negative_prompt: negativePrompt,
       width,
       height,
-      num_inference_steps: samplingSteps,
+      num_inference_steps: numInferenceSteps,
       guidance_scale: guidanceScale,
       seed,
       batch_count: batchCount,
       batch_size: batchSize,
       output_path: outputPath,
       strength,
-      init_image_list: bgfiles,
-      mask_image_list: canvasfiles,
+      init_image_list: bgFiles,
+      mask_image_list: canvasFiles,
       init_input_path: initInputPath,
       mask_input_path: maskInputPath
     };
 
     try {
-      // API 호출
+      dispatch(setIsLoading(true));
       const outputImgUrls = await postInpaintingGeneration('remote', data);
-      console.log('Generated image URLs:', outputImgUrls);
-      // 결과 이미지를 상태에 저장
       dispatch(setOutputImgUrls(outputImgUrls));
     } catch (error) {
       console.error('Error generating image:', error);
+    } finally {
+      dispatch(setIsLoading(false));
+    }
+  };
+
+  // Clip아이콘 클릭
+  const handleClipClick = async () => {
+    if (clipData.length === 0) {
+      try {
+        if (initImageList.length > 0) {
+          const file = convertStringToFile(initImageList[0], 'image.png');
+          const generatedPrompts = await getClip([file]);
+          dispatch(setClipData(generatedPrompts));
+        } else {
+          console.error('No image available for clip generation');
+        }
+      } catch (error) {
+        console.error('Error generating clip data:', error);
+      }
     }
   };
 
   return (
     <div className="flex h-[calc(100vh-60px)] pt-4 pb-6">
       {/* 사이드바 */}
-      <div className="w-[360px] pl-8 pr-4 h-full hidden md:block">
+      <div className="w-[360px] pl-8 h-full hidden md:block">
         <Sidebar />
       </div>
 
@@ -97,17 +153,18 @@ const InpaintingLayout = () => {
             prompt={prompt}
             negativePrompt={negativePrompt}
             isNegativePrompt={isNegativePrompt}
-            setPrompt={(value) => dispatch(setPrompt(value))}
-            setNegativePrompt={(value) => dispatch(setNegativePrompt(value))}
+            setPrompt={handleSetPrompt}
+            setNegativePrompt={handleSetNegativePrompt}
             handleNegativePromptChange={handleNegativePromptChange}
-            clipData={clipData}
+            clipData={mode === 'manual' ? clipData : []}
+            handleClipClick={mode === 'manual' ? handleClipClick : undefined}
           />
         </div>
       </div>
 
       {/* Generate 버튼 */}
       <div className="fixed bottom-[50px] right-[56px]">
-        <GenerateButton onClick={handleGenerate} />
+        <GenerateButton onClick={handleGenerate} disabled={isLoading} />
       </div>
     </div>
   );

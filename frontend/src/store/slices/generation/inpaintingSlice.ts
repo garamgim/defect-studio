@@ -1,37 +1,32 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SnakeToCamel } from '../../../utils/snakeToCamel';
+import { InpaintingParams } from '../../../types/generation';
 
-interface InpaintingState {
-  model: string;
-  scheduler: string;
-  prompt: string;
-  negativePrompt: string;
-  width: number;
-  height: number;
-  samplingSteps: number;
-  guidanceScale: number;
-  strength: number;
-  seed: number;
+interface InpaintingState extends Omit<SnakeToCamel<InpaintingParams>, 'initImageList' | 'maskImageList'> {
+  mode: 'manual' | 'batch';
   isRandomSeed: boolean;
-  batchCount: number;
-  batchSize: number;
   isNegativePrompt: boolean;
   initImageList: string[];
   maskImageList: string[];
-  initInputPath: string;
-  maskInputPath: string;
-  outputPath: string;
   outputImgUrls: string[];
   clipData: string[];
+
+  // skeleton ui에 이용
+  isLoading: boolean;
+  uploadImgsCount: number;
+
+  combinedImg: string | null;
 }
 
 const initialState: InpaintingState = {
-  model: 'CompVis/stable-diffusion-v1-4',
+  mode: 'manual',
+  model: 'diffusers/stable-diffusion-xl-1.0-inpainting-0.1',
   scheduler: 'DPM++ 2M',
   prompt: '',
   negativePrompt: '',
   width: 512,
   height: 512,
-  samplingSteps: 50,
+  numInferenceSteps: 50,
   guidanceScale: 7.5,
   strength: 0.75,
   seed: -1,
@@ -45,13 +40,21 @@ const initialState: InpaintingState = {
   maskInputPath: '',
   outputPath: '',
   outputImgUrls: [],
-  clipData: []
+  clipData: [],
+
+  isLoading: false,
+  uploadImgsCount: 1,
+
+  combinedImg: null
 };
 
 const inpaintingSlice = createSlice({
   name: 'inpainting',
   initialState,
   reducers: {
+    setMode: (state, action: PayloadAction<'manual' | 'batch'>) => {
+      state.mode = action.payload;
+    },
     setModel: (state, action: PayloadAction<string>) => {
       state.model = action.payload;
     },
@@ -70,8 +73,8 @@ const inpaintingSlice = createSlice({
     setHeight: (state, action: PayloadAction<number>) => {
       state.height = action.payload;
     },
-    setSamplingSteps: (state, action: PayloadAction<number>) => {
-      state.samplingSteps = action.payload;
+    setNumInferenceSteps: (state, action: PayloadAction<number>) => {
+      state.numInferenceSteps = action.payload;
     },
     setGuidanceScale: (state, action: PayloadAction<number>) => {
       state.guidanceScale = action.payload;
@@ -120,18 +123,31 @@ const inpaintingSlice = createSlice({
     },
     setClipData: (state, action: PayloadAction<string[]>) => {
       state.clipData = action.payload;
+    },
+    setIsLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
+    setUploadImgsCount: (state, action: PayloadAction<number>) => {
+      state.uploadImgsCount = action.payload;
+    },
+    setCombinedImg: (state, action: PayloadAction<string | null>) => {
+      state.combinedImg = action.payload;
+    },
+    resetState: (state) => {
+      Object.assign(state, initialState);
     }
   }
 });
 
 export const {
+  setMode,
   setModel,
   setScheduler,
   setPrompt,
   setNegativePrompt,
   setWidth,
   setHeight,
-  setSamplingSteps,
+  setNumInferenceSteps,
   setGuidanceScale,
   setStrength,
   setSeed,
@@ -145,7 +161,11 @@ export const {
   setMaskInputPath,
   setOutputPath,
   setOutputImgUrls,
-  setClipData
+  setClipData,
+  setIsLoading,
+  setUploadImgsCount,
+  setCombinedImg,
+  resetState
 } = inpaintingSlice.actions;
 
 export default inpaintingSlice.reducer;

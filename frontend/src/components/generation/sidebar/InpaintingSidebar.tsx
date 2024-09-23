@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Button } from 'antd';
-import { FormatPainterOutlined } from '@ant-design/icons';
-import { RootState } from '../../../store/store';
-import Model from '../params/ModelParam';
+import { FormatPainterOutlined, FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
+import Model from '../params/InpaintingModelParam';
 import MaskingModal from '../masking/MaskingModal';
 import SamplingParams from '../params/SamplingParams';
 import ImgDimensionParams from '../params/ImgDimensionParams';
@@ -11,129 +10,151 @@ import BatchParams from '../params/BatchParams';
 import StrengthParam from '../params/StrengthParam';
 import GuidanceScaleParms from '../params/GuidanceScaleParam';
 import UploadImgWithMaskingParams from '../params/UploadImgWithMaskingParams';
-import { useSelector, useDispatch } from 'react-redux';
-import { saveImages } from '../../../store/slices/generation/maskingSlice';
-import {
-  setModel,
-  setScheduler,
-  setWidth,
-  setHeight,
-  setSamplingSteps,
-  setGuidanceScale,
-  setSeed,
-  setStrength,
-  setIsRandomSeed,
-  setBatchCount,
-  setBatchSize,
-  setInitImageList,
-  setMaskImageList,
-  setClipData
-} from '../../../store/slices/generation/inpaintingSlice';
-import { getClip } from '../../../api/generation';
+import { useInpaintingParams } from '../../../hooks/generation/useInpaintingParams';
+import CreatePreset from '../presets/CreatePreset';
+import LoadPreset from '../presets/LoadPreset';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
+import { setCombinedImg, resetState } from '../../../store/slices/generation/inpaintingSlice';
+import { useDispatch } from 'react-redux';
 
 const InpaintingSidebar = () => {
-  const { combinedImg } = useSelector((state: RootState) => state.masking);
-
-  const dispatch = useDispatch();
   const {
     model,
     scheduler,
     width,
     height,
-    samplingSteps,
+    numInferenceSteps,
     seed,
     isRandomSeed,
     guidanceScale,
     strength,
     batchCount,
-    batchSize
-  } = useSelector((state: RootState) => state.inpainting);
+    batchSize,
+    initInputPath,
+    maskInputPath,
+    outputPath,
+    mode,
+    initImageList,
+    combinedImg,
+    prompt,
+    negativePrompt,
+    handleSetModel,
+    handleSetScheduler,
+    handleSetWidth,
+    handleSetHeight,
+    handleSetNumInferenceSteps,
+    handleSetGuidanceScale,
+    handleSetSeed,
+    handleSetStrength,
+    handleSetIsRandomSeed,
+    handleSetBatchCount,
+    handleSetBatchSize,
+    handleSetInitImageList,
+    handleSetMaskImageList,
+    handleSetClipData,
+    handleSetInitInputPath,
+    handleSetMaskInputPath,
+    handleSetOutputPath,
+    handleSetMode,
+    handleSetPrompt,
+    handleSetNegativePrompt,
+    handleSetCombinedImg
+  } = useInpaintingParams();
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
   const [showModal, setShowModal] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('manual');
 
   const handleRandomSeedChange = () => {
-    setIsRandomSeed(!isRandomSeed);
-    setSeed(!isRandomSeed ? -1 : seed);
+    handleSetIsRandomSeed(!isRandomSeed);
+    handleSetSeed(!isRandomSeed ? -1 : seed);
   };
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-      const base64String = reader.result as string; // 변환된 Base64 문자열
+      const base64String = reader.result as string;
       const img = new Image();
       img.onload = async () => {
-        setImageSrc(base64String);
-        console.log('Base64 String:', base64String); // Base64 문자열 출력
+        handleSetClipData([]);
+        handleSetInitImageList([base64String]);
 
-        dispatch(
-          saveImages({
-            backgroundImg: null,
-            canvasImg: null,
-            combinedImg: null
-          })
-        );
-
-        try {
-          // Base64을 Blob으로 변환 후 getClip 호출
-          console.log('파일: ', file);
-          const response = await getClip([file]); // 파일 배열로 전달
-          console.log('결과: ', response);
-          dispatch(setClipData(response)); // 클립 결과를 Redux 상태에 저장
-        } catch (error) {
-          console.error('Failed to get clip data:', error);
-        }
+        setCombinedImg(null);
       };
       img.src = base64String;
     };
-    reader.readAsDataURL(file); // 파일을 Base64로 변환
+    reader.readAsDataURL(file);
   };
-
-  // const handleDownloadImage = (url: string | null, filename: string) => {
-  //   if (url) {
-  //     const link = document.createElement('a');
-  //     link.href = url;
-  //     link.download = filename;
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     document.body.removeChild(link);
-  //   }
-  // };
-
-  // const handleDownloadbackgroundImg = () => {
-  //   handleDownloadImage(backgroundImg, 'stage_image.png'); // backgroundImg 다운로드
-  // };
-
-  // const handleDownloadcanvasImg = () => {
-  //   handleDownloadImage(canvasImg, 'canvas_image.png'); // canvasImg 다운로드
-  // };
 
   const handleCloseModal = () => {
     setShowModal(false);
   };
 
+  const [isCreatePresetOpen, setIsCreatePresetOpen] = useState(false);
+  const [isLoadPresetOpen, setIsLoadPresetOpen] = useState(false);
+
+  const showCreatePreset = () => {
+    setIsCreatePresetOpen(true);
+  };
+  const closeCreatePreset = () => {
+    setIsCreatePresetOpen(false);
+  };
+  const showLoadPreset = () => {
+    setIsLoadPresetOpen(true);
+  };
+  const closeLoadPreset = () => {
+    setIsLoadPresetOpen(false);
+  };
+
+  const dispatch = useDispatch();
+  const handleReset = () => {
+    dispatch(resetState());
+  };
+
   return (
     <div className="w-full h-full mr-6">
-      <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
+      <div className="relative w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
+        {/* reset parameters & preset */}
+        {level === 'Advanced' && (
+          <div className="absolute top-6 right-0 mx-6">
+            <UndoOutlined
+              onClick={handleReset}
+              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
+            />
+            <FileAddOutlined
+              onClick={showCreatePreset}
+              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
+            />
+            <FileSearchOutlined
+              onClick={showLoadPreset}
+              className="text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
+            />
+          </div>
+        )}
+
         {/* 모델 선택 */}
-        <Model model={model} setModel={setModel} />
+        <Model model={model} setModel={handleSetModel} />
 
         <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
         {/* 이미지 업로드 */}
         <UploadImgWithMaskingParams
           handleImageUpload={handleImageUpload}
-          imagePreview={imageSrc}
-          setActiveTab={setActiveTab}
+          imagePreview={initImageList[0]}
+          initInputPath={initInputPath}
+          maskInputPath={maskInputPath}
+          outputPath={outputPath}
+          setInitInputPath={handleSetInitInputPath}
+          setMaskInputPath={handleSetMaskInputPath}
+          setOutputPath={handleSetOutputPath}
+          setMode={handleSetMode}
         />
 
-        {imageSrc && (
+        {initImageList[0] && (
           <div className="px-6 pb-10">
             {/* Start Masking 버튼 */}
-            {activeTab === 'manual' && (
+            {mode === 'manual' && (
               <Button
                 type="primary"
                 icon={<FormatPainterOutlined />}
@@ -144,26 +165,12 @@ const InpaintingSidebar = () => {
               </Button>
             )}
 
-            {/* 인페인팅 결과 및 다운로드 */}
-            {combinedImg && (
+            {/* 인페인팅 결과 */}
+            {mode === 'manual' && combinedImg && (
               <div className="w-full border border-dashed border-gray-300 rounded-lg mt-4 flex flex-col items-center">
                 <img src={combinedImg} alt="Inpainting Result" className="w-full h-full object-cover rounded-lg" />
               </div>
             )}
-            {/* 
-            <div className="mt-4 flex flex-col space-y-2">
-              {backgroundImg && (
-                <Button type="default" onClick={handleDownloadbackgroundImg} className="w-full">
-                  Download Stage Image
-                </Button>
-              )}
-
-              {canvasImg && (
-                <Button type="default" onClick={handleDownloadcanvasImg} className="w-full">
-                  Download Canvas Image
-                </Button>
-              )}
-            </div> */}
           </div>
         )}
 
@@ -174,36 +181,28 @@ const InpaintingSidebar = () => {
             {/* 샘플링 설정 */}
             <SamplingParams
               scheduler={scheduler}
-              samplingSteps={samplingSteps}
-              setSamplingSteps={(value: number) => dispatch(setSamplingSteps(value))}
-              setScheduler={(value: string) => dispatch(setScheduler(value))}
+              numInferenceSteps={numInferenceSteps}
+              setNumInferenceSteps={handleSetNumInferenceSteps}
+              setScheduler={handleSetScheduler}
             />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 이미지 크기 설정 */}
-            <ImgDimensionParams
-              width={width}
-              height={height}
-              setWidth={(value: number) => dispatch(setWidth(value))}
-              setHeight={(value: number) => dispatch(setHeight(value))}
-            />
+            <ImgDimensionParams width={width} height={height} setWidth={handleSetWidth} setHeight={handleSetHeight} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* guidance scale 설정 */}
-            <GuidanceScaleParms
-              guidanceScale={guidanceScale}
-              setGuidanceScale={(value: number) => dispatch(setGuidanceScale(value))}
-            />
+            <GuidanceScaleParms guidanceScale={guidanceScale} setGuidanceScale={handleSetGuidanceScale} />
 
             {/* strength 설정 */}
-            <StrengthParam strength={strength} setStrength={(value: number) => dispatch(setStrength(value))} />
+            <StrengthParam strength={strength} setStrength={handleSetStrength} />
 
             {/* seed 설정 */}
             <SeedParam
               seed={seed}
-              setSeed={(value: number) => dispatch(setSeed(value))}
+              setSeed={handleSetSeed}
               isRandomSeed={isRandomSeed}
               handleRandomSeedChange={handleRandomSeedChange}
             />
@@ -214,26 +213,61 @@ const InpaintingSidebar = () => {
             <BatchParams
               batchCount={batchCount}
               batchSize={batchSize}
-              setBatchCount={(value: number) => dispatch(setBatchCount(value))}
-              setBatchSize={(value: number) => dispatch(setBatchSize(value))}
+              setBatchCount={handleSetBatchCount}
+              setBatchSize={handleSetBatchSize}
             />
           </>
         )}
       </div>
 
       {/* Masking 모달 창 */}
-      {showModal && imageSrc && (
+      {showModal && initImageList[0] && (
         <MaskingModal
-          imageSrc={imageSrc}
+          imageSrc={initImageList[0]}
           onClose={handleCloseModal}
-          setInitImageList={(value: string[]) => {
-            dispatch(setInitImageList(value));
-          }}
-          setMaskImageList={(value: string[]) => {
-            dispatch(setMaskImageList(value));
-          }}
+          setInitImageList={handleSetInitImageList}
+          setMaskImageList={handleSetMaskImageList}
+          setCombinedImg={handleSetCombinedImg}
         />
       )}
+
+      {/* 프리셋 생성 */}
+      <CreatePreset
+        model={model}
+        width={width}
+        height={height}
+        guidanceScale={guidanceScale}
+        numInferenceSteps={numInferenceSteps}
+        seed={seed}
+        prompt={prompt}
+        negativePrompt={negativePrompt}
+        batchCount={batchCount}
+        batchSize={batchSize}
+        scheduler={scheduler}
+        type="inpainting"
+        isModalOpen={isCreatePresetOpen}
+        closeModal={closeCreatePreset}
+        strength={strength}
+      />
+
+      {/* 프리셋 다운로드 */}
+      <LoadPreset
+        isModalOpen={isLoadPresetOpen}
+        closeModal={closeLoadPreset}
+        type="inpainting"
+        setModel={handleSetModel}
+        setWidth={handleSetWidth}
+        setHeight={handleSetHeight}
+        setGuidanceScale={handleSetGuidanceScale}
+        setNumInferenceSteps={handleSetNumInferenceSteps}
+        setSeed={handleSetSeed}
+        setPrompt={handleSetPrompt}
+        setNegativePrompt={handleSetNegativePrompt}
+        setBatchCount={handleSetBatchCount}
+        setBatchSize={handleSetBatchSize}
+        setScheduler={handleSetScheduler}
+        setStrength={handleSetStrength}
+      />
     </div>
   );
 };

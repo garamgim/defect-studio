@@ -32,21 +32,12 @@ const Generation = () => {
     <div className="flex h-[calc(100vh-60px)] bg-gray-100 dark:bg-gray-800">
       {/* 사이드 메뉴탭 선택 */}
       <div
-        className={`pt-8 fixed top-0 left-0 bg-white shadow-lg z-20 h-full transition-transform duration-300 ease-in-out overflow-y-auto custom-scrollbar pb-[150px] ${
+        className={`fixed top-0 left-0 bg-white shadow-lg z-20 h-full transition-transform duration-300 ease-in-out overflow-y-auto custom-scrollbar pb-[150px] ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } w-20 dark:bg-gray-800 dark:border-r dark:border-gray-600`}
         style={{ top: '60px' }}
       >
         <nav className="flex flex-col items-center">
-          <button
-            className="border border-gray-300 text-gray-600 rounded-md py-[4px] px-[8px] text-[14px] 
-            hover:bg-gray-500 hover:text-white hover:border-transparent 
-            dark:text-slate-300 dark:bg-gray-700 dark:border-none 
-            dark:hover:border-slate-300 dark:hover:bg-gray-600 dark:hover:text-white"
-            onClick={showModal} // 모달 열기
-          >
-            Preset
-          </button>
           <div className="mt-6 flex flex-col items-center space-y-8">
             <Link
               to="text-to-image"
