@@ -58,3 +58,22 @@ export const approveGuestUser = async ({
     }
   }
 };
+
+// 관리자 거절 함수
+export const rejectGuestUser = async (member_pk: number): Promise<AxiosResponse<string>> => {
+  try {
+    const response = await axiosInstance.delete(`/admin/members/guests/${member_pk}`);
+    return response;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    if (error.response?.status === 400) {
+      throw Error(error.response?.data.message || 'Something went wrong');
+    } else if (error.response?.status === 404) {
+      throw Error('해당 임시 회원을 찾을 수 없습니다.');
+    } else if (error.response?.status === 403) {
+      throw Error('권한이 없습니다.');
+    } else {
+      throw new Error('Unexpected error occurred');
+    }
+  }
+};
