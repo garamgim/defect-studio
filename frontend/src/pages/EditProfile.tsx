@@ -57,7 +57,7 @@ const EditProfile = () => {
                 <div className="h-[120px] relative">
                   <p className="text-black dark:text-white text-[20px] font-bold font-samsung">Email</p>
                   <input
-                    className={`w-full border-none bg-gray-700 h-[40px] rounded-[8px] p-[10px] focus:outline-none ${errors?.email && 'border-red-500 border-[2px]'}`}
+                    className={`w-full border-gray-300 border-[2px]  dark:border-none  dark:bg-gray-700 h-[40px] rounded-[8px] p-[10px] focus:outline-none ${errors?.email && 'border-red-500 border-[2px]'}`}
                     type="email"
                     placeholder="Email"
                     defaultValue={myInfo.email}
@@ -79,7 +79,7 @@ const EditProfile = () => {
                 <div className="h-[120px] relative">
                   <p className="text-black dark:text-white text-[20px] font-bold font-samsung">Nickname</p>
                   <input
-                    className={`w-full  bg-gray-700 h-[40px] rounded-[8px] p-[10px] focus:outline-none ${errors?.nickname && 'border-red-500 border-[2px]'}`}
+                    className={`w-full border-gray-300 border-[2px]  dark:border-none  dark:bg-gray-700 h-[40px] rounded-[8px] p-[10px] focus:outline-none ${errors?.nickname && 'border-red-500 border-[2px]'}`}
                     type="text"
                     placeholder="Nickname"
                     defaultValue={myInfo.nickname}
