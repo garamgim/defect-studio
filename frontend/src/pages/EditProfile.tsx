@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useGetMyInfo } from '../api/user';
 import { useForm } from 'react-hook-form';
+import { editProfile, upDateMyInfo } from '../api/user';
+import { message } from 'antd';
 
 const EditProfile = () => {
   // 자기 정보 가져오기
@@ -21,6 +23,18 @@ const EditProfile = () => {
     formState: { errors, isValid, isSubmitting } // errors: register의 에러 메세지 자동 출력
   } = useForm<EditProfileInputs>({ mode: 'onChange' });
 
+  const onSubmit = async (data: EditProfileInputs) => {
+    try {
+      await editProfile(data);
+      upDateMyInfo();
+      navigate(-1);
+      message.success('Profile updated successfully');
+    } catch (error) {
+      console.error('Error editing profile:', error);
+      message.error('Failed to update profile');
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-center items-center h-[calc(100vh-60px)] bg-gray-100 p-4 overflow-hidden dark:bg-gray-800">
@@ -37,7 +51,7 @@ const EditProfile = () => {
               {/* 폼 시작 */}
               <form
                 onSubmit={handleSubmit((data) => {
-                  console.log(data);
+                  onSubmit(data);
                 })}
               >
                 <div className="h-[120px] relative">
@@ -116,7 +130,7 @@ const EditProfile = () => {
                         Back(Cancel)
                       </button>
                       <button
-                        disabled={!!errors}
+                        disabled={!isValid}
                         type="submit"
                         className={`font-samsung font-bold ms-10 ${!isValid && 'text-red-300'} hover:scale-105 active:scale-95 transition-transform`}
                       >

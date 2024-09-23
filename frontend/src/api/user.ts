@@ -2,7 +2,8 @@ import noAuthAxios from './token/noAuthAxios';
 import { loginData } from '../types/user';
 import axiosInstance from './token/axiosInstance';
 import { AxiosError, AxiosResponse } from 'axios';
-import { useQuery, QueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+import { queryClient } from '../main';
 
 // 로그인 함수
 export async function login(user: loginData) {
@@ -86,7 +87,6 @@ export const useGetMyInfo = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 
 // 내 정보 업데이트 요청하기
 export const upDateMyInfo = async () => {
-  const queryClient = new QueryClient();
   queryClient.invalidateQueries({
     queryKey: ['myInfo']
   });
@@ -97,7 +97,6 @@ export async function logout() {
   try {
     localStorage.removeItem('accessToken');
     await axiosInstance.post('/auth/logout');
-    const queryClient = new QueryClient();
     queryClient.removeQueries({
       queryKey: ['myInfo']
     });
