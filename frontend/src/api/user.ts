@@ -109,3 +109,24 @@ export async function logout() {
     return false;
   }
 }
+
+// 유저 정보 수정 --------
+interface EditProfileInputs {
+  email?: string;
+  nickname?: string;
+  password?: string;
+}
+
+export const editProfile = async (data: EditProfileInputs) => {
+  const submitData: { [key: string]: string } = {};
+  if (data.email) submitData.email = data.email;
+  if (data.nickname) submitData.nickname = data.nickname;
+  if (data.password) submitData.password = data.password;
+  try {
+    const response = await axiosInstance.patch('/members', submitData);
+    return response;
+  } catch (error) {
+    console.error('Error editing profile:', error);
+    throw error;
+  }
+};
