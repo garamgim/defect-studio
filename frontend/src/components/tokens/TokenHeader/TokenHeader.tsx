@@ -1,4 +1,3 @@
-import './TokenHeader.css';
 import { useGetMyInfo } from '../../../api/user';
 
 const TokenHeader = () => {
