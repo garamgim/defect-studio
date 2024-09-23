@@ -1,10 +1,10 @@
-import base64
 import torch
-from io import BytesIO
-from fastapi import APIRouter, HTTPException, Request, status
 from PIL import Image
-from starlette.responses import JSONResponse
+from fastapi import APIRouter, HTTPException, Request, status
+from starlette.responses import StreamingResponse
 from transformers import pipeline
+
+from utils import generate_zip_from_images
 
 router = APIRouter(
     prefix="/remove-bg"
@@ -28,18 +28,16 @@ async def remove_bg(request: Request):
                              trust_remote_code=True,
                              device=device)
 
-    encoded_images = []
+    generated_image_list = []
+
     for i in range(0, len(images), batch_size):
         batch_images = images[i:i+batch_size]
         input_images = [Image.open(image.file).convert("RGBA") for image in batch_images]
         output_images = rmbg_pipeline(input_images)
+        generated_image_list.extend(output_images)
 
-        for output_image in output_images:
-            buffered = BytesIO()
-            output_image.save(buffered, format="PNG")
-            buffered.seek(0)
+    zip_buffer = generate_zip_from_images(generated_image_list)
 
-            img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-            encoded_images.append(img_str)
-
-    return JSONResponse(content={"image_list": encoded_images})
+    return StreamingResponse(zip_buffer, media_type="application/zip", headers={
+        "Content-Disposition": "attachment; filename=images.zip"
+    })

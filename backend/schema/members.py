@@ -14,7 +14,7 @@ class MemberCreate(BaseModel):
 
 
 class MemberRead(BaseModel):
-    member_pk: int
+    member_id: int
     login_id: str
     nickname: str
     email: EmailStr
@@ -26,7 +26,7 @@ class MemberRead(BaseModel):
     @classmethod
     def from_orm(cls, member: 'Member') -> 'MemberRead':
         return cls(
-            member_pk=member.member_id,
+            member_id=member.member_id,
             login_id=member.login_id,
             nickname=member.nickname,
             email=member.email,

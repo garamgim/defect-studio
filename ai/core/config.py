@@ -10,5 +10,8 @@ class Settings(BaseSettings):
     DIFFUSERS_TRAIN_PATH: str
     BASE_MODEL_NAME: str
 
+    # LOGGER
+    SENTRY_DSN: str
+
 # 환경 변수 로드 및 검증
 settings = Settings()

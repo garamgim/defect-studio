@@ -8,6 +8,9 @@ from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
 from redis import Redis
 from rq import Queue
+import sentry_sdk
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+from sentry_sdk.integrations.starlette import StarletteIntegration
 from starlette.middleware.cors import CORSMiddleware
 
 from api.main import api_router
@@ -15,6 +18,7 @@ from core.config import settings
 from core.db import engine
 from models import *
 from scheduler import expire_tokens, delete_guests
+from schema.presets import GenerationPreset
 
 
 @asynccontextmanager
@@ -66,6 +70,31 @@ if settings.BACKEND_CORS_ORIGINS:
         expose_headers=["Authorization", "Content-Length", "Set-Cookie"],
     )
 
+
+def before_send(event, hint):
+    # 이벤트에 태그를 추가
+    event["tags"] = {
+        "server_type": "backend",
+    }
+    return event
+
+sentry_sdk.init(
+    dsn=settings.SENTRY_DSN,
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+    before_send=before_send,  # 이벤트가 전송되기 전에 태그를 추가
+    integrations=[
+        StarletteIntegration(
+            transaction_style="endpoint",
+            # Http status 300~599 까지 전송
+            failed_request_status_codes=[range(300, 599)],
+        ),
+        FastApiIntegration(
+            transaction_style="endpoint",
+            failed_request_status_codes=[range(300, 599)],
+        ),
+    ]
+)
 
 @celery.task
 def test_function(x, y):

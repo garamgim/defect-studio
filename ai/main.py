@@ -2,7 +2,11 @@ import uvicorn
 import time
 import torch
 from fastapi import FastAPI
+import sentry_sdk
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+from sentry_sdk.integrations.starlette import StarletteIntegration
 from starlette.middleware.base import BaseHTTPMiddleware
+from core.config import settings
 
 from api.routes.main import api_router
 
@@ -39,6 +43,29 @@ class CustomMiddleware(BaseHTTPMiddleware):
 # 미들웨어 추가
 app.add_middleware(CustomMiddleware)
 
+def before_send(event, hint):
+    # 이벤트에 태그를 추가
+    event["tags"] = {
+        "server_type": "ai",
+    }
+    return event
+
+sentry_sdk.init(
+    dsn=settings.SENTRY_DSN,
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+    before_send=before_send,  # 이벤트가 전송되기 전에 태그를 추가
+    integrations=[
+        StarletteIntegration(
+            transaction_style="endpoint",
+            failed_request_status_codes=[range(300, 599)],
+        ),
+        FastApiIntegration(
+            transaction_style="endpoint",
+            failed_request_status_codes=[range(300, 599)],
+        ),
+    ]
+)
 
 app.include_router(api_router)
 

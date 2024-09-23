@@ -1,12 +1,11 @@
 from datetime import datetime
 
-from beanie import Document
-from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, Enum, ForeignKey, DateTime, Boolean, Index
+from sqlalchemy.orm import relationship
 
-from enums import Role, LogType, UseType
 from core.db import Base
-from typing import Optional
+from enums import Role, LogType, UseType
+
 
 class Department(Base):
     __tablename__ = 'department'
@@ -69,27 +68,9 @@ class TokenLog(Base):
     log_type = Column(Enum(LogType), nullable=False)
     use_type = Column(Enum(UseType), nullable=True)
     quantity = Column(Integer, nullable=True)
+    image_quantity = Column(Integer, nullable=True)
+    model = Column(String(255), nullable=True)
     member_id = Column(Integer, ForeignKey('member.member_id'))
     member = relationship("Member", back_populates="token_logs")
     department_id = Column(Integer, ForeignKey('department.department_id'))
     department = relationship("Department", back_populates="token_logs")
-
-
-# Mongo DB Schemas
-
-class GenerationPreset(Document):
-    generation_type: Optional[str] = None
-    model: Optional[str] = None
-    prompt: Optional[str] = None
-    negative_prompt: Optional[str] = None
-    width: Optional[int] = None
-    height: Optional[int] = None
-    batch_count: Optional[int] = None
-    batch_size: Optional[int] = None
-    strength: Optional[int] = None
-    guidance_scale: Optional[float] = None
-    sampling_steps: Optional[int] = None
-    sampling_method: Optional[str] = None
-    seed: Optional[int] = None
-    member_id: int = 0  # TODO : 로그인한 유저의 id로 변경
-    date: datetime = datetime.today()

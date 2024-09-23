@@ -2,6 +2,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 from models import Token, TokenUsage
 from typing import Optional, List
+from enums import UseType
 
 class TokenCreates(BaseModel):
     end_date: datetime = Field(...)
@@ -64,3 +65,9 @@ class TokenUsageRead(BaseModel):
             start_date=token_usage.start_date,
             end_date=token_usage.end_date
         )
+
+class TokenUse(BaseModel):
+    cost: int
+    use_type: UseType
+    image_quantity: int
+    model: str

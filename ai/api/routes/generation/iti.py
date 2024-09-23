@@ -1,14 +1,17 @@
 import base64
 import random
 from io import BytesIO
+from core.config import settings
+from pathlib import Path
 
 import PIL.Image
 import torch
 from diffusers import StableDiffusionImg2ImgPipeline
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
+from starlette.responses import StreamingResponse
 
-from utils import get_scheduler
+from utils import get_scheduler, generate_zip_from_images
 
 router = APIRouter(
     prefix="/img-to-img",
@@ -21,7 +24,7 @@ async def image_to_image(
 ):
     form = await request.form()
 
-    model = form.get("model", "CompVis/stable-diffusion-v1-4")
+    model = form.get("model")
     scheduler = form.get("scheduler")
     prompt = form.get("prompt")
     negative_prompt = form.get("negative_prompt")
@@ -37,14 +40,15 @@ async def image_to_image(
     images = form.getlist("images")
     image_list = [PIL.Image.open(BytesIO(await file.read())).convert("RGB") for file in images]
 
-    if seed == -1:
-        seed = random.randint(0, 2 ** 32 - 1)
-
     total_images = batch_size * batch_count * len(image_list)
-    seeds = [seed + i for i in range(total_images)]
+    seeds = [(seed + i) % (2 ** 32) for i in range(total_images)]
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    i2i_pipe = StableDiffusionImg2ImgPipeline.from_pretrained(model, torch_dtype=torch.float16).to(device)
+
+    model_dir = settings.OUTPUT_DIR
+    model_path = Path(model_dir) / model
+
+    i2i_pipe = StableDiffusionImg2ImgPipeline.from_pretrained(model_path, torch_dtype=torch.float16).to(device)
     if scheduler:
         i2i_pipe.scheduler = get_scheduler(scheduler, i2i_pipe.scheduler.config)
 
@@ -71,12 +75,8 @@ async def image_to_image(
 
             generated_image_list.extend(images)
 
-    encoded_images = []
+    zip_buffer = generate_zip_from_images(generated_image_list)
 
-    for image in generated_image_list:
-        image_bytes_io = BytesIO()
-        image.save(image_bytes_io, format="PNG")
-        img_str = base64.b64encode(image_bytes_io.getvalue()).decode("utf-8")
-        encoded_images.append(img_str)
-
-    return JSONResponse(content={"image_list": encoded_images})
+    return StreamingResponse(zip_buffer, media_type="application/zip", headers={
+        "Content-Disposition": "attachment; filename=images.zip"
+    })
