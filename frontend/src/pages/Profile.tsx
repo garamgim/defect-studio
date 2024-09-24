@@ -1,12 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 import { useGetMyInfo, deleteProfile } from '../api/user';
 import { Button, message } from 'antd';
+import Modal from './../components/common/Modal';
+import { useState } from 'react';
+import PasswordChnage from '../components/profile/PasswordChnage';
 
 const Profile = () => {
   // 자기 정보 가져오기
   const { myInfo, myInfoPending, isGetMyInfoError, myInfoError } = useGetMyInfo({
     isLoggedIn: !!localStorage.getItem('accessToken')
   });
+
+  // 모달 상태
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const navigate = useNavigate();
   return (
     <div>
@@ -48,8 +55,15 @@ const Profile = () => {
 
               {/* 비밀번호 변경 */}
               <section className="w-full flex flex-row">
-                <Button className="font-samsung font-bold ">Change Password</Button>
+                <Button onClick={() => setIsModalOpen(true)} className="font-samsung font-bold">
+                  Change Password
+                </Button>
               </section>
+
+              {/* 비밀번호 변경 모달 */}
+              <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                <PasswordChnage onClose={() => setIsModalOpen(false)} />
+              </Modal>
 
               {/* 수정 삭제 */}
               <section className="flex flex-row justify-end">
