@@ -1,4 +1,5 @@
 import Header from '../components/home/Header';
+import { setAuthorizationToken } from '../api/token/axiosInstance';
 
 const Home = () => {
   return (
