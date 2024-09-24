@@ -78,7 +78,7 @@ const DepartmentPersonStatistics = ({ departmentId }: DepartmentPersonStatistics
         // 선택된 사람이 있을 경우
         selectedMember && (
           <div className="token-content mt-3">
-            <PersonStatisticSection member_pk={selectedMember} />
+            <PersonStatisticSection member_id={selectedMember} />
           </div>
         )
       }
