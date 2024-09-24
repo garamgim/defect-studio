@@ -31,8 +31,7 @@
       "@hooks/*": ["src/hooks/*"],
       "@store/*": ["src/store/*"],
       "@styles/*": ["src/styles/*"],
-      "@assets/*": ["src/assets/*"],
-      "@types/*": ["src/types/*"]
+      "@assets/*": ["src/assets/*"]
     }
   },
   "include": ["src", "electron"],
