@@ -40,7 +40,7 @@ const PasswordChnage = ({ onClose }: PasswordChnageProps) => {
           <input
             id="newPasswordInput"
             type="password"
-            className="w-full h-10 rounded px-3 mt-1 text-[#222222] dark:bg-gray-800 dark:text-white"
+            className="w-full h-10 rounded px-3 mt-1 text-[#222222] dark:bg-gray-800 dark:text-white border-gray-300 border-[2px] dark:border-none focus:outline-none"
             {...register('newPassword', {
               required: 'Enter new Password Please',
               minLength: {
@@ -64,7 +64,7 @@ const PasswordChnage = ({ onClose }: PasswordChnageProps) => {
           <input
             id="newPasswordConfirm"
             type="password"
-            className="w-full h-10 rounded px-3 mt-1 text-[#222222] dark:bg-gray-800 dark:text-white"
+            className="w-full h-10 rounded px-3 mt-1 text-[#222222] dark:bg-gray-800 dark:text-white border-gray-300 border-[2px] dark:border-none focus:outline-none"
             {...register('newPasswordConfirm', {
               validate: (value) => value === newPassword || 'The passwords do not match.'
             })}
