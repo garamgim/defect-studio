@@ -8,24 +8,13 @@ import snakecaseKeys from 'snakecase-keys';
 const TrainingButton = () => {
   const [loading, setLoading] = useState(false);
 
-  // const trainingParamsData = useSelector((state: RootState) => {
-  //   const { maxConcepts, concepts, ...rest } = state.training;
-  //   return rest;
-  // });
-  const concepts = useSelector((state: RootState) => state.training.concepts);
+  const trainingParamsData = useSelector((state: RootState) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { maxConcepts, concepts, ...rest } = state.training;
+    return rest;
+  });
 
-  // 테스트 추가
-  const { trainModelName, model, resolution, trainBatchSize, numTrainEpochs, learningRate } = useSelector(
-    (state: RootState) => state.training
-  );
-  const trainingTestParams = {
-    trainModelName,
-    model,
-    resolution,
-    trainBatchSize,
-    numTrainEpochs,
-    learningRate
-  };
+  const concepts = useSelector((state: RootState) => state.training.concepts);
 
   const getFilesFromFolder = async (folderPath: string) => {
     const fileDataArray = await window.electron.getFilesInFolder(folderPath);
@@ -45,6 +34,18 @@ const TrainingButton = () => {
     return files;
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cleanObject = (obj: any) => {
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        if (obj[key] === '' || obj[key] === false || obj[key] === -1) {
+          delete obj[key];
+        }
+      }
+    }
+    return obj;
+  };
+
   const handleTrainingStart = async () => {
     setLoading(true);
 
@@ -56,31 +57,19 @@ const TrainingButton = () => {
       const instanceImageFiles = await getFilesFromFolder(instanceImageFolder);
       const classImageListFiles = await getFilesFromFolder(classImageFolder);
 
-      // let trainingData = {
-      //   ...trainingParamsData,
-      //   instancePrompt,
-      //   classPrompt,
-      //   instanceImageList: instanceImageFiles,
-      //   classImageLis: classImageListFiles,
-      //   memberId: 345 // 나중에 본인 멤버아이디로 변경
-      // };
-
-      // 테스트 추가
-      const trainingTest = {
-        ...trainingTestParams,
+      const trainingData = {
+        ...trainingParamsData,
         instancePrompt,
         classPrompt,
         instanceImageList: instanceImageFiles,
         classImageList: classImageListFiles,
-        memberId: 345
+        memberId: 1 // 나중에 본인 멤버아이디로 변경
       };
 
-      // trainingData = snakecaseKeys(trainingData, { deep: false });
+      let trainData = snakecaseKeys(trainingData, { deep: false });
+      trainData = cleanObject(trainData);
 
-      // 테스트 추가
-      const trainingTestResult = snakecaseKeys(trainingTest, { deep: false });
-
-      const response = await postTraining('remote', trainingTestResult);
+      const response = await postTraining('remote', trainData);
       console.log('Training started, response:', response);
     } catch (error) {
       console.error('Error during training:', error);

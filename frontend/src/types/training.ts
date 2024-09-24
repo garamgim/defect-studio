@@ -65,7 +65,7 @@ export interface TrainingParams {
   tokenizer_max_length?: number;
   text_encoder_use_attention_mask?: boolean;
   skip_save_text_encoder?: boolean;
-  validation_images?: string[]; // 여기 체크
+  validation_images?: File[]; // 여기 체크
   class_labels_conditioning?: string;
   validation_scheduler?: string;
 }
