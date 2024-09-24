@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
 import { Table } from 'antd';
 interface PersonStatisticSectionProps {
-  member_pk: number;
+  member_id: number;
 }
 
 const startDateObject = dayjs();
@@ -30,17 +30,17 @@ const columns = [
   }
 ];
 
-const PersonStatisticSection = ({ member_pk }: PersonStatisticSectionProps) => {
+const PersonStatisticSection = ({ member_id }: PersonStatisticSectionProps) => {
   const { data, isPending, isError, error } = useQuery<
     AxiosResponse<PersonTokenLogType[]>,
     Error,
     PersonTokenLogType[],
     (string | number)[]
   >({
-    queryKey: ['person_token_statistic', member_pk],
+    queryKey: ['person_token_statistic', member_id],
     queryFn: () =>
       getPersonTokenStatistic({
-        member_id: member_pk,
+        member_id: member_id,
         start_date: startDateObject.format('YYYY-MM-DD'),
         end_date: endDateObject.format('YYYY-MM-DD'),
         use_type: 'text_to_image'

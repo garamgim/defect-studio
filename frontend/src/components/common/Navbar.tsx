@@ -132,12 +132,7 @@ const Navbar = () => {
             </div>
             <Dropdown
               overlay={
-                <MiniProfile
-                  nickname={myInfo.nickname}
-                  department_name={myInfo.department_name}
-                  email={myInfo.email}
-                  member_pk={myInfo.member_pk}
-                />
+                <MiniProfile nickname={myInfo.nickname} department_name={myInfo.department_name} email={myInfo.email} />
               }
               trigger={['hover']}
             >

@@ -30,16 +30,16 @@ export const getGuestUserInfo = async (): Promise<AxiosResponse<MemberRead[]>> =
 // 관리자 승인 함수
 
 export interface ApproveGuestUserProps {
-  member_pk: number;
+  member_id: number;
   new_role: Omit<RoleType, 'guest'>;
 }
 
 export const approveGuestUser = async ({
-  member_pk,
+  member_id,
   new_role
 }: ApproveGuestUserProps): Promise<AxiosResponse<string>> => {
   try {
-    const response = await axiosInstance.patch(`/admin/members/guests/${member_pk}`, null, {
+    const response = await axiosInstance.patch(`/admin/members/guests/${member_id}`, null, {
       params: {
         new_role
       }
@@ -62,11 +62,11 @@ export const approveGuestUser = async ({
 // 관리자 거절 함수
 
 export interface RejectGuestUserProps {
-  member_pk: number;
+  member_id: number;
 }
-export const rejectGuestUser = async ({ member_pk }: RejectGuestUserProps): Promise<AxiosResponse<string>> => {
+export const rejectGuestUser = async ({ member_id }: RejectGuestUserProps): Promise<AxiosResponse<string>> => {
   try {
-    const response = await axiosInstance.delete(`/admin/members/guests/${member_pk}`);
+    const response = await axiosInstance.delete(`/admin/members/guests/${member_id}`);
     return response;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

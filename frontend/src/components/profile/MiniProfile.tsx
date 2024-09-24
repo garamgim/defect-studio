@@ -4,7 +4,6 @@ interface miniProfilePropsType {
   nickname: string;
   department_name: string;
   email: string;
-  member_pk: number;
 }
 
 const MiniProfile = ({ nickname, department_name, email }: miniProfilePropsType) => {

@@ -37,7 +37,7 @@ export async function login(user: loginData) {
 
 // 유저 정보 가져올 떄 쓰는 정보
 export type userInfoType = {
-  member_pk: number;
+  member_id: number;
   login_id: string;
   nickname: string;
   email: string;
