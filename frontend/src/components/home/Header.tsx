@@ -14,7 +14,7 @@ const Header = () => {
             lineHeight: '1.2', // Line height 조정
 
             paddingTop: '2px', // 상단 패딩 조정
-            paddingBottom: '2px', // 하단 패딩 조정
+            paddingBottom: '2px' // 하단 패딩 조정
           }}
         >
           Imagine, Create, and Innovate with Defect Studio
