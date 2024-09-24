@@ -2,6 +2,13 @@
 
 // 도구 목록
 export type UseType = 'text_to_image' | 'remove_background' | 'clip' | 'clean_up' | 'image_to_image';
+// 날짜 구간 검색
+export interface durationSearchProps {
+  start_date?: string;
+  end_date?: string;
+}
+
+// --------------------------------------------------------------------
 
 // 일별 이미지 수 - 일별 생성한 이미지 총 수
 export interface DailyImageCount {
@@ -21,6 +28,15 @@ export interface ModelFrequency {
   usage: number;
 }
 
+// 토큰 실제 사용 현황
+export interface TokenUsage {
+  use_date: string;
+  use_type: UseType;
+  token_quantity: number;
+}
+
+// --------------------------------------------------------------------
+
 // 부서 내 사용자 별 이미지 생성 수
 export interface MemberImageCount {
   member_id: number;
@@ -35,7 +51,7 @@ export interface TokenDistribution {
 }
 
 // 부서 내 사용자별 토큰 사용 현황
-export interface DepartmentTokenUsage {
+export interface DepartmentMemberTokenUsage {
   member_id: number;
   member_name: string;
   token_quantity: number;
