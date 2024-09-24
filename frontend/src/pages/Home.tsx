@@ -1,8 +1,8 @@
 import Header from '../components/home/Header';
 import ImgModal from '../components/home/ImgModal';
-import { useState } from 'react';
+import { SetStateAction, useState } from 'react';
 
-// 더미 데이터
+// 더미 데이터 (api통신 데이터 형식 확인 후 수정)
 const folders = [
   {
     folder_id: 1,
@@ -45,7 +45,8 @@ const folders = [
     image_count: 25,
     type: 'image_to_image',
     created_at: '2024-09-21T05:12:11Z',
-    prompt: 'Transforming a portrait into a cartoon',
+    prompt:
+      'GeneraAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscaAn artistic rendition of a cityscate a high-resolution image of a defective metal product with visible surface cracks. The productshould have multiple irregular, jagged cracks of varying lengths and depths, clearly indicating stressor potential breakage. The lighting should accentuate the texture and depth of the cracks, making themprominent. The background should be neutral or slightly blurred, ensuring the focus remains on thedefective product.',
     first_image:
       'data:image/jpeg;base64,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'
   }
@@ -56,7 +57,7 @@ const Home = () => {
   const [selectedFolder, setSelectedFolder] = useState(null);
 
   // 모달을 열고 폴더 정보를 설정하는 함수
-  const openModal = (folder) => {
+  const openModal = (folder: SetStateAction<null>) => {
     setSelectedFolder(folder);
     setIsModalVisible(true);
   };
@@ -66,6 +67,7 @@ const Home = () => {
     setIsModalVisible(false);
     setSelectedFolder(null);
   };
+
   return (
     <div className="bg-white dark:bg-gray-800">
       <header>
@@ -76,19 +78,26 @@ const Home = () => {
         <p className="mt-4 mb-4 text-[24px] font-semibold dark:text-gray-300">Assets</p>
         <p className="mb-10 text-[18px] dark:text-gray-300">Browse and Utilize Your Custom-Generated Images</p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {folders.map((folder) => (
             <div
               key={folder.folder_id}
-              className="w-full h-[360px] rounded-3xl bg-cover bg-center cursor-pointer"
+              className="relative w-full h-0 pt-[100%] rounded-3xl bg-cover bg-center cursor-pointer group"
               style={{
                 backgroundImage: `url(${folder.first_image})`
               }}
-              onClick={() => openModal(folder)} // 클릭 시 모달 열기
-            ></div>
+              onClick={() => openModal(folder)}
+            >
+              {/* 마우스 호버할 때 */}
+              <div className="absolute p-8 flex justify-between inset-0 bg-black bg-opacity-60 flex flex-col justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl p-4">
+                <p className="text-white mb-12 text-[14px] font-semibold">{folder.type}</p>
+                <p className="text-white text-[18px] overflow-hidden text-ellipsis line-clamp-6">{folder.prompt}</p>
+              </div>
+            </div>
           ))}
         </div>
       </main>
+
       {/* 모달 */}
       {isModalVisible && selectedFolder && (
         <ImgModal
@@ -101,16 +110,3 @@ const Home = () => {
 };
 
 export default Home;
-
-{
-  /* 마우스 호버 시 어두워지고, 텍스트 표시 */
-}
-{
-  /* <div
-  onClick={handleImgInfo}
-  className="flex flex-col absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-60 rounded-3xl"
->
-  <p className="text-white opacity-0 hover:opacity-100 text-lg font-bold px-4">{folder.type}</p>
-  <p className="text-white opacity-0 hover:opacity-100 text-lg font-bold px-4">{folder.prompt}</p>
-</div>; */
-}
