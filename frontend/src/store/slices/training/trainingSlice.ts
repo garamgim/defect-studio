@@ -26,8 +26,8 @@ const initialState: TrainingState = {
   // instancePrompt: '', // 범주 중에 특징(선 잘린 케이블)
   // classPrompt: '', // 큰 범주(케이블)
   resolution: 512, // 학습할 이미지 크기
-  trainBatchSize: 8,
-  numTrainEpochs: 10,
+  trainBatchSize: 1, ////////////////////////////////8로 고치기!!!!!!!!!!!!!!!!!!
+  numTrainEpochs: 2, ////////////////////10으로 고치기!!!!!!!!!!!!
   learningRate: 0.001, // 0과 1사이 실수
 
   revision: '', // 모델의 버전 <- 여기서는 사용x
@@ -38,14 +38,14 @@ const initialState: TrainingState = {
   seed: 42, // 해당 시드로 재현성 테스트
   centerCrop: false,
   trainTextEncoder: false, // ?? textEncoder학습 왜 default false??
-  sampleBatchSize: 4,
-  maxTrainSteps: 1000,
+  sampleBatchSize: 1, //////////////////////4로 고치기
+  maxTrainSteps: 10, //1000//////////////////////////
   checkpointingSteps: 500,
   checkpointsTotalLimit: -1, // default: None 맞는지 확인!
   resumeFromCheckpoint: '', //경로 "none, latest, path"
   gradientAccumulationSteps: 1,
   gradientCheckpointing: false,
-  scaleLr: true,
+  scaleLr: false,
   lrScheduler: 'linear', // 드롭다운 <- ""은 뭔지? ("", "constant", "linear", "cosine", "cosineWithRestarts", "polynomial", "constantWithWarmup")
   lrWarmupSteps: 0,
   lrNumCycles: 1,
@@ -61,8 +61,8 @@ const initialState: TrainingState = {
   hubToken: '', //pushToHub있으면 넣어야함
   hubModelId: '', //pushToHub있으면 넣어야함
   loggingDir: '', // 이 디렉토리는??? 지정안하면 어디에 저장? 뭔지모르겠음
-  allowTf32: true,
-  reportTo: 'none', // 이것도 뭐지
+  allowTf32: false,
+  reportTo: '', // 이것도 뭐지
   validationPrompt: '', // 검증을 위한 프롬프트 예시??
   numValidationImages: 5,
   validationSteps: 100,
@@ -74,8 +74,8 @@ const initialState: TrainingState = {
   offsetNoise: false,
   snrGamma: 5.0,
   preComputeTextEmbeddings: false,
-  tokenizerMaxLength: 512, // 이거 기본값 맞는지 확인
-  textEncoderUseAttentionMask: true,
+  tokenizerMaxLength: -1, // 이거 기본값 맞는지 확인
+  textEncoderUseAttentionMask: false,
   skipSaveTextEncoder: false,
   // validationImages: '', //왜 문자열??????????
   // instanceImageList: [''],

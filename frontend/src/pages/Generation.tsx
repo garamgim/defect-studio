@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
-import { Button, Modal } from 'antd';
 import TextToImage from '../components/generation/layouts/Txt2ImgLayout';
 import ImageToImage from '../components/generation/layouts/Img2ImgLayout';
 import Inpainting from '../components/generation/layouts/InpaintingLayout';
@@ -8,24 +7,13 @@ import RemoveBackground from '../components/generation/layouts/RemoveBgLayout';
 import Cleanup from '../components/generation/layouts/CleanupLayout';
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from 'react-icons/ai';
 import { FaImage, FaMagic, FaPaintBrush, FaEraser, FaTrash } from 'react-icons/fa';
-import PresetContent from '../components/generation/presets/PresetContent';
 
 const Generation = () => {
   // 사이드바 열림/닫힘 상태 관리
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
   };
 
   return (
@@ -103,27 +91,6 @@ const Generation = () => {
           <Route path="cleanup" element={<Cleanup />} />
         </Routes>
       </div>
-
-      {/* 모달 컴포넌트 (Ant Design) */}
-      <Modal
-        open={isModalOpen}
-        onCancel={closeModal}
-        footer={null}
-        width={600}
-        centered
-        styles={{
-          body: {
-            maxHeight: '80vh',
-            overflowY: 'auto' // 스크롤 활성화
-          }
-        }}
-      >
-        <PresetContent />
-        <div className="flex justify-end mt-4 gap-4">
-          <Button onClick={closeModal}>Cancel</Button>
-          <Button type="primary">Create</Button>
-        </div>
-      </Modal>
     </div>
   );
 };

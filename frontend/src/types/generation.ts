@@ -104,6 +104,6 @@ export interface PresetDataType {
   seed?: number;
 
   _id?: string; // 필요없는 정보
-  _member_id?: number; // 필요없는 정보
+  member_id?: number; // 필요없는 정보
   date?: string; // 필요없는 정보
 }
