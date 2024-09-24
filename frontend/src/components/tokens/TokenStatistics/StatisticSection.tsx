@@ -11,7 +11,7 @@ const StatisticSection = ({ departmentId }: StatisticSectionProps) => {
   // 선택옵션 - 부서, 개인
 
   const items: TabsProps['items'] = [
-    { key: 'Department', label: 'Department', children: <DepartmentStatistics departmentId={departmentId} /> },
+    { key: 'Department', label: 'Department', children: <DepartmentStatistics department_id={departmentId} /> },
     { key: 'Person', label: 'Person', children: <DepartmentPersonStatistics departmentId={departmentId} /> }
   ];
 
