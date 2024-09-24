@@ -30,26 +30,35 @@ body {
   overflow-x: hidden; /* 가로 스크롤 숨기기 */
 }
 
+.custom-scrollbar3 {
+  height: 100%;
+  overflow-y: auto; /* 세로 스크롤만 허용 */
+  overflow-x: hidden; /* 가로 스크롤 숨기기 */
+}
+
 /* 스크롤바 스타일링 */
 .custom-scrollbar::-webkit-scrollbar,
 .ant-modal-body::-webkit-scrollbar {
   width: 0px; /* 스크롤바 너비 */
 }
-.custom-scrollbar2::-webkit-scrollbar {
+.custom-scrollbar2::-webkit-scrollbar,
+.custom-scrollbar3::-webkit-scrollbar {
   width: 10px; /* 스크롤바 너비 */
 }
 
-.custom-scrollbar2::-webkit-scrollbar-track {
+.custom-scrollbar2::-webkit-scrollbar-track,
+.custom-scrollbar3::-webkit-scrollbar-track {
   background-color: #ffffff;
-  /* margin-top: 10px; */
-  /* margin-bottom: 10px;  */
   border-radius: 5px;
 }
 
 html.dark .custom-scrollbar2::-webkit-scrollbar-track {
   background-color: #374151;
-  /* margin-top: 10px;  */
-  /* margin-bottom: 10px;  */
+  border-radius: 5px;
+}
+
+html.dark .custom-scrollbar3::-webkit-scrollbar-track {
+  background-color: #4b5563;
   border-radius: 5px;
 }
 
@@ -58,16 +67,30 @@ html.dark .custom-scrollbar2::-webkit-scrollbar-track {
   border-radius: 5px;
 }
 
+.custom-scrollbar3::-webkit-scrollbar-thumb {
+  background-color: #e5e7eb;
+  border-radius: 5px;
+}
+
 html.dark .custom-scrollbar2::-webkit-scrollbar-thumb {
   background-color: #6b7280;
   border-radius: 5px;
 }
 
-/* hover 효과
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #fffff;
+html.dark .custom-scrollbar3::-webkit-scrollbar-thumb {
+  background-color: rgba(3, 7, 18, 0.2); 
+  border-radius: 5px;
+}
+
+/* hover 효과 */
+.custom-scrollbar3::-webkit-scrollbar-thumb:hover {
+  background-color: #d1d5db;
   transition: all 0.2s;
-} */
+}
+html.dark .custom-scrollbar3::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(3, 7, 18, 0.3); 
+  transition: all 0.2s;
+}
 
 /* dark mode */
 /* 다크 모드에서만 적용되는 Select 박스 스타일 */
@@ -196,6 +219,13 @@ html.dark .ant-form-item-label > label {
 /* 모달 (다크모드) */
 html.dark .ant-modal-content {
   background-color: #4b5563;
+}
+
+/* training 탭 커스텀 */
+.ant-tabs-content,
+.ant-col,
+.ant-row {
+  height: 100%;
 }
 
 /* antd Table dark mode 색  */

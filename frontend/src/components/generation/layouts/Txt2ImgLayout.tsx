@@ -156,7 +156,7 @@ const Txt2ImgLayout = () => {
   );
 
   return (
-    <div className="flex h-[calc(100vh-60px)] pt-4 pb-6">
+    <div className="flex h-full pt-4 pb-6">
       {/* 사이드바 */}
       {isSidebarVisible && (
         <div className="w-[360px] pl-8 h-full hidden md:block">

@@ -7,6 +7,7 @@ import inpaintingSlice from './slices/generation/inpaintingSlice';
 import removeBgSlice from './slices/generation/removeBgSlice';
 import cleanupSlice from './slices/generation/cleanupSlice';
 import userInfoSlice from './slices/userInfoSlice';
+import trainingSlice from './slices/training/trainingSlice';
 
 const store = configureStore({
   reducer: {
@@ -17,7 +18,8 @@ const store = configureStore({
     inpainting: inpaintingSlice,
     removeBg: removeBgSlice,
     cleanup: cleanupSlice,
-    userInfo: userInfoSlice
+    userInfo: userInfoSlice,
+    training: trainingSlice
   }
 });
 
