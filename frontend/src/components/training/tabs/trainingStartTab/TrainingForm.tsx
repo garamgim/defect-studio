@@ -1,4 +1,4 @@
-import { Tabs, Button } from 'antd';
+import { Tabs } from 'antd';
 import ModelParams from '../../params/ModelParams';
 import ImageParams from '../../params/ImageParams';
 import TrainParams from '../../params/TrainParams';
@@ -7,6 +7,7 @@ import CheckpointParams from '../../params/CheckpointParams';
 import ValidationParams from '../../params/ValidationParams';
 import MiscParams from '../../params/MiscParams';
 import styled from 'styled-components';
+import TrainingButton from '../../TrainingButton';
 
 const { TabPane } = Tabs;
 
@@ -55,9 +56,9 @@ const TrainingForm = () => {
         </CustomTabs>
       </div>
 
-      {/* Start Training Button Section */}
+      {/* 훈련시작 버튼 */}
       <div className="flex justify-end p-4 bg-gray-100 dark:bg-gray-700">
-        <Button type="primary">Start Training</Button>
+        <TrainingButton />
       </div>
     </div>
   );

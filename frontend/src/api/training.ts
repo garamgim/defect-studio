@@ -7,7 +7,7 @@ export const postTraining = async (gpu_env: TrainingDataType['gpu_env'], data: T
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
-      console.log(key, value);
+      console.log(key, value, typeof value);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
@@ -17,19 +17,19 @@ export const postTraining = async (gpu_env: TrainingDataType['gpu_env'], data: T
       }
     });
 
-    const response = await axiosInstance.post(`generation/img-to-img/${gpu_env}`, formData, {
+    const response = await axiosInstance.post(`training/dreambooth/${gpu_env}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     });
 
-    if (response.status === 201) {
-      return response.data.image_list; // image_list 배열 반환
+    if (response.status === 200) {
+      return response.data;
     } else {
-      throw new Error('Failed to generate image-to-image');
+      throw new Error('Failed to training model');
     }
   } catch (error) {
     console.error(error);
-    throw new Error('Failed to generate image-to-image');
+    throw new Error('Failed to training model');
   }
 };

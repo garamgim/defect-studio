@@ -32,6 +32,25 @@ import styled from 'styled-components';
 
 const { Panel } = Collapse;
 
+const CustomMinusSquareOutlined = styled(MinusSquareOutlined)`
+  color: black;
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: red;
+  }
+
+  /* 다크 모드에서는 흰색 → 빨간색으로 변경 */
+  html.dark & {
+    color: white;
+
+    &:hover {
+      color: red;
+    }
+  }
+`;
+
 const ImageParams = () => {
   const dispatch = useDispatch();
   const { concepts, resolution, centerCrop, sampleBatchSize, classLabelsConditioning, maxConcepts } = useSelector(
@@ -55,25 +74,6 @@ const ImageParams = () => {
       console.error('Error selecting folder:', error);
     }
   };
-
-  const CustomMinusSquareOutlined = styled(MinusSquareOutlined)`
-    color: black;
-    cursor: pointer;
-    transition: color 0.3s ease;
-
-    &:hover {
-      color: red;
-    }
-
-    /* 다크 모드에서는 흰색 → 빨간색으로 변경 */
-    html.dark & {
-      color: white;
-
-      &:hover {
-        color: red;
-      }
-    }
-  `;
 
   return (
     <div className="mb-4">

@@ -1,20 +1,18 @@
-import AIToolBoxList from '../components/home/AIToolBoxList';
 import Header from '../components/home/Header';
-import { setAuthorizationToken } from '../api/token/axiosInstance';
 
 const Home = () => {
   return (
-    <div className="relative overflow-hidden bg-white dark:bg-gray-800">
+    <div className="h-[calc(100vh-60px)] bg-white dark:bg-gray-800">
       <header>
         <Header />
       </header>
 
-      <main>
-        <p className="mt-8 md:mt-16 text-2xl font-bold text-black text-center md:text-left md:ml-10 dark:text-gray-300">
-          Defect Studio’s AI Tools
-        </p>
+      <main className="p-16">
+        <p className="mt-4 mb-4 text-[24px] font-semibold dark:text-gray-300">Assets</p>
+        <p className="mb-10 text-[18px] dark:text-gray-300">Browse and Utilize Your Custom-Generated Images</p>
 
-        <AIToolBoxList />
+        <div className="w-[360px] h-[360px] rounded-3xl bg-gray-300"></div>
+
       </main>
     </div>
   );
