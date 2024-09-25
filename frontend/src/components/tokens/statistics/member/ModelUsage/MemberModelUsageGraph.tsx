@@ -44,7 +44,11 @@ const MemberModelUsageGraph = ({ data }: MemberModelUsageGraphProps) => {
       }
     ]
   };
-  return <Doughnut options={options} data={chartData} />;
+  return (
+    <div className="dark:bg-white mt-3 rounded-[10px] p-2 w-full h-full">
+      <Doughnut options={options} data={chartData} />
+    </div>
+  );
 };
 
 export default MemberModelUsageGraph;
