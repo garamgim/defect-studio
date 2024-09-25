@@ -1,6 +1,5 @@
 import AIToolBoxList from '../components/home/AIToolBoxList';
 import Header from '../components/home/Header';
-import { setAuthorizationToken } from '../api/token/axiosInstance';
 
 const Home = () => {
   return (
