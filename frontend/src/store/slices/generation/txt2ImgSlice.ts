@@ -107,7 +107,7 @@ const txt2ImgSlice = createSlice({
       state.isLoading = action.payload;
     },
     // output
-    setProcessedImgsCount: (state, action: PayloadAction<number>) => {
+    setProcessedImgsCnt: (state, action: PayloadAction<number>) => {
       state.output.processedImgsCnt = action.payload;
     },
     setFirstProcessedImg: (state, action: PayloadAction<string | null>) => {
@@ -135,7 +135,7 @@ export const {
   setSeedParams,
   setBatchParams,
   setIsLoading,
-  setProcessedImgsCount,
+  setProcessedImgsCnt,
   setFirstProcessedImg,
   setOutputImgs,
   resetState

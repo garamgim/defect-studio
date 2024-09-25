@@ -16,8 +16,9 @@ import {
   setInitImageList,
   setMaskImageList,
   setMaskInputPath,
-  setInputPath,
-  setOutputPath
+  setInitInputPath,
+  setOutputPath,
+  setCombinedImg
 } from '../../store/slices/generation/inpaintingSlice';
 import { useCallback } from 'react';
 
@@ -40,14 +41,19 @@ export const useInpaintingParams = () => {
   // UploadImgWithMaskingParams도 자주 변경될 수 있으므로 따로 개별 호출
   const mode = useSelector((state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.mode);
   const clipData = useSelector((state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.clipData);
-  const imageList = useSelector((state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.initImageList);
+  const combinedImg = useSelector((state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.combinedImg);
+  const initImageList = useSelector(
+    (state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.initImageList
+  );
   const maskImageList = useSelector(
     (state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.maskImageList
   );
   const maskInputPath = useSelector(
     (state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.maskInputPath
   );
-  const inputPath = useSelector((state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.inputPath);
+  const initInputPath = useSelector(
+    (state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.initInputPath
+  );
   const outputPath = useSelector((state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.outputPath);
 
   // params 업데이트 함수들
@@ -125,9 +131,9 @@ export const useInpaintingParams = () => {
     },
     [dispatch]
   );
-  const updateImageList = useCallback(
-    (imageList: string[]) => {
-      dispatch(setInitImageList(imageList));
+  const updateInitImageList = useCallback(
+    (initImageList: string[]) => {
+      dispatch(setInitImageList(initImageList));
     },
     [dispatch]
   );
@@ -143,9 +149,15 @@ export const useInpaintingParams = () => {
     },
     [dispatch]
   );
-  const updateInputPath = useCallback(
-    (inputPath: string) => {
-      dispatch(setInputPath(inputPath));
+  const updateCombinedImg = useCallback(
+    (combinedImg: string) => {
+      dispatch(setCombinedImg(combinedImg));
+    },
+    [dispatch]
+  );
+  const updateInitInputPath = useCallback(
+    (initInputPath: string) => {
+      dispatch(setInitInputPath(initInputPath));
     },
     [dispatch]
   );
@@ -169,10 +181,11 @@ export const useInpaintingParams = () => {
     strengthParams,
     mode,
     clipData,
-    imageList,
+    combinedImg,
+    initImageList,
     maskImageList,
     maskInputPath,
-    inputPath,
+    initInputPath,
     outputPath,
     updateModelParams,
     updateSamplingParams,
@@ -186,10 +199,11 @@ export const useInpaintingParams = () => {
     updateMode,
     updateStrengthParams,
     updateClipData,
-    updateImageList,
+    updateInitImageList,
     updateMaskImageList,
+    updateCombinedImg,
     updateMaskInputPath,
-    updateInputPath,
+    updateInitInputPath,
     updateOutputPath
   };
 };

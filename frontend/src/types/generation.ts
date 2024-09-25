@@ -36,7 +36,8 @@ export interface UploadImgParamsType {
   inputPath: string;
   outputPath: string;
 }
-export interface UploadImgWithMaskingParamsType extends Omit<UploadImgParamsType, 'imageList'> {
+export interface UploadImgWithMaskingParamsType extends Omit<UploadImgParamsType, 'imageList' | 'inputPath'> {
+  initInputPath: string;
   initImageList: string[];
   maskImageList: string[];
   maskInputPath: string;

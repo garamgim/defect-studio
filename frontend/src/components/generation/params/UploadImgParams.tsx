@@ -5,7 +5,7 @@ import React from 'react';
 
 interface UploadImgParamsProps {
   handleImageUpload: (file: File) => void;
-  imagePreview: string | ArrayBuffer | null;
+  imagePreview: string | null;
   inputPath: string;
   updateInputPath: (inputPath: string) => void;
   outputPath: string;
@@ -66,11 +66,7 @@ const UploadImgParams = ({
         <div>
           <Upload.Dragger {...uploadProps} className="mb-4">
             {imagePreview ? (
-              <img
-                src={imagePreview as string}
-                alt="Uploaded preview"
-                className="w-full h-full object-cover rounded-md"
-              />
+              <img src={imagePreview} alt="Uploaded preview" className="w-full h-full object-cover rounded-md" />
             ) : (
               <div>
                 <p className="ant-upload-drag-icon">

@@ -5,7 +5,7 @@ import {
   setIsNegativePrompt,
   setOutputImgs,
   setIsLoading,
-  setProcessedImgsCount,
+  setProcessedImgsCnt,
   setClipData
 } from '../../../store/slices/generation/img2ImgSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -32,12 +32,12 @@ const Img2ImgLayout = () => {
       files = params.uploadImgParams.imageList.map((base64Img, index) =>
         convertStringToFile(base64Img, `image_${index}.png`)
       );
-      dispatch(setProcessedImgsCount(params.batchParams.batchCount * params.batchParams.batchSize));
+      dispatch(setProcessedImgsCnt(params.batchParams.batchCount * params.batchParams.batchSize));
       console.log('파일: ', files);
     } else {
       const fileDataArray = await window.electron.getFilesInFolder(params.uploadImgParams.inputPath);
       dispatch(
-        setProcessedImgsCount(fileDataArray.length * params.batchParams.batchCount * params.batchParams.batchSize)
+        setProcessedImgsCnt(fileDataArray.length * params.batchParams.batchCount * params.batchParams.batchSize)
       );
 
       // base64 데이터를 Blob으로 변환하고 File 객체로 생성

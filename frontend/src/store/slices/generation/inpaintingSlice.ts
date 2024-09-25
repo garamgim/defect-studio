@@ -66,7 +66,7 @@ const initialState: InpaintingState = {
       initImageList: [],
       maskImageList: [],
       combinedImg: null,
-      inputPath: '',
+      initInputPath: '',
       maskInputPath: '',
       outputPath: ''
     },
@@ -116,8 +116,11 @@ const inpaintingSlice = createSlice({
     setMaskInputPath: (state, action: PayloadAction<string>) => {
       state.params.uploadImgWithMaskingParams.maskInputPath = action.payload;
     },
-    setInputPath: (state, action: PayloadAction<string>) => {
-      state.params.uploadImgWithMaskingParams.inputPath = action.payload;
+    setCombinedImg: (state, action: PayloadAction<string | null>) => {
+      state.params.uploadImgWithMaskingParams.combinedImg = action.payload;
+    },
+    setInitInputPath: (state, action: PayloadAction<string>) => {
+      state.params.uploadImgWithMaskingParams.initInputPath = action.payload;
     },
     setOutputPath: (state, action: PayloadAction<string>) => {
       state.params.uploadImgWithMaskingParams.outputPath = action.payload;
@@ -150,7 +153,7 @@ const inpaintingSlice = createSlice({
       state.isLoading = action.payload;
     },
     // output
-    setProcessedImgsCount: (state, action: PayloadAction<number>) => {
+    setProcessedImgsCnt: (state, action: PayloadAction<number>) => {
       state.output.processedImgsCnt = action.payload;
     },
     setFirstProcessedImg: (state, action: PayloadAction<string | null>) => {
@@ -178,7 +181,7 @@ export const {
   setSeedParams,
   setBatchParams,
   setIsLoading,
-  setProcessedImgsCount,
+  setProcessedImgsCnt,
   setFirstProcessedImg,
   setOutputImgs,
   setStrengthParams,
@@ -187,8 +190,9 @@ export const {
   setInitImageList,
   setMaskImageList,
   setMaskInputPath,
-  setInputPath,
+  setInitInputPath,
   setOutputPath,
+  setCombinedImg,
   resetState
 } = inpaintingSlice.actions;
 

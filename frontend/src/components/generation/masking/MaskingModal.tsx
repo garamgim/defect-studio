@@ -14,9 +14,9 @@ import Konva from 'konva';
 interface MaskingModalProps {
   onClose: () => void;
   imageSrc: string;
-  setInitImageList: (value: string[]) => void;
-  setMaskImageList: (value: string[]) => void;
-  setCombinedImg: (value: string) => void;
+  updateInitImageList: (initImgList: string[]) => void;
+  updateMaskImageList: (maskImgList: string[]) => void;
+  updateCombinedImg: (combinedImg: string) => void;
 }
 
 interface LineObject {
@@ -26,7 +26,13 @@ interface LineObject {
   fill?: string;
 }
 
-const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList, setCombinedImg }: MaskingModalProps) => {
+const MaskingModal = ({
+  onClose,
+  imageSrc,
+  updateInitImageList,
+  updateMaskImageList,
+  updateCombinedImg
+}: MaskingModalProps) => {
   const [tool, setTool] = useState<'brush' | 'polygon' | 'select' | null>(null);
   const [isMovingPoints, setIsMovingPoints] = useState(false);
   const [brushSize, setBrushSize] = useState<number>(10);
@@ -162,9 +168,9 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList, s
         pixelRatio: 1
       });
 
-      setInitImageList([backgroundImgBase64]);
-      setMaskImageList([canvasImgBase64]);
-      setCombinedImg(combinedImgBase64);
+      updateInitImageList([backgroundImgBase64]);
+      updateMaskImageList([canvasImgBase64]);
+      updateCombinedImg(combinedImgBase64);
     } catch (error) {
       console.error('Error saving images:', error);
     } finally {
