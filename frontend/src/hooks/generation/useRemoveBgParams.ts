@@ -1,81 +1,50 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
-import {
-  setImageList,
-  setOutputImgUrls,
-  setIsLoading,
-  setInputPath,
-  setOutputPath,
-  setMode
-} from '../../store/slices/generation/removeBgSlice';
+import { setImageList, setInputPath, setOutputPath, setMode } from '../../store/slices/generation/removeBgSlice';
 import { useCallback } from 'react';
 
 export const useRemoveBgParams = () => {
   const dispatch = useDispatch();
 
-  // 상태값들 가져오기 (성능 최적화를 위해 따로따로 불러옴- 리렌더링 방지)
-  const imageList = useSelector((state: RootState) => state.removeBg.imageList);
-  const outputImgUrls = useSelector((state: RootState) => state.removeBg.outputImgUrls);
-  const inputPath = useSelector((state: RootState) => state.removeBg.inputPath);
-  const outputPath = useSelector((state: RootState) => state.removeBg.outputPath);
-  const isLoading = useSelector((state: RootState) => state.removeBg.isLoading);
-  const mode = useSelector((state: RootState) => state.removeBg.mode);
+  // uploadImgParams도 자주 변경될 수 있으므로 따로 개별 호출
+  const mode = useSelector((state: RootState) => state.removeBg.params.uploadImgParams.mode);
+  const imageList = useSelector((state: RootState) => state.removeBg.params.uploadImgParams.imageList);
+  const inputPath = useSelector((state: RootState) => state.removeBg.params.uploadImgParams.inputPath);
+  const outputPath = useSelector((state: RootState) => state.removeBg.params.uploadImgParams.outputPath);
 
-  // 상태 업데이트 함수
-  const handleSetImageList = useCallback(
-    (value: string[]) => {
-      dispatch(setImageList(value));
+  const updateMode = useCallback(
+    (mode: 'manual' | 'batch') => {
+      dispatch(setMode(mode));
     },
     [dispatch]
   );
-
-  const handleSetOutputImgUrls = useCallback(
-    (value: string[]) => {
-      dispatch(setOutputImgUrls(value));
+  const updateImageList = useCallback(
+    (imageList: string[]) => {
+      dispatch(setImageList(imageList));
     },
     [dispatch]
   );
-
-  const handleSetIsLoading = useCallback(
-    (value: boolean) => {
-      dispatch(setIsLoading(value));
+  const updateInputPath = useCallback(
+    (inputPath: string) => {
+      dispatch(setInputPath(inputPath));
     },
     [dispatch]
   );
-
-  const handleSetInputPath = useCallback(
-    (value: string) => {
-      dispatch(setInputPath(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetOutputPath = useCallback(
-    (value: string) => {
-      dispatch(setOutputPath(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetMode = useCallback(
-    (value: 'manual' | 'batch') => {
-      dispatch(setMode(value));
+  const updateOutputPath = useCallback(
+    (outputPath: string) => {
+      dispatch(setOutputPath(outputPath));
     },
     [dispatch]
   );
 
   return {
     imageList,
-    outputImgUrls,
     inputPath,
     outputPath,
-    isLoading,
     mode,
-    handleSetImageList,
-    handleSetOutputImgUrls,
-    handleSetIsLoading,
-    handleSetInputPath,
-    handleSetOutputPath,
-    handleSetMode
+    updateMode,
+    updateImageList,
+    updateInputPath,
+    updateOutputPath
   };
 };

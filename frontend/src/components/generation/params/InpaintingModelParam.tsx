@@ -1,16 +1,17 @@
-import { Select, Form } from 'antd';
-import React from 'react';
+import { Select, Form, message } from 'antd';
+import React, { useEffect } from 'react';
 import { getModelList } from '../../../api/generation';
 import { useQuery } from '@tanstack/react-query';
+import { ModelParamsType } from '../../../types/generation';
 
 interface InpaintingModelParamsProps {
-  model: string;
-  setModel: (model: string) => void;
+  modelParams: ModelParamsType;
+  updateModelParams: (model: string) => void;
 }
 
-const InpaintingModelParam = ({ model, setModel }: InpaintingModelParamsProps) => {
-  const handleChange = (value: string) => {
-    setModel(value);
+const InpaintingModelParam = ({ modelParams, updateModelParams }: InpaintingModelParamsProps) => {
+  const handleChange = (model: string) => {
+    updateModelParams(model);
   };
 
   const member_id = 1;
@@ -19,7 +20,7 @@ const InpaintingModelParam = ({ model, setModel }: InpaintingModelParamsProps) =
     data: modelList,
     isLoading,
     error
-  } = useQuery({
+  } = useQuery<string[], Error>({
     queryKey: ['models', member_id],
     queryFn: () => getModelList(member_id)
   });
@@ -33,17 +34,29 @@ const InpaintingModelParam = ({ model, setModel }: InpaintingModelParamsProps) =
     ...(modelList?.map((model: string) => ({ value: model, label: model })) || [])
   ];
 
-  // 이때는 default 모델 보여줌
+  // 로딩 중이나 에러나면 default 모델 보여줌
   if (isLoading || error) {
     combinedModelOptions = defaultModels;
   }
+
+  // model리스트 조회 api 오류 발생 시 알림 표시
+  useEffect(() => {
+    if (error) {
+      message.error('Error loading models. Please try again later.');
+    }
+  }, [error]);
 
   return (
     <div className="mt-[32px] px-6 pb-2">
       <p className="text-[14px] font-semibold mb-3 text-[#222] dark:text-gray-300">Model</p>
       <Form layout="vertical">
         <Form.Item>
-          <Select value={model} onChange={handleChange} options={combinedModelOptions} placeholder="Select a model" />
+          <Select
+            value={modelParams.model}
+            onChange={handleChange}
+            options={combinedModelOptions}
+            placeholder="Select a model"
+          />
         </Form.Item>
       </Form>
     </div>

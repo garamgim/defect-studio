@@ -2,62 +2,45 @@ import Sidebar from '../sidebar/InpaintingSidebar';
 import PromptParams from '../params/PromptParams';
 import InpaintingDisplay from '../outputDisplay/InpaintingDisplay';
 import { useInpaintingParams } from '../../../hooks/generation/useInpaintingParams';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { postInpaintingGeneration, getClip } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import GenerateButton from '../../common/GenerateButton';
 import {
   setClipData,
   setIsLoading,
-  setOutputImgUrls,
-  setUploadImgsCount
+  setOutputImgs,
+  setProcessedImgsCnt
 } from '../../../store/slices/generation/inpaintingSlice';
+import { RootState } from '../../../store/store';
 
 const InpaintingLayout = () => {
   const dispatch = useDispatch();
-  const {
-    prompt,
-    negativePrompt,
-    isNegativePrompt,
-    strength,
-    initImageList,
-    maskImageList,
-    initInputPath,
-    maskInputPath,
-    model,
-    scheduler,
-    width,
-    height,
-    numInferenceSteps,
-    guidanceScale,
-    seed,
-    batchCount,
-    batchSize,
-    outputPath,
-    clipData,
-    mode,
-    isLoading,
-    handleSetPrompt,
-    handleSetNegativePrompt,
-    handleSetIsNegativePrompt
-  } = useInpaintingParams();
+  const { params, isLoading } = useSelector((state: RootState) => state.inpainting);
+  const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useInpaintingParams();
 
   const handleNegativePromptChange = () => {
-    handleSetIsNegativePrompt(!isNegativePrompt);
+    !isNegativePrompt;
   };
 
   let bgFiles;
   let canvasFiles;
 
   const handleGenerate = async () => {
-    if (mode === 'manual') {
-      bgFiles = initImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
-      canvasFiles = maskImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
-      dispatch(setUploadImgsCount(batchCount * batchSize));
+    if (params.uploadImgWithMaskingParams.mode === 'manual') {
+      bgFiles = params.uploadImgWithMaskingParams.initImageList.map((base64Img, index) =>
+        convertStringToFile(base64Img, `image_${index}.png`)
+      );
+      canvasFiles = params.uploadImgWithMaskingParams.maskImageList.map((base64Img, index) =>
+        convertStringToFile(base64Img, `image_${index}.png`)
+      );
+      dispatch(setProcessedImgsCnt(params.batchParams.batchCount * params.batchParams.batchSize));
     } else {
-      const bgFileDataArray = await window.electron.getFilesInFolder(initInputPath);
-      const maskFileDataArray = await window.electron.getFilesInFolder(maskInputPath);
-      dispatch(setUploadImgsCount(bgFileDataArray.length * batchCount * batchSize));
+      const bgFileDataArray = await window.electron.getFilesInFolder(params.uploadImgWithMaskingParams.initInputPath);
+      const maskFileDataArray = await window.electron.getFilesInFolder(params.uploadImgWithMaskingParams.maskInputPath);
+      dispatch(
+        setProcessedImgsCnt(bgFileDataArray.length * params.batchParams.batchCount * params.batchParams.batchSize)
+      );
 
       // base64 데이터를 Blob으로 변환하고 File 객체로 생성
       bgFiles = bgFileDataArray.map((fileData) => {
@@ -88,29 +71,30 @@ const InpaintingLayout = () => {
     }
 
     const data = {
-      model,
-      scheduler,
-      prompt,
-      negative_prompt: negativePrompt,
-      width,
-      height,
-      num_inference_steps: numInferenceSteps,
-      guidance_scale: guidanceScale,
-      seed,
-      batch_count: batchCount,
-      batch_size: batchSize,
-      output_path: outputPath,
-      strength,
+      model: params.modelParams.model,
+      scheduler: params.samplingParams.scheduler,
+      prompt: params.promptParams.prompt,
+      negative_prompt: params.promptParams.negativePrompt,
+      width: params.imgDimensionParams.width,
+      height: params.imgDimensionParams.height,
+      num_inference_steps: params.samplingParams.numInferenceSteps,
+      guidance_scale: params.guidanceParams.guidanceScale,
+      seed: params.seedParams.seed,
+      batch_count: params.batchParams.batchCount,
+      batch_size: params.batchParams.batchSize,
+      strength: params.strengthParams.strength,
+      input_path: params.uploadImgWithMaskingParams.initInputPath,
       init_image_list: bgFiles,
       mask_image_list: canvasFiles,
-      init_input_path: initInputPath,
-      mask_input_path: maskInputPath
+      init_input_path: '',
+      mask_input_path: '',
+      output_path: '' // 추후 settings 페이지 경로 넣을 예정
     };
 
     try {
       dispatch(setIsLoading(true));
       const outputImgUrls = await postInpaintingGeneration('remote', data);
-      dispatch(setOutputImgUrls(outputImgUrls));
+      dispatch(setOutputImgs(outputImgUrls));
     } catch (error) {
       console.error('Error generating image:', error);
     } finally {
@@ -120,10 +104,10 @@ const InpaintingLayout = () => {
 
   // Clip아이콘 클릭
   const handleClipClick = async () => {
-    if (clipData.length === 0) {
+    if (params.uploadImgWithMaskingParams.clipData.length === 0) {
       try {
-        if (initImageList.length > 0) {
-          const file = convertStringToFile(initImageList[0], 'image.png');
+        if (params.uploadImgWithMaskingParams.initImageList.length > 0) {
+          const file = convertStringToFile(params.uploadImgWithMaskingParams.initImageList[0], 'image.png');
           const generatedPrompts = await getClip([file]);
           dispatch(setClipData(generatedPrompts));
         } else {
@@ -152,12 +136,15 @@ const InpaintingLayout = () => {
           <PromptParams
             prompt={prompt}
             negativePrompt={negativePrompt}
+            updatePrompt={updatePrompt}
+            updateNegativePrompt={updateNegativePrompt}
             isNegativePrompt={isNegativePrompt}
-            setPrompt={handleSetPrompt}
-            setNegativePrompt={handleSetNegativePrompt}
             handleNegativePromptChange={handleNegativePromptChange}
-            clipData={mode === 'manual' ? clipData : []}
-            handleClipClick={mode === 'manual' ? handleClipClick : undefined}
+            // 메뉴얼 모드일 때만 props로 전달(batch에서는 clip실행 안함)
+            clipData={
+              params.uploadImgWithMaskingParams.mode === 'manual' ? params.uploadImgWithMaskingParams.clipData : []
+            }
+            handleClipClick={params.uploadImgWithMaskingParams.mode === 'manual' ? handleClipClick : undefined}
           />
         </div>
       </div>

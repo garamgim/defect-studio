@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../sidebar/Txt2ImgSidebar';
 import PromptParams from '../params/PromptParams';
 import Txt2ImgDisplay from '../outputDisplay/Txt2ImgDisplay';
-import { useDispatch } from 'react-redux';
-import { setIsNegativePrompt, setOutputImgUrls, setIsLoading } from '../../../store/slices/generation/txt2ImgSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { setIsNegativePrompt, setIsLoading } from '../../../store/slices/generation/txt2ImgSlice';
 import { setImageList as setImg2ImgImages } from '../../../store/slices/generation/img2ImgSlice';
 import { setInitImageList as setInpaintingImages } from '../../../store/slices/generation/inpaintingSlice';
 import { setImageList as setRemoveBgImages } from '../../../store/slices/generation/removeBgSlice';
@@ -17,25 +17,13 @@ import { MdMoveUp } from 'react-icons/md';
 import { RiCheckboxMultipleBlankFill, RiCheckboxMultipleBlankLine } from 'react-icons/ri';
 import { AiOutlineEyeInvisible, AiOutlineEye } from 'react-icons/ai';
 import { postTxt2ImgGeneration } from '../../../api/generation';
+import { RootState } from '../../../store/store';
 
 const Txt2ImgLayout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {
-    model,
-    scheduler,
-    width,
-    height,
-    numInferenceSteps,
-    guidanceScale,
-    seed,
-    batchCount,
-    batchSize,
-    outputPath,
-    isLoading,
-    outputImgUrls
-  } = useTxt2ImgParams();
-  const { prompt, negativePrompt, isNegativePrompt, handleSetPrompt, handleSetNegativePrompt } = useTxt2ImgParams();
+  const { params, isLoading, output } = useSelector((state: RootState) => state.txt2Img);
+  const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useTxt2ImgParams();
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
@@ -58,27 +46,30 @@ const Txt2ImgLayout = () => {
 
   const handleGenerate = async () => {
     const data = {
-      model,
-      scheduler,
-      prompt,
-      negative_prompt: negativePrompt,
-      width,
-      height,
-      num_inference_steps: numInferenceSteps,
-      guidance_scale: guidanceScale,
-      seed,
-      batch_count: batchCount,
-      batch_size: batchSize,
-      output_path: outputPath
+      model: params.modelParams.model,
+      scheduler: params.samplingParams.scheduler,
+      prompt: params.promptParams.prompt,
+      negative_prompt: params.promptParams.negativePrompt,
+      width: params.imgDimensionParams.width,
+      height: params.imgDimensionParams.height,
+      num_inference_steps: params.samplingParams.numInferenceSteps,
+      guidance_scale: params.guidanceParams.guidanceScale,
+      seed: params.seedParams.seed,
+      batch_count: params.batchParams.batchCount,
+      batch_size: params.batchParams.batchSize,
+      output_path: '' // 추후 settings 페이지 경로 넣을 예정
     };
 
     try {
       dispatch(setIsLoading(true));
-      const outputImgUrls = await postTxt2ImgGeneration('remote', data);
-      dispatch(setOutputImgUrls(outputImgUrls));
+      await postTxt2ImgGeneration('remote', data);
+      dispatch(setIsLoading(false));
     } catch (error) {
-      console.error('Error generating image:', error);
-    } finally {
+      if (error instanceof Error) {
+        message.error(`Error generating image: ${error.message}`);
+      } else {
+        message.error('An unknown error occurred');
+      }
       dispatch(setIsLoading(false));
     }
   };
@@ -87,11 +78,11 @@ const Txt2ImgLayout = () => {
     if (allSelected) {
       setSelectedImages([]);
     } else {
-      setSelectedImages(outputImgUrls);
+      setSelectedImages(output.outputImgs);
     }
     setAllSelected(!allSelected);
     setIsIconFilled(!isIconFilled);
-  }, [allSelected, outputImgUrls]);
+  }, [allSelected, output.outputImgs]);
 
   const handleDownloadImages = async () => {
     if (selectedImages.length === 0) {
@@ -214,8 +205,8 @@ const Txt2ImgLayout = () => {
             <PromptParams
               prompt={prompt}
               negativePrompt={negativePrompt}
-              setPrompt={handleSetPrompt}
-              setNegativePrompt={handleSetNegativePrompt}
+              updatePrompt={updatePrompt}
+              updateNegativePrompt={updateNegativePrompt}
               isNegativePrompt={isNegativePrompt}
               handleNegativePromptChange={handleNegativePromptChange}
             />

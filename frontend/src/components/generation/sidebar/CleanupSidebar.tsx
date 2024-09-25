@@ -2,25 +2,26 @@ import { useState } from 'react';
 import { Button } from 'antd';
 import { FormatPainterOutlined } from '@ant-design/icons';
 import MaskingModal from '../masking/MaskingModal';
-import UploadImagePlusMask from '../params/UploadImgWithMaskingParams';
 import { useCleanupParams } from '../../../hooks/generation/useCleanupParams';
 import { setCombinedImg } from '../../../store/slices/generation/inpaintingSlice';
+import UploadImgWithMaskingParams from '../params/UploadImgWithMaskingParams';
 
 const CleanupSidebar = () => {
+  // useSelector와 useCallback으로 처리하는 부분을 커스텀 훅으로 분리
   const {
-    initInputPath,
-    maskInputPath,
-    outputPath,
     mode,
-    initImageList,
     combinedImg,
-    handleSetInitInputPath,
-    handleSetMaskInputPath,
-    handleSetOutputPath,
-    handleSetMode,
-    handleSetInitImageList,
-    handleSetMaskImageList,
-    handleSetCombinedImg
+    initImageList,
+    maskInputPath,
+    initInputPath,
+    outputPath,
+    updateInitImageList,
+    updateMaskImageList,
+    updateMaskInputPath,
+    updateInitInputPath,
+    updateOutputPath,
+    updateMode,
+    updateCombinedImg
   } = useCleanupParams();
 
   const [showModal, setShowModal] = useState(false);
@@ -31,12 +32,12 @@ const CleanupSidebar = () => {
       const base64String = reader.result as string;
       const img = new Image();
       img.onload = () => {
-        handleSetInitImageList([base64String]);
+        updateInitImageList([base64String]);
 
         // 초기 이미지와 마스크 이미지 저장
         setCombinedImg(null);
       };
-      img.src = reader.result as string;
+      img.src = base64String;
     };
     reader.readAsDataURL(file);
   };
@@ -49,16 +50,16 @@ const CleanupSidebar = () => {
     <div className="w-full h-full mr-6">
       <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* 이미지 업로드 */}
-        <UploadImagePlusMask
+        <UploadImgWithMaskingParams
           handleImageUpload={handleImageUpload}
           imagePreview={initImageList[0]}
           initInputPath={initInputPath}
           maskInputPath={maskInputPath}
           outputPath={outputPath}
-          setInitInputPath={handleSetInitInputPath}
-          setMaskInputPath={handleSetMaskInputPath}
-          setOutputPath={handleSetOutputPath}
-          setMode={handleSetMode}
+          updateInitInputPath={updateInitInputPath}
+          updateMaskInputPath={updateMaskInputPath}
+          updateOutputPath={updateOutputPath}
+          updateMode={updateMode}
         />
 
         {initImageList[0] && (
@@ -90,9 +91,9 @@ const CleanupSidebar = () => {
         <MaskingModal
           imageSrc={initImageList[0]}
           onClose={handleCloseModal}
-          setInitImageList={handleSetInitImageList}
-          setMaskImageList={handleSetMaskImageList}
-          setCombinedImg={handleSetCombinedImg}
+          updateInitImageList={updateInitImageList}
+          updateMaskImageList={updateMaskImageList}
+          updateCombinedImg={updateCombinedImg}
         />
       )}
     </div>

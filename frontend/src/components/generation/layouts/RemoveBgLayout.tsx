@@ -4,18 +4,24 @@ import { postRemoveBgGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import RemoveBgDisplay from '../outputDisplay/RemoveBgDisplay';
 import { useRemoveBgParams } from '../../../hooks/generation/useRemoveBgParams';
+import { RootState } from '../../../store/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { setOutputImgs, setIsLoading } from '../../../store/slices/generation/removeBgSlice';
 
 const RemoveBackground = () => {
-  const { imageList, inputPath, outputPath, isLoading, mode, handleSetIsLoading, handleSetOutputImgUrls } =
-    useRemoveBgParams();
+  const dispatch = useDispatch();
+  const { params, isLoading } = useSelector((state: RootState) => state.removeBg);
+  useRemoveBgParams();
 
   let files;
 
   const handleGenerate = async () => {
-    if (mode === 'manual') {
-      files = imageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+    if (params.uploadImgParams.mode === 'manual') {
+      files = params.uploadImgParams.imageList.map((base64Img, index) =>
+        convertStringToFile(base64Img, `image_${index}.png`)
+      );
     } else {
-      const fileDataArray = await window.electron.getFilesInFolder(inputPath);
+      const fileDataArray = await window.electron.getFilesInFolder(params.uploadImgParams.inputPath);
 
       // base64 데이터를 Blob으로 변환하고 File 객체로 생성
       files = fileDataArray.map((fileData) => {
@@ -34,18 +40,18 @@ const RemoveBackground = () => {
 
     const data = {
       image_list: files,
-      input_path: inputPath,
-      output_path: outputPath
+      input_path: params.uploadImgParams.inputPath,
+      output_path: '' // 추후 settings 페이지 경로 넣을 예정
     };
 
     try {
-      handleSetIsLoading(true);
+      setIsLoading(true);
       const outputImgUrls = await postRemoveBgGeneration('remote', data);
-      handleSetOutputImgUrls(outputImgUrls);
+      setOutputImgs(outputImgUrls);
     } catch (error) {
       console.error('Error removing background:', error);
     } finally {
-      handleSetIsLoading(false);
+      dispatch(setIsLoading(false));
     }
   };
 

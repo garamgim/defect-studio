@@ -3,43 +3,23 @@ import PromptParams from '../params/PromptParams';
 import Img2ImgDisplay from '../outputDisplay/Img2ImgDisplay';
 import {
   setIsNegativePrompt,
-  setOutputImgUrls,
+  setOutputImgs,
   setIsLoading,
-  setUploadImgsCount,
+  setProcessedImgsCnt,
   setClipData
 } from '../../../store/slices/generation/img2ImgSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { postImg2ImgGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import GenerateButton from '../../common/GenerateButton';
 import { getClip } from '../../../api/generation';
 import { useImg2ImgParams } from '../../../hooks/generation/useImg2ImgParams';
+import { RootState } from '../../../store/store';
 
 const Img2ImgLayout = () => {
   const dispatch = useDispatch();
-  const {
-    prompt,
-    negativePrompt,
-    isNegativePrompt,
-    imageList,
-    strength,
-    inputPath,
-    model,
-    scheduler,
-    width,
-    height,
-    numInferenceSteps,
-    guidanceScale,
-    seed,
-    batchCount,
-    batchSize,
-    outputPath,
-    clipData,
-    mode,
-    isLoading,
-    handleSetPrompt,
-    handleSetNegativePrompt
-  } = useImg2ImgParams();
+  const { params, isLoading } = useSelector((state: RootState) => state.img2Img);
+  const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useImg2ImgParams();
 
   const handleNegativePromptChange = () => {
     dispatch(setIsNegativePrompt(!isNegativePrompt));
@@ -48,13 +28,17 @@ const Img2ImgLayout = () => {
   let files;
 
   const handleGenerate = async () => {
-    if (mode === 'manual') {
-      files = imageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
-      dispatch(setUploadImgsCount(batchCount * batchSize));
+    if (params.uploadImgParams.mode === 'manual') {
+      files = params.uploadImgParams.imageList.map((base64Img, index) =>
+        convertStringToFile(base64Img, `image_${index}.png`)
+      );
+      dispatch(setProcessedImgsCnt(params.batchParams.batchCount * params.batchParams.batchSize));
       console.log('파일: ', files);
     } else {
-      const fileDataArray = await window.electron.getFilesInFolder(inputPath);
-      dispatch(setUploadImgsCount(fileDataArray.length * batchCount * batchSize));
+      const fileDataArray = await window.electron.getFilesInFolder(params.uploadImgParams.inputPath);
+      dispatch(
+        setProcessedImgsCnt(fileDataArray.length * params.batchParams.batchCount * params.batchParams.batchSize)
+      );
 
       // base64 데이터를 Blob으로 변환하고 File 객체로 생성
       files = fileDataArray.map((fileData) => {
@@ -72,27 +56,27 @@ const Img2ImgLayout = () => {
     }
 
     const data = {
-      model,
-      scheduler,
-      prompt,
-      negative_prompt: negativePrompt,
-      width,
-      height,
-      num_inference_steps: numInferenceSteps,
-      guidance_scale: guidanceScale,
-      seed,
-      batch_count: batchCount,
-      batch_size: batchSize,
-      output_path: outputPath,
-      strength,
+      model: params.modelParams.model,
+      scheduler: params.samplingParams.scheduler,
+      prompt: params.promptParams.prompt,
+      negative_prompt: params.promptParams.negativePrompt,
+      width: params.imgDimensionParams.width,
+      height: params.imgDimensionParams.height,
+      num_inference_steps: params.samplingParams.numInferenceSteps,
+      guidance_scale: params.guidanceParams.guidanceScale,
+      seed: params.seedParams.seed,
+      batch_count: params.batchParams.batchCount,
+      batch_size: params.batchParams.batchSize,
+      strength: params.strengthParams.strength,
       image_list: files,
-      input_path: inputPath
+      input_path: params.uploadImgParams.inputPath,
+      output_path: '' // 추후 settings 페이지 경로 넣을 예정
     };
 
     try {
       dispatch(setIsLoading(true));
       const outputImgUrls = await postImg2ImgGeneration('remote', data);
-      dispatch(setOutputImgUrls(outputImgUrls));
+      dispatch(setOutputImgs(outputImgUrls));
     } catch (error) {
       console.error('Error generating image:', error);
     } finally {
@@ -103,14 +87,14 @@ const Img2ImgLayout = () => {
   // Clip아이콘 클릭
   const handleClipClick = async () => {
     // clipData가 빈 배열일 때만 getClip 실행
-    if (clipData.length === 0) {
+    if (params.uploadImgParams.clipData.length === 0) {
       try {
-        if (imageList.length > 0) {
-          const file = convertStringToFile(imageList[0], 'image.png');
+        if (params.uploadImgParams.imageList.length > 0) {
+          const file = convertStringToFile(params.uploadImgParams.imageList[0], 'image.png');
 
           const generatedPrompts = await getClip([file]);
           dispatch(setClipData(generatedPrompts));
-          console.log('clip 갱신: ', clipData);
+          console.log('clip 갱신: ', params.uploadImgParams.clipData);
         } else {
           console.error('No image available for clip generation');
         }
@@ -137,13 +121,13 @@ const Img2ImgLayout = () => {
           <PromptParams
             prompt={prompt}
             negativePrompt={negativePrompt}
-            setPrompt={handleSetPrompt}
-            setNegativePrompt={handleSetNegativePrompt}
+            updatePrompt={updatePrompt}
+            updateNegativePrompt={updateNegativePrompt}
             isNegativePrompt={isNegativePrompt}
             handleNegativePromptChange={handleNegativePromptChange}
             // 메뉴얼 모드일 때만 props로 전달(batch에서는 clip실행 안함)
-            clipData={mode === 'manual' ? clipData : []}
-            handleClipClick={mode === 'manual' ? handleClipClick : undefined}
+            clipData={params.uploadImgParams.mode === 'manual' ? params.uploadImgParams.clipData : []}
+            handleClipClick={params.uploadImgParams.mode === 'manual' ? handleClipClick : undefined}
           />
         </div>
       </div>

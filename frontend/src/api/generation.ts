@@ -211,6 +211,7 @@ export const postCleanupGeneration = async (gpu_env: CleanupDataType['gpu_env'],
 
 // 프리셋 생성 함수
 export const postPreset = async (preset: PresetDataType) => {
+  console.log(preset);
   try {
     const response = await axiosInstance.post('/generation/presets', preset);
 

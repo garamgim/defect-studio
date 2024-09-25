@@ -8,12 +8,10 @@ interface Txt2ImgDisplayProps {
 }
 
 const Txt2ImgDisplay = ({ selectedImages, setSelectedImages }: Txt2ImgDisplayProps) => {
-  const { outputImgUrls, isLoading, batchCount, batchSize, width, height } = useSelector(
-    (state: RootState) => state.txt2Img
-  );
+  const { output, params, isLoading } = useSelector((state: RootState) => state.txt2Img);
 
   // 생성할 이미지 가로세로 비율 계산
-  const aspectRatio = width / height;
+  const aspectRatio = params.imgDimensionParams.width / params.imgDimensionParams.height;
 
   const handleImageClick = (url: string) => {
     setSelectedImages((prevSelected: string[]) => {
@@ -34,12 +32,12 @@ const Txt2ImgDisplay = ({ selectedImages, setSelectedImages }: Txt2ImgDisplayPro
           className="grid gap-4 mr-[16px]"
           style={{
             gridTemplateColumns:
-              batchCount * batchSize <= 4
+              output.processedImgsCnt <= 4
                 ? 'repeat(4, 1fr)' // 이미지가 4개 이하일 때는 4열 고정
                 : 'repeat(auto-fit, minmax(200px, 1fr))' // 4개 이상일 때는 부모 요소 크기에 맞춰 조정
           }}
         >
-          {Array.from({ length: batchCount * batchSize }).map((_, index) => (
+          {Array.from({ length: output.processedImgsCnt }).map((_, index) => (
             <div
               key={index}
               className="relative w-full h-0"
@@ -51,17 +49,17 @@ const Txt2ImgDisplay = ({ selectedImages, setSelectedImages }: Txt2ImgDisplayPro
             </div>
           ))}
         </div>
-      ) : outputImgUrls.length > 0 ? (
+      ) : output.outputImgs.length > 0 ? (
         <div
           className="grid gap-4 mr-[16px]"
           style={{
             gridTemplateColumns:
-              outputImgUrls.length <= 4
+              output.outputImgs.length <= 4
                 ? 'repeat(4, 1fr)' // 이미지가 4개 이하일 때는 4열 고정
                 : 'repeat(auto-fit, minmax(200px, 1fr))' // 4개 이상일 때는 부모 요소 크기에 맞춰 조정
           }}
         >
-          {outputImgUrls.map((url, index) => (
+          {output.outputImgs.map((url, index) => (
             <div
               key={index}
               className="relative w-full h-0 cursor-pointer"

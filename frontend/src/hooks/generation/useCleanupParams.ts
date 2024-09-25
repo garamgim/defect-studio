@@ -3,8 +3,6 @@ import { RootState } from '../../store/store';
 import {
   setInitImageList,
   setMaskImageList,
-  setOutputImgUrls,
-  setIsLoading,
   setInitInputPath,
   setMaskInputPath,
   setOutputPath,
@@ -16,99 +14,80 @@ import { useCallback } from 'react';
 export const useCleanupParams = () => {
   const dispatch = useDispatch();
 
-  // 상태값들 가져오기 (성능 최적화를 위해 따로따로 불러옴- 리렌더링 방지)
-  const initImageList = useSelector((state: RootState) => state.cleanup.initImageList);
-  const maskImageList = useSelector((state: RootState) => state.cleanup.maskImageList);
-  const outputImgUrls = useSelector((state: RootState) => state.cleanup.outputImgUrls);
-  const initInputPath = useSelector((state: RootState) => state.cleanup.initInputPath);
-  const maskInputPath = useSelector((state: RootState) => state.cleanup.maskInputPath);
-  const outputPath = useSelector((state: RootState) => state.cleanup.outputPath);
-  const isLoading = useSelector((state: RootState) => state.cleanup.isLoading);
-  const mode = useSelector((state: RootState) => state.cleanup.mode);
-  const combinedImg = useSelector((state: RootState) => state.cleanup.combinedImg);
+  // uploadImgParams도 자주 변경될 수 있으므로 따로 개별 호출
+  const mode = useSelector((state: RootState) => state.cleanup.params.uploadImgWithMaskingParams.mode);
+  const combinedImg = useSelector((state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.combinedImg);
+  const initImageList = useSelector(
+    (state: RootState) => state.cleanup.params.uploadImgWithMaskingParams.initImageList
+  );
+  const maskImageList = useSelector(
+    (state: RootState) => state.cleanup.params.uploadImgWithMaskingParams.maskImageList
+  );
+  const maskInputPath = useSelector(
+    (state: RootState) => state.cleanup.params.uploadImgWithMaskingParams.maskInputPath
+  );
+  const initInputPath = useSelector(
+    (state: RootState) => state.cleanup.params.uploadImgWithMaskingParams.initInputPath
+  );
+  const outputPath = useSelector((state: RootState) => state.cleanup.params.uploadImgWithMaskingParams.outputPath);
 
-  // 상태 업데이트 함수
-  const handleSetInitImageList = useCallback(
-    (value: string[]) => {
-      dispatch(setInitImageList(value));
+  const updateMode = useCallback(
+    (mode: 'manual' | 'batch') => {
+      dispatch(setMode(mode));
     },
     [dispatch]
   );
-
-  const handleSetMaskImageList = useCallback(
-    (value: string[]) => {
-      dispatch(setMaskImageList(value));
+  const updateInitImageList = useCallback(
+    (initImageList: string[]) => {
+      dispatch(setInitImageList(initImageList));
     },
     [dispatch]
   );
-
-  const handleSetOutputImgUrls = useCallback(
-    (value: string[]) => {
-      dispatch(setOutputImgUrls(value));
+  const updateMaskImageList = useCallback(
+    (maskImageList: string[]) => {
+      dispatch(setMaskImageList(maskImageList));
     },
     [dispatch]
   );
-
-  const handleSetInitInputPath = useCallback(
-    (value: string) => {
-      dispatch(setInitInputPath(value));
+  const updateMaskInputPath = useCallback(
+    (maskInputPath: string) => {
+      dispatch(setMaskInputPath(maskInputPath));
     },
     [dispatch]
   );
-
-  const handleSetMaskInputPath = useCallback(
-    (value: string) => {
-      dispatch(setMaskInputPath(value));
+  const updateCombinedImg = useCallback(
+    (combinedImg: string) => {
+      dispatch(setCombinedImg(combinedImg));
     },
     [dispatch]
   );
-
-  const handleSetOutputPath = useCallback(
-    (value: string) => {
-      dispatch(setOutputPath(value));
+  const updateInitInputPath = useCallback(
+    (initInputPath: string) => {
+      dispatch(setInitInputPath(initInputPath));
     },
     [dispatch]
   );
-
-  const handleSetIsLoading = useCallback(
-    (value: boolean) => {
-      dispatch(setIsLoading(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetMode = useCallback(
-    (value: 'manual' | 'batch') => {
-      dispatch(setMode(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetCombinedImg = useCallback(
-    (value: string) => {
-      dispatch(setCombinedImg(value));
+  const updateOutputPath = useCallback(
+    (outputPath: string) => {
+      dispatch(setOutputPath(outputPath));
     },
     [dispatch]
   );
 
   return {
-    initImageList,
-    maskImageList,
-    outputImgUrls,
-    initInputPath,
-    maskInputPath,
-    outputPath,
-    isLoading,
     mode,
     combinedImg,
-    handleSetInitImageList,
-    handleSetMaskImageList,
-    handleSetOutputImgUrls,
-    handleSetInitInputPath,
-    handleSetMaskInputPath,
-    handleSetOutputPath,
-    handleSetIsLoading,
-    handleSetMode,
-    handleSetCombinedImg
+    initImageList,
+    maskImageList,
+    maskInputPath,
+    initInputPath,
+    outputPath,
+    updateMode,
+    updateInitImageList,
+    updateMaskImageList,
+    updateCombinedImg,
+    updateMaskInputPath,
+    updateInitInputPath,
+    updateOutputPath
   };
 };

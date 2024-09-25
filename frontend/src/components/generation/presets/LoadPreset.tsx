@@ -13,36 +13,30 @@ interface LoadPresetProps {
   closeModal: () => void;
   type: 'text_to_image' | 'image_to_image' | 'inpainting' | 'remove_background' | 'clean_up';
 
-  setModel: (value: string) => void;
-  setWidth: (value: number) => void;
-  setHeight: (value: number) => void;
-  setGuidanceScale: (value: number) => void;
-  setNumInferenceSteps: (value: number) => void;
-  setSeed: (value: number) => void;
-  setPrompt: (value: string) => void;
-  setNegativePrompt: (value: string) => void;
-  setBatchCount: (value: number) => void;
-  setBatchSize: (value: number) => void;
-  setScheduler: (value: string) => void;
-  setStrength?: (value: number) => void;
+  updateModelParams: (model: string) => void;
+  updateSamplingParams: (scheduler: string, num_inference_steps: number) => void;
+  updateSeedParams: (seed: number, isRandomSeed: boolean) => void;
+  updateGuidanceParams: (guidanceScale: number) => void;
+  updateImgDimensionParams: (width: number, height: number) => void;
+  updateBatchParams: (batchCount: number, batchSize: number) => void;
+  updatePrompt: (prompt: string) => void;
+  updateNegativePrompt: (negativePrompt: string) => void;
+  updateStrengthParams?: (strength: number) => void;
 }
 
 const LoadPreset = ({
   isModalOpen,
   closeModal,
   type,
-  setModel,
-  setWidth,
-  setHeight,
-  setGuidanceScale,
-  setNumInferenceSteps,
-  setSeed,
-  setPrompt,
-  setNegativePrompt,
-  setBatchCount,
-  setBatchSize,
-  setScheduler,
-  setStrength
+  updateModelParams,
+  updateSamplingParams,
+  updateSeedParams,
+  updateGuidanceParams,
+  updateImgDimensionParams,
+  updateBatchParams,
+  updatePrompt,
+  updateNegativePrompt,
+  updateStrengthParams
 }: LoadPresetProps) => {
   const [, setLoading] = useState(true);
   const [filteredPresets, setFilteredPresets] = useState<PresetDataType[]>([]);
@@ -118,40 +112,31 @@ const LoadPreset = ({
   const handleLoadPreset = () => {
     if (selectedPreset) {
       if (selectedPreset.model) {
-        setModel(selectedPreset.model);
+        updateModelParams(selectedPreset.model);
       }
-      if (selectedPreset.width) {
-        setWidth(selectedPreset.width);
-      }
-      if (selectedPreset.height) {
-        setHeight(selectedPreset.height);
+      if (selectedPreset.width || selectedPreset.height) {
+        updateImgDimensionParams(selectedPreset.width || 512, selectedPreset.height || 512);
       }
       if (selectedPreset.guidance_scale) {
-        setGuidanceScale(selectedPreset.guidance_scale);
+        updateGuidanceParams(selectedPreset.guidance_scale);
       }
       if (selectedPreset.sampling_steps) {
-        setNumInferenceSteps(selectedPreset.sampling_steps);
+        updateSamplingParams(selectedPreset.sampling_method || '', selectedPreset.sampling_steps);
       }
       if (selectedPreset.seed) {
-        setSeed(selectedPreset.seed);
+        updateSeedParams(selectedPreset.seed, false);
       }
       if (selectedPreset.prompt) {
-        setPrompt(selectedPreset.prompt);
+        updatePrompt(selectedPreset.prompt);
       }
       if (selectedPreset.negative_prompt) {
-        setNegativePrompt(selectedPreset.negative_prompt);
+        updateNegativePrompt(selectedPreset.negative_prompt);
       }
-      if (selectedPreset.batch_count) {
-        setBatchCount(selectedPreset.batch_count);
+      if (selectedPreset.batch_count || selectedPreset.batch_size) {
+        updateBatchParams(selectedPreset.batch_count || 1, selectedPreset.batch_size || 1);
       }
-      if (selectedPreset.batch_size) {
-        setBatchSize(selectedPreset.batch_size);
-      }
-      if (selectedPreset.sampling_method) {
-        setScheduler(selectedPreset.sampling_method);
-      }
-      if (selectedPreset.strength && setStrength) {
-        setStrength(selectedPreset.strength);
+      if (selectedPreset.strength && updateStrengthParams) {
+        updateStrengthParams(selectedPreset.strength);
       }
     }
     closeModal();
@@ -219,9 +204,9 @@ const LoadPreset = ({
                         <button
                           className="w-1/12 text-[15px] text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-white"
                           onClick={async (event) => {
-                            event.stopPropagation(); // 부모 클릭 이벤트 전파 방지
+                            event.stopPropagation();
                             if (preset._id) {
-                              await handleDeletePreset(preset._id); // 삭제 후
+                              await handleDeletePreset(preset._id);
                               fetchPresets();
                             }
                           }}

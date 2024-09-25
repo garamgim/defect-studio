@@ -3,30 +3,27 @@ import Sidebar from '../sidebar/CleanupSidebar';
 import { postCleanupGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import CleanupDisplay from '../outputDisplay/CleanupDisplay';
-import { useCleanupParams } from '../../../hooks/generation/useCleanupParams';
+import { setIsLoading, setOutputImgs } from '../../../store/slices/generation/txt2ImgSlice';
+import { RootState } from '../../../store/store';
+import { useSelector, useDispatch } from 'react-redux';
 
 const Cleanup = () => {
-  const {
-    initImageList,
-    maskImageList,
-    mode,
-    initInputPath,
-    maskInputPath,
-    isLoading,
-    handleSetIsLoading,
-    handleSetOutputImgUrls
-  } = useCleanupParams();
-
+  const dispatch = useDispatch();
+  const { params, isLoading } = useSelector((state: RootState) => state.cleanup);
   let bgFiles;
   let canvasFiles;
 
   const handleGenerate = async () => {
-    if (mode === 'manual') {
-      bgFiles = initImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
-      canvasFiles = maskImageList.map((base64Img, index) => convertStringToFile(base64Img, `image_${index}.png`));
+    if (params.uploadImgWithMaskingParams.mode === 'manual') {
+      bgFiles = params.uploadImgWithMaskingParams.initImageList.map((base64Img, index) =>
+        convertStringToFile(base64Img, `image_${index}.png`)
+      );
+      canvasFiles = params.uploadImgWithMaskingParams.maskImageList.map((base64Img, index) =>
+        convertStringToFile(base64Img, `image_${index}.png`)
+      );
     } else {
-      const bgFileDataArray = await window.electron.getFilesInFolder(initInputPath);
-      const maskFileDataArray = await window.electron.getFilesInFolder(maskInputPath);
+      const bgFileDataArray = await window.electron.getFilesInFolder(params.uploadImgWithMaskingParams.initInputPath);
+      const maskFileDataArray = await window.electron.getFilesInFolder(params.uploadImgWithMaskingParams.maskInputPath);
 
       // base64 데이터를 Blob으로 변환하고 File 객체로 생성
       bgFiles = bgFileDataArray.map((fileData) => {
@@ -62,13 +59,13 @@ const Cleanup = () => {
     };
 
     try {
-      handleSetIsLoading(true);
+      dispatch(setIsLoading(true));
       const outputImgUrls = await postCleanupGeneration('remote', data);
-      handleSetOutputImgUrls(outputImgUrls);
+      dispatch(setOutputImgs(outputImgUrls));
     } catch (error) {
       console.error('Error cleaning up image:', error);
     } finally {
-      handleSetIsLoading(false);
+      dispatch(setIsLoading(false));
     }
   };
 
