@@ -1,4 +1,4 @@
-import MemberImageUsage from '../statistics/member/MemberImageUsage';
+import MemberImageUsage from '../statistics/member/ImageUsage/MemberImageUsage';
 
 interface PersonStatisticSectionProps {
   member_id: number;
