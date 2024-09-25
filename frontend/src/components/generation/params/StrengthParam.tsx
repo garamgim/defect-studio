@@ -1,15 +1,16 @@
 import { Form, Slider, Row, Col, InputNumber } from 'antd';
 import React from 'react';
+import { StrengthParamsType } from '../../../types/generation';
 
 interface StrengthParamsProps {
-  strength: number;
-  setStrength: (value: number) => void;
+  strengthParams: StrengthParamsType;
+  updateStrengthParams: (strength: number) => void;
 }
 
-const StrengthParam = ({ strength, setStrength }: StrengthParamsProps) => {
-  const handleStrengthChange = (value: number | null) => {
-    if (value !== null) {
-      setStrength(value);
+const StrengthParam = ({ strengthParams, updateStrengthParams }: StrengthParamsProps) => {
+  const handleStrengthChange = (strength: number | null) => {
+    if (strength !== null) {
+      updateStrengthParams(strength);
     }
   };
 
@@ -24,7 +25,7 @@ const StrengthParam = ({ strength, setStrength }: StrengthParamsProps) => {
                 min={0.0}
                 max={1.0}
                 step={0.01}
-                value={strength}
+                value={strengthParams.strength}
                 onChange={handleStrengthChange}
                 tooltip={{ open: undefined }}
               />
@@ -34,7 +35,7 @@ const StrengthParam = ({ strength, setStrength }: StrengthParamsProps) => {
                 min={0.0}
                 max={1.0}
                 step={0.01}
-                value={strength}
+                value={strengthParams.strength}
                 onChange={handleStrengthChange}
                 style={{ width: '100%' }}
               />

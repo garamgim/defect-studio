@@ -3,7 +3,7 @@ import CreatePreset from '../presets/CreatePreset';
 import LoadPreset from '../presets/LoadPreset';
 import ModelParam from '../params/ModelParam';
 import ImgDimensionParams from '../params/ImgDimensionParams';
-import GuidanceScaleParams from '../params/GuidanceScaleParam';
+import GuidanceScaleParam from '../params/GuidanceScaleParam';
 import SeedParam from '../params/SeedParam';
 import SamplingParams from '../params/SamplingParams';
 import BatchParams from '../params/BatchParams';
@@ -81,14 +81,14 @@ const Sidebar = () => {
           </div>
         )}
 
-        {/* 모델 파라미터 */}
+        {/* 모델 */}
         <ModelParam modelParams={modelParams} updateModelParams={updateModelParams} />
 
         {level === 'Advanced' && (
           <>
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
-            {/* 이미지 크기 파라미터 */}
+            {/* 이미지 크기 */}
             <ImgDimensionParams
               imgDimensionParams={imgDimensionParams}
               updateImgDimensionParams={updateImgDimensionParams}
@@ -96,13 +96,13 @@ const Sidebar = () => {
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
-            {/* 샘플링 세팅 파라미터 */}
+            {/* 샘플링 세팅 */}
             <SamplingParams samplingParams={samplingParams} updateSamplingParams={updateSamplingParams} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
-            {/* 초기 이미지에서의 변화 세팅 */}
-            <GuidanceScaleParams guidanceParams={guidanceParams} updateGuidanceParams={updateGuidanceParams} />
+            {/* 초기 이미지 변화 제어 */}
+            <GuidanceScaleParam guidanceParams={guidanceParams} updateGuidanceParams={updateGuidanceParams} />
 
             {/* 이미지 재현 & 다양성 세팅 */}
             <SeedParam seedParams={seedParams} updateSeedParams={updateSeedParams} />

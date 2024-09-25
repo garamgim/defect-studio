@@ -10,6 +10,7 @@ import {
   setIsNegativePrompt,
   setNegativePrompt,
   setSeedParams,
+  setStrengthParams,
   setMode,
   setClipData,
   setImageList,
@@ -21,6 +22,7 @@ import { useCallback } from 'react';
 export const useImg2ImgParams = () => {
   const dispatch = useDispatch();
   const modelParams = useSelector((state: RootState) => state.img2Img.params.modelParams);
+  const strengthParams = useSelector((state: RootState) => state.img2Img.params.strengthParams);
   const samplingParams = useSelector((state: RootState) => state.img2Img.params.samplingParams);
   const guidanceParams = useSelector((state: RootState) => state.img2Img.params.guidanceParams);
   const imgDimensionParams = useSelector((state: RootState) => state.img2Img.params.imgDimensionParams);
@@ -43,6 +45,12 @@ export const useImg2ImgParams = () => {
   const updateModelParams = useCallback(
     (model: string) => {
       dispatch(setModelParams(model));
+    },
+    [dispatch]
+  );
+  const updateStrengthParams = useCallback(
+    (strength: number) => {
+      dispatch(setStrengthParams(strength));
     },
     [dispatch]
   );
@@ -137,6 +145,7 @@ export const useImg2ImgParams = () => {
     prompt,
     isNegativePrompt,
     negativePrompt,
+    strengthParams,
     mode,
     clipData,
     imageList,
@@ -152,6 +161,7 @@ export const useImg2ImgParams = () => {
     updateIsNegativePrompt,
     updateNegativePrompt,
     updateMode,
+    updateStrengthParams,
     updateClipData,
     updateImageList,
     updateInputPath,

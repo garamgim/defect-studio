@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
-import ModelParams from '../params/ModelParam';
+import ModelParam from '../params/ModelParam';
 import UploadImgParams from '../params/UploadImgParams';
 import StrengthParam from '../params/StrengthParam';
 import ImgDimensionParams from '../params/ImgDimensionParams';
@@ -17,49 +17,37 @@ import { useDispatch } from 'react-redux';
 import { resetState } from '../../../store/slices/generation/img2ImgSlice';
 
 const Img2ImgSidebar = () => {
+  const dispatch = useDispatch();
+
+  // useSelector와 useCallback으로 처리하는 부분을 커스텀 훅으로 분리
   const {
-    model,
-    scheduler,
-    width,
-    height,
-    numInferenceSteps,
-    seed,
-    isRandomSeed,
-    guidanceScale,
-    strength,
-    batchCount,
-    batchSize,
-    inputPath,
-    outputPath,
-    imageList,
+    modelParams,
+    samplingParams,
+    strengthParams,
+    guidanceParams,
+    imgDimensionParams,
+    seedParams,
+    batchParams,
     prompt,
     negativePrompt,
-    handleSetModel,
-    handleSetScheduler,
-    handleSetWidth,
-    handleSetHeight,
-    handleSetNumInferenceSteps,
-    handleSetGuidanceScale,
-    handleSetSeed,
-    handleSetStrength,
-    handleSetIsRandomSeed,
-    handleSetBatchCount,
-    handleSetBatchSize,
-    handleSetImageList,
-    handleSetInputPath,
-    handleSetOutputPath,
-    handleSetMode,
-    handleSetClipData,
-    handleSetPrompt,
-    handleSetNegativePrompt
+    imageList,
+    inputPath,
+    outputPath,
+    updateModelParams,
+    updateSamplingParams,
+    updateStrengthParams,
+    updateSeedParams,
+    updateGuidanceParams,
+    updateImgDimensionParams,
+    updateBatchParams,
+    updateInputPath,
+    updateOutputPath,
+    updateMode,
+    updateClipData,
+    updateImageList
   } = useImg2ImgParams();
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
-
-  const handleRandomSeedChange = () => {
-    handleSetIsRandomSeed(!isRandomSeed);
-    handleSetSeed(!isRandomSeed ? -1 : seed);
-  };
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
@@ -67,8 +55,8 @@ const Img2ImgSidebar = () => {
       const base64String = reader.result as string;
       const img = new Image();
       img.onload = () => {
-        handleSetClipData([]);
-        handleSetImageList([base64String]);
+        updateClipData([]);
+        updateImageList([base64String]);
       };
       img.src = base64String;
     };
@@ -91,7 +79,6 @@ const Img2ImgSidebar = () => {
     setIsLoadPresetOpen(false);
   };
 
-  const dispatch = useDispatch();
   const handleReset = () => {
     dispatch(resetState());
   };
@@ -117,8 +104,8 @@ const Img2ImgSidebar = () => {
           </div>
         )}
 
-        {/* 모델 선택 */}
-        <ModelParams model={model} setModel={handleSetModel} />
+        {/* 모델 */}
+        <ModelParam modelParams={modelParams} updateModelParams={updateModelParams} />
 
         <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
@@ -128,9 +115,9 @@ const Img2ImgSidebar = () => {
           imagePreview={imageList[0]}
           inputPath={inputPath}
           outputPath={outputPath}
-          setInputPath={handleSetInputPath}
-          setOutputPath={handleSetOutputPath}
-          setMode={handleSetMode}
+          updateInputPath={updateInputPath}
+          updateOutputPath={updateOutputPath}
+          updateMode={updateMode}
         />
 
         {level === 'Advanced' && (
@@ -138,60 +125,47 @@ const Img2ImgSidebar = () => {
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 이미지 크기 */}
-            <ImgDimensionParams width={width} height={height} setWidth={handleSetWidth} setHeight={handleSetHeight} />
-
+            <ImgDimensionParams
+              imgDimensionParams={imgDimensionParams}
+              updateImgDimensionParams={updateImgDimensionParams}
+            />
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 샘플링 세팅 */}
-            <SamplingParams
-              scheduler={scheduler}
-              numInferenceSteps={numInferenceSteps}
-              setNumInferenceSteps={handleSetNumInferenceSteps}
-              setScheduler={handleSetScheduler}
-            />
+            <SamplingParams samplingParams={samplingParams} updateSamplingParams={updateSamplingParams} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 초기 이미지 변화 제어 */}
-            <GuidanceScaleParam guidanceScale={guidanceScale} setGuidanceScale={handleSetGuidanceScale} />
+            <GuidanceScaleParam guidanceParams={guidanceParams} updateGuidanceParams={updateGuidanceParams} />
 
             {/* 초기 이미지 변화 제어 */}
-            <StrengthParam strength={strength} setStrength={handleSetStrength} />
+            <StrengthParam strengthParams={strengthParams} updateStrengthParams={updateStrengthParams} />
 
-            {/* 이미지 재현/다양성 제어 */}
-            <SeedParam
-              seed={seed}
-              isRandomSeed={isRandomSeed}
-              setSeed={handleSetSeed}
-              handleRandomSeedChange={handleRandomSeedChange}
-            />
+            {/* 이미지 재현 & 다양성 세팅 */}
+            <SeedParam seedParams={seedParams} updateSeedParams={updateSeedParams} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 배치 세팅 */}
-            <BatchParams
-              batchCount={batchCount}
-              batchSize={batchSize}
-              setBatchCount={handleSetBatchCount}
-              setBatchSize={handleSetBatchSize}
-            />
+            <BatchParams batchParams={batchParams} updateBatchParams={updateBatchParams} />
           </>
         )}
       </div>
 
       {/* 프리셋 생성 */}
       <CreatePreset
-        model={model}
-        width={width}
-        height={height}
-        guidanceScale={guidanceScale}
-        numInferenceSteps={numInferenceSteps}
-        seed={seed}
+        model={modelParams.model}
+        width={imgDimensionParams.width}
+        height={imgDimensionParams.height}
+        guidanceScale={guidanceParams.guidanceScale}
+        numInferenceSteps={samplingParams.numInferenceSteps}
+        seed={seedParams.seed}
         prompt={prompt}
         negativePrompt={negativePrompt}
-        batchCount={batchCount}
-        batchSize={batchSize}
-        scheduler={scheduler}
+        batchCount={batchParams.batchCount}
+        batchSize={batchParams.batchSize}
+        scheduler={samplingParams.scheduler}
         type="image_to_image"
         isModalOpen={isCreatePresetOpen}
         closeModal={closeCreatePreset}

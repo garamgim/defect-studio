@@ -7,7 +7,8 @@ import {
   PromptParamsType,
   SamplingParamsType,
   SeedParamsType,
-  UploadImgParamsType
+  UploadImgParamsType,
+  StrengthParamsType
 } from '../../../types/generation';
 
 interface Img2ImgState {
@@ -20,6 +21,7 @@ interface Img2ImgState {
     samplingParams: SamplingParamsType;
     seedParams: SeedParamsType;
     uploadImgParams: UploadImgParamsType;
+    strengthParams: StrengthParamsType;
   };
   isLoading: boolean;
   output: {
@@ -64,6 +66,9 @@ const initialState: Img2ImgState = {
       imageList: [],
       inputPath: '',
       outputPath: ''
+    },
+    strengthParams: {
+      strength: 0.75
     }
   },
   isLoading: false,
@@ -111,6 +116,9 @@ const img2ImgSlice = createSlice({
 
     setModelParams: (state, action: PayloadAction<string>) => {
       state.params.modelParams.model = action.payload;
+    },
+    setStrengthParams: (state, action: PayloadAction<number>) => {
+      state.params.strengthParams.strength = action.payload;
     },
     setSamplingParams: (state, action: PayloadAction<{ scheduler: string; numInferenceSteps: number }>) => {
       state.params.samplingParams = action.payload;
@@ -164,6 +172,7 @@ export const {
   setProcessedImgsCount,
   setFirstProcessedImg,
   setOutputImgs,
+  setStrengthParams,
   setMode,
   setClipData,
   setImageList,
