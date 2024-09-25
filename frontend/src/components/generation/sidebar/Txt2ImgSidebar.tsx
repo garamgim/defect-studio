@@ -31,7 +31,9 @@ const Sidebar = () => {
     updateSeedParams,
     updateGuidanceParams,
     updateImgDimensionParams,
-    updateBatchParams
+    updateBatchParams,
+    updatePrompt,
+    updateNegativePrompt
   } = useTxt2ImgParams();
 
   // 사용자 레벨에 따라서 보이는 컴포넌트 구분
@@ -117,17 +119,14 @@ const Sidebar = () => {
 
       {/* 프리셋 생성 */}
       <CreatePreset
-        model={model}
-        width={width}
-        height={height}
-        guidanceScale={guidanceScale}
-        numInferenceSteps={numInferenceSteps}
-        seed={seed}
+        modelParams={modelParams}
+        batchParams={batchParams}
+        imgDimensionParams={imgDimensionParams}
+        guidanceParams={guidanceParams}
+        samplingParams={samplingParams}
+        seedParams={seedParams}
         prompt={prompt}
         negativePrompt={negativePrompt}
-        batchCount={batchCount}
-        batchSize={batchSize}
-        scheduler={scheduler}
         type="text_to_image"
         isModalOpen={isCreatePresetOpen}
         closeModal={closeCreatePreset}
@@ -138,17 +137,14 @@ const Sidebar = () => {
         isModalOpen={isLoadPresetOpen}
         closeModal={closeLoadPreset}
         type="text_to_image"
-        setModel={handleSetModel}
-        setWidth={handleSetWidth}
-        setHeight={handleSetHeight}
-        setGuidanceScale={handleSetGuidanceScale}
-        setNumInferenceSteps={handleSetNumInferenceSteps}
-        setSeed={handleSetSeed}
-        setPrompt={handleSetPrompt}
-        setNegativePrompt={handleSetNegativePrompt}
-        setBatchCount={handleSetBatchCount}
-        setBatchSize={handleSetBatchSize}
-        setScheduler={handleSetScheduler}
+        updateModelParams={updateModelParams}
+        updateSamplingParams={updateSamplingParams}
+        updateSeedParams={updateSeedParams}
+        updateGuidanceParams={updateGuidanceParams}
+        updateImgDimensionParams={updateImgDimensionParams}
+        updateBatchParams={updateBatchParams}
+        updatePrompt={updatePrompt}
+        updateNegativePrompt={updateNegativePrompt}
       />
     </div>
   );

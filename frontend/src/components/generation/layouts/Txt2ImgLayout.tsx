@@ -5,7 +5,7 @@ import Sidebar from '../sidebar/Txt2ImgSidebar';
 import PromptParams from '../params/PromptParams';
 import Txt2ImgDisplay from '../outputDisplay/Txt2ImgDisplay';
 import { useDispatch, useSelector } from 'react-redux';
-import { setIsNegativePrompt, setOutputImgs, setIsLoading } from '../../../store/slices/generation/txt2ImgSlice';
+import { setIsNegativePrompt, setIsLoading } from '../../../store/slices/generation/txt2ImgSlice';
 import { setImageList as setImg2ImgImages } from '../../../store/slices/generation/img2ImgSlice';
 import { setInitImageList as setInpaintingImages } from '../../../store/slices/generation/inpaintingSlice';
 import { setImageList as setRemoveBgImages } from '../../../store/slices/generation/removeBgSlice';
@@ -22,7 +22,7 @@ import { RootState } from '../../../store/store';
 const Txt2ImgLayout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { params, isLoading } = useSelector((state: RootState) => state.txt2Img);
+  const { params, isLoading, output } = useSelector((state: RootState) => state.txt2Img);
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useTxt2ImgParams();
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
@@ -62,10 +62,14 @@ const Txt2ImgLayout = () => {
 
     try {
       dispatch(setIsLoading(true));
-      const response = await postTxt2ImgGeneration('remote', data);
-      dispatch(setIsLoading(true));
+      await postTxt2ImgGeneration('remote', data);
+      dispatch(setIsLoading(false));
     } catch (error) {
-      message.error('Error generating image:', error);
+      if (error instanceof Error) {
+        message.error(`Error generating image: ${error.message}`);
+      } else {
+        message.error('An unknown error occurred');
+      }
       dispatch(setIsLoading(false));
     }
   };
@@ -74,11 +78,11 @@ const Txt2ImgLayout = () => {
     if (allSelected) {
       setSelectedImages([]);
     } else {
-      setSelectedImages(outputImgUrls);
+      setSelectedImages(output.outputImgs);
     }
     setAllSelected(!allSelected);
     setIsIconFilled(!isIconFilled);
-  }, [allSelected, outputImgUrls]);
+  }, [allSelected, output.outputImgs]);
 
   const handleDownloadImages = async () => {
     if (selectedImages.length === 0) {
