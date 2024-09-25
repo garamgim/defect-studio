@@ -1,27 +1,28 @@
 import { TokenUsage, UseType } from '@/types/statistics'; // Response Type
-
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
+  TimeScale,
   PointElement,
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ChartOptions
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import 'chartjs-adapter-date-fns';
 import { backgroundColorList } from '../../common/constance';
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale);
 
 interface MemberTokenUsageGraphProps {
   data: TokenUsage[];
 }
 
-const options = {
+const options: ChartOptions<'line'> = {
   spanGaps: true, // null 데이터가 있어도 선을 연결
   responsive: true, // 반응형
-  grouped: true, // x축 값이 같은 것끼리 묶일지의 여부.
   interaction: {
     intersect: true // 정확한 위치에 hover 해야 데이터 표시
   },
@@ -30,11 +31,17 @@ const options = {
       grid: {
         display: false // y축 그리드 제거
       }
-    }
-  },
-  elements: {
-    line: {
-      spanGaps: true // null 데이터가 있어도 선을 연결
+    },
+    x: {
+      type: 'time' as const, // 시간으로 고정
+      time: {
+        unit: 'day' // 단위
+      },
+      title: {
+        // 제목
+        display: true,
+        text: 'Date'
+      }
     }
   }
 };
