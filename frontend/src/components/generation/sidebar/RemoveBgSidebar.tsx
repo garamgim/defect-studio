@@ -2,15 +2,8 @@ import UploadImage from '../params/UploadImgParams';
 import { useRemoveBgParams } from '../../../hooks/generation/useRemoveBgParams';
 
 const RemoveBgSidebar = () => {
-  const {
-    inputPath,
-    outputPath,
-    imageList,
-    handleSetInputPath,
-    handleSetOutputPath,
-    handleSetImageList,
-    handleSetMode
-  } = useRemoveBgParams();
+  const { inputPath, outputPath, imageList, updateInputPath, updateOutputPath, updateImageList, updateMode } =
+    useRemoveBgParams();
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
@@ -18,7 +11,7 @@ const RemoveBgSidebar = () => {
       const base64String = reader.result as string;
       const img = new Image();
       img.onload = () => {
-        handleSetImageList([base64String]);
+        updateImageList([base64String]);
       };
       img.src = reader.result as string;
     };
@@ -34,9 +27,9 @@ const RemoveBgSidebar = () => {
           imagePreview={imageList[0]}
           inputPath={inputPath}
           outputPath={outputPath}
-          setInputPath={handleSetInputPath}
-          setOutputPath={handleSetOutputPath}
-          setMode={handleSetMode}
+          updateInputPath={updateInputPath}
+          updateOutputPath={updateOutputPath}
+          updateMode={updateMode}
         />
       </div>
     </div>

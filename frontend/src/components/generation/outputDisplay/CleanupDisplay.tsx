@@ -2,14 +2,13 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 
 const CleanupDisplay = () => {
-  // 슬라이스에서 생성된 이미지 URL 가져오기
-  const outputImgUrls = useSelector((state: RootState) => state.cleanup.outputImgUrls);
+  const { output } = useSelector((state: RootState) => state.inpainting);
 
   return (
     <div className="h-full image-display grid gap-4 overflow-y-auto custom-scrollbar2">
-      {outputImgUrls.length > 0 ? (
+      {output.outputImgs.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mr-[16px]">
-          {outputImgUrls.map((url, index) => (
+          {output.outputImgs.map((url, index) => (
             <img
               key={index}
               src={url}
