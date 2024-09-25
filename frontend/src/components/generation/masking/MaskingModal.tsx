@@ -33,6 +33,10 @@ const MaskingModal = ({
   updateMaskImageList,
   updateCombinedImg
 }: MaskingModalProps) => {
+  // 마우스 커서 위치, RGB 값
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
+  const [rgbColor, setRgbColor] = useState<string | null>(null);
+
   const [tool, setTool] = useState<'brush' | 'polygon' | 'select' | null>(null);
   const [isMovingPoints, setIsMovingPoints] = useState(false);
   const [brushSize, setBrushSize] = useState<number>(10);
@@ -319,22 +323,44 @@ const MaskingModal = ({
   };
 
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    const stage = e.target.getStage();
+    if (!stage) return;
+
+    const pos = stage.getPointerPosition();
+    if (!pos) return;
+
+    setMousePosition(pos);
+
+    // 브러시 도구가 활성화되고 드로잉 중인 경우
     if (tool === 'brush' && isDrawing.current) {
-      const stage = e.target.getStage();
-      if (!stage) return;
-
-      const pos = getRelativePointerPosition(stage);
-      if (!pos) return;
-
       const lastObject = objects[objects.length - 1];
       lastObject.points = lastObject.points.concat([pos.x, pos.y]);
       setObjects([...objects.slice(0, objects.length - 1), lastObject]);
     }
 
+    // 마우스 커서에 브러시 크기만큼 원을 표시
     if (tool === 'brush') {
-      const pos = getRelativePointerPosition(stageRef.current);
-      if (pos) {
-        setCursorPosition(pos);
+      setCursorPosition(pos); // 브러시 크기 원을 표시할 위치 설정
+    }
+
+    // 배경 이미지의 RGB 색상 값 얻기
+    const imageNode = stage.findOne((node: Konva.Node) => node instanceof Konva.Image) as Konva.Image;
+    if (imageNode) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) return;
+
+      // 배경 이미지가 로드되어 있으면 drawImage 수행
+      const imgSource = imageNode.image();
+      if (imgSource) {
+        canvas.width = imageNode.width();
+        canvas.height = imageNode.height();
+
+        context.drawImage(imgSource, 0, 0);
+        const imageData = context.getImageData(Math.floor(pos.x), Math.floor(pos.y), 1, 1).data;
+        const rgb = `rgb(${imageData[0]}, ${imageData[1]}, ${imageData[2]})`;
+
+        setRgbColor(rgb);
       }
     }
   };
@@ -438,6 +464,14 @@ const MaskingModal = ({
       width="100%"
       className="max-w-screen-sm w-full md:max-w-screen-md lg:max-w-screen-lg"
     >
+      <div>
+        {mousePosition && (
+          <p>
+            Mouse Position: X: {mousePosition.x}, Y: {mousePosition.y}
+          </p>
+        )}
+        {rgbColor && <p>RGB: {rgbColor}</p>}
+      </div>
       <div className="flex flex-col h-full w-full justify-center">
         <div className="flex justify-center items-center w-full h-[80%]">
           <Stage
