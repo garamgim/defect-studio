@@ -12,7 +12,7 @@ interface Img2ImgState extends Omit<SnakeToCamel<Img2ImgParams>, 'imageList'> {
 
   // skeleton ui에 이용
   isLoading: boolean;
-  uploadImgsCount: number;
+  generatedImgsCnt: number;
 }
 
 const initialState: Img2ImgState = {

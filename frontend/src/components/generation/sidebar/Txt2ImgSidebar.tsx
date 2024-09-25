@@ -15,33 +15,7 @@ import { resetState } from '../../../store/slices/generation/txt2ImgSlice';
 import { useDispatch } from 'react-redux';
 
 const Sidebar = () => {
-  const {
-    width,
-    height,
-    guidanceScale,
-    numInferenceSteps,
-    seed,
-    isRandomSeed,
-    model,
-    scheduler,
-    batchCount,
-    batchSize,
-    prompt,
-    negativePrompt,
-    handleSetWidth,
-    handleSetHeight,
-    handleSetBatchCount,
-    handleSetGuidanceScale,
-    handleSetNumInferenceSteps,
-    handleSetSeed,
-    handleSetIsRandomSeed,
-    handleSetModel,
-    handleSetScheduler,
-    handleSetPrompt,
-    handleSetNegativePrompt,
-    handleSetBatchSize
-  } = useTxt2ImgParams();
-
+  
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
   const [isCreatePresetOpen, setIsCreatePresetOpen] = useState(false);

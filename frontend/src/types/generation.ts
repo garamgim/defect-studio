@@ -1,3 +1,44 @@
+// 상태 관리
+export interface ModelParams {
+  model: string;
+}
+export interface BatchParams {
+  batchCount: number;
+  batchSize: number;
+}
+export interface ImgDimensionParams {
+  width: number;
+  height: number;
+}
+export interface GuidanceParams {
+  guidanceScale: number;
+}
+export interface PromptParams {
+  prompt: string;
+  isNegativePrompt: boolean;
+  negativePrompt: string;
+}
+export interface SamplingParams {
+  scheduler: string;
+  numInferenceSteps: number;
+}
+export interface SeedParams {
+  isRandomSeed: boolean;
+  seed: number;
+}
+export interface StrengthParams {
+  strength: number;
+}
+export interface UploadImgParams {
+  mode: string;
+  inputPath: string;
+  outputPath: string;
+}
+export interface uploadImgWithMaskingParams extends UploadImgParams {
+  maskInputPath: string;
+}
+
+// API 통신
 export interface Txt2ImgDataType {
   gpu_env: 'local' | 'remote';
   data: Txt2ImgParams;

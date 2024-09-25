@@ -6,8 +6,12 @@ interface RemoveBgState extends Omit<SnakeToCamel<RemoveBgParams>, 'imageList'> 
   mode: 'manual' | 'batch';
   imageList: string[];
 
-  outputImgUrls: string[];
-  isLoading: boolean;
+  output: {
+    isLoading: boolean;
+    firstProcessedImg: string | null;
+    imgsCount: number;
+  };
+  // outputImgUrls: string[];
 }
 
 const initialState: RemoveBgState = {
@@ -15,9 +19,15 @@ const initialState: RemoveBgState = {
   imageList: [],
   inputPath: '',
   outputPath: '',
-  outputImgUrls: [],
 
-  isLoading: false
+  output: {
+    isLoading: false,
+    firstProcessedImg: null,
+    imgsCount: 0
+  }
+
+  // outputImgUrls: [],
+  // isLoading: false
 };
 
 const removeBgSlice = createSlice({
@@ -36,16 +46,27 @@ const removeBgSlice = createSlice({
     setOutputPath: (state, action: PayloadAction<string>) => {
       state.outputPath = action.payload;
     },
-    setOutputImgUrls: (state, action: PayloadAction<string[]>) => {
-      state.outputImgUrls = action.payload;
-    },
+
     setIsLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
+      state.output.isLoading = action.payload;
+    },
+    setFirstProcessedImg: (state, action: PayloadAction<string | null>) => {
+      state.output.firstProcessedImg = action.payload;
+    },
+    setImgsCount: (state, action: PayloadAction<number>) => {
+      state.output.imgsCount = action.payload;
     }
+
+    // setOutputImgUrls: (state, action: PayloadAction<string[]>) => {
+    //   state.outputImgUrls = action.payload;
+    // },
+    // setIsLoading: (state, action: PayloadAction<boolean>) => {
+    //   state.isLoading = action.payload;
+    // }
   }
 });
 
-export const { setImageList, setInputPath, setOutputPath, setOutputImgUrls, setMode, setIsLoading } =
+export const { setImageList, setInputPath, setOutputPath, setFirstProcessedImg, setMode, setIsLoading } =
   removeBgSlice.actions;
 
 export default removeBgSlice.reducer;
