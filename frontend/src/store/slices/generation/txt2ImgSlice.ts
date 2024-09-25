@@ -1,28 +1,28 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
-  ModelParams,
-  BatchParams,
-  ImgDimensionParams,
-  GuidanceParams,
-  PromptParams,
-  SamplingParams,
-  SeedParams
+  ModelParamsType,
+  BatchParamsType,
+  ImgDimensionParamsType,
+  GuidanceParamsType,
+  PromptParamsType,
+  SamplingParamsType,
+  SeedParamsType
 } from '../../../types/generation';
 
 export interface Txt2ImgState {
   params: {
-    modelParams: ModelParams;
-    batchParams: BatchParams;
-    imgDimensionParams: ImgDimensionParams;
-    guidanceParams: GuidanceParams;
-    promptParams: PromptParams;
-    samplingParams: SamplingParams;
-    seedParams: SeedParams;
+    modelParams: ModelParamsType;
+    batchParams: BatchParamsType;
+    imgDimensionParams: ImgDimensionParamsType;
+    guidanceParams: GuidanceParamsType;
+    promptParams: PromptParamsType;
+    samplingParams: SamplingParamsType;
+    seedParams: SeedParamsType;
   };
   isLoading: boolean;
   output: {
-    outputPath: string;
     processedImgsCnt: number;
+    outputImgs: string[];
     firstProcessedImg: string | null;
   };
 }
@@ -59,8 +59,8 @@ const initialState: Txt2ImgState = {
   },
   isLoading: false,
   output: {
-    outputPath: '',
     processedImgsCnt: 0,
+    outputImgs: [],
     firstProcessedImg: null
   }
 };
@@ -89,7 +89,7 @@ const txt2ImgSlice = createSlice({
     setSamplingParams: (state, action: PayloadAction<{ scheduler: string; numInferenceSteps: number }>) => {
       state.params.samplingParams = action.payload;
     },
-    setGuidancetParams: (state, action: PayloadAction<number>) => {
+    setGuidanceParams: (state, action: PayloadAction<number>) => {
       state.params.guidanceParams.guidanceScale = action.payload;
     },
     setImgDimensionParams: (state, action: PayloadAction<{ width: number; height: number }>) => {
@@ -106,14 +106,14 @@ const txt2ImgSlice = createSlice({
       state.isLoading = action.payload;
     },
 
-    setOutputPath: (state, action: PayloadAction<string>) => {
-      state.output.outputPath = action.payload;
-    },
     setProcessedImgsCount: (state, action: PayloadAction<number>) => {
       state.output.processedImgsCnt = action.payload;
     },
     setFirstProcessedImg: (state, action: PayloadAction<string | null>) => {
       state.output.firstProcessedImg = action.payload;
+    },
+    setOutputImgs: (state, action: PayloadAction<string[]>) => {
+      state.output.outputImgs = action.payload;
     },
 
     // params 초기화
@@ -129,14 +129,14 @@ export const {
   setIsNegativePrompt,
   setModelParams,
   setSamplingParams,
-  setGuidancetParams,
+  setGuidanceParams,
   setImgDimensionParams,
   setSeedParams,
   setBatchParams,
   setIsLoading,
-  setOutputPath,
   setProcessedImgsCount,
   setFirstProcessedImg,
+  setOutputImgs,
   resetState
 } = txt2ImgSlice.actions;
 

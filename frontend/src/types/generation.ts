@@ -1,40 +1,40 @@
 // 상태 관리
-export interface ModelParams {
+export interface ModelParamsType {
   model: string;
 }
-export interface BatchParams {
+export interface BatchParamsType {
   batchCount: number;
   batchSize: number;
 }
-export interface ImgDimensionParams {
+export interface ImgDimensionParamsType {
   width: number;
   height: number;
 }
-export interface GuidanceParams {
+export interface GuidanceParamsType {
   guidanceScale: number;
 }
-export interface PromptParams {
+export interface PromptParamsType {
   prompt: string;
   isNegativePrompt: boolean;
   negativePrompt: string;
 }
-export interface SamplingParams {
+export interface SamplingParamsType {
   scheduler: string;
   numInferenceSteps: number;
 }
-export interface SeedParams {
+export interface SeedParamsType {
   isRandomSeed: boolean;
   seed: number;
 }
-export interface StrengthParams {
+export interface StrengthParamsType {
   strength: number;
 }
-export interface UploadImgParams {
+export interface UploadImgParamsType {
   mode: string;
   inputPath: string;
   outputPath: string;
 }
-export interface uploadImgWithMaskingParams extends UploadImgParams {
+export interface uploadImgWithMaskingParamsType extends UploadImgParamsType {
   maskInputPath: string;
 }
 

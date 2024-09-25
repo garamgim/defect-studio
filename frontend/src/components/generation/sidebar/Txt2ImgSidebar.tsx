@@ -8,14 +8,33 @@ import SeedParam from '../params/SeedParam';
 import SamplingParams from '../params/SamplingParams';
 import BatchParams from '../params/BatchParams';
 import { FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
-import { useTxt2ImgParams } from '../../../hooks/generation/useTxt2ImgParams';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import { resetState } from '../../../store/slices/generation/txt2ImgSlice';
-import { useDispatch } from 'react-redux';
+import { useTxt2ImgParams } from '../../../hooks/generation/useTxt2ImgParams';
 
 const Sidebar = () => {
-  
+  const dispatch = useDispatch();
+
+  // useSelector와 useCallback으로 처리하는 부분을 커스텀 훅으로 분리
+  const {
+    modelParams,
+    samplingParams,
+    guidanceParams,
+    imgDimensionParams,
+    seedParams,
+    batchParams,
+    prompt,
+    negativePrompt,
+    updateModelParams,
+    updateSamplingParams,
+    updateSeedParams,
+    updateGuidanceParams,
+    updateImgDimensionParams,
+    updateBatchParams
+  } = useTxt2ImgParams();
+
+  // 사용자 레벨에 따라서 보이는 컴포넌트 구분
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
   const [isCreatePresetOpen, setIsCreatePresetOpen] = useState(false);
@@ -37,7 +56,6 @@ const Sidebar = () => {
     setIsLoadPresetOpen(false);
   }, []);
 
-  const dispatch = useDispatch();
   const handleReset = () => {
     dispatch(resetState());
   };
@@ -64,47 +82,35 @@ const Sidebar = () => {
         )}
 
         {/* 모델 파라미터 */}
-        <ModelParam model={model} setModel={handleSetModel} />
+        <ModelParam modelParams={modelParams} updateModelParams={updateModelParams} />
 
         {level === 'Advanced' && (
           <>
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 이미지 크기 파라미터 */}
-            <ImgDimensionParams width={width} height={height} setWidth={handleSetWidth} setHeight={handleSetHeight} />
+            <ImgDimensionParams
+              imgDimensionParams={imgDimensionParams}
+              updateImgDimensionParams={updateImgDimensionParams}
+            />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 샘플링 세팅 파라미터 */}
-            <SamplingParams
-              scheduler={scheduler}
-              numInferenceSteps={numInferenceSteps}
-              setNumInferenceSteps={handleSetNumInferenceSteps}
-              setScheduler={handleSetScheduler}
-            />
+            <SamplingParams samplingParams={samplingParams} updateSamplingParams={updateSamplingParams} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 초기 이미지에서의 변화 세팅 */}
-            <GuidanceScaleParams guidanceScale={guidanceScale} setGuidanceScale={handleSetGuidanceScale} />
+            <GuidanceScaleParams guidanceParams={guidanceParams} updateGuidanceParams={updateGuidanceParams} />
 
             {/* 이미지 재현 & 다양성 세팅 */}
-            <SeedParam
-              seed={seed}
-              setSeed={handleSetSeed}
-              isRandomSeed={isRandomSeed}
-              handleRandomSeedChange={handleSetIsRandomSeed}
-            />
+            <SeedParam seedParams={seedParams} updateSeedParams={updateSeedParams} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 배치 세팅 */}
-            <BatchParams
-              batchCount={batchCount}
-              batchSize={batchSize}
-              setBatchCount={handleSetBatchCount}
-              setBatchSize={handleSetBatchSize}
-            />
+            <BatchParams batchParams={batchParams} updateBatchParams={updateBatchParams} />
           </>
         )}
       </div>
