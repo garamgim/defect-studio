@@ -17,6 +17,7 @@ const PersonStatisticSection = ({ member_id }: PersonStatisticSectionProps) => {
   ];
   return (
     <div>
+      <p>Displays only information about you, regardless of department selection.</p>
       <Tabs items={items} defaultActiveKey="ImageUage" />
     </div>
   );
