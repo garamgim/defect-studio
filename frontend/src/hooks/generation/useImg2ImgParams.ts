@@ -21,6 +21,7 @@ import { useCallback } from 'react';
 
 export const useImg2ImgParams = () => {
   const dispatch = useDispatch();
+  // 리렌더링 고려 (컴포넌트별 호출)
   const modelParams = useSelector((state: RootState) => state.img2Img.params.modelParams);
   const strengthParams = useSelector((state: RootState) => state.img2Img.params.strengthParams);
   const samplingParams = useSelector((state: RootState) => state.img2Img.params.samplingParams);
@@ -29,12 +30,12 @@ export const useImg2ImgParams = () => {
   const seedParams = useSelector((state: RootState) => state.img2Img.params.seedParams);
   const batchParams = useSelector((state: RootState) => state.img2Img.params.batchParams);
 
-  // prompt는 자주 변경되기 때문에 따로 개별 구독
+  // prompt는 자주 변경되기 때문에 따로 개별 호출
   const prompt = useSelector((state: RootState) => state.img2Img.params.promptParams.prompt);
   const isNegativePrompt = useSelector((state: RootState) => state.img2Img.params.promptParams.isNegativePrompt);
   const negativePrompt = useSelector((state: RootState) => state.img2Img.params.promptParams.negativePrompt);
 
-  // uploadImgParams도 자주 변경될 수 있으므로 따로 개별 구독
+  // uploadImgParams도 자주 변경될 수 있으므로 따로 개별 호출
   const mode = useSelector((state: RootState) => state.img2Img.params.uploadImgParams.mode);
   const clipData = useSelector((state: RootState) => state.img2Img.params.uploadImgParams.clipData);
   const imageList = useSelector((state: RootState) => state.img2Img.params.uploadImgParams.imageList);

@@ -15,6 +15,7 @@ import {
 
 export const useTxt2ImgParams = () => {
   const dispatch = useDispatch();
+  // 리렌더링 고려 (컴포넌트별 호출)
   const modelParams = useSelector((state: RootState) => state.txt2Img.params.modelParams);
   const samplingParams = useSelector((state: RootState) => state.txt2Img.params.samplingParams);
   const guidanceParams = useSelector((state: RootState) => state.txt2Img.params.guidanceParams);
@@ -22,7 +23,7 @@ export const useTxt2ImgParams = () => {
   const seedParams = useSelector((state: RootState) => state.txt2Img.params.seedParams);
   const batchParams = useSelector((state: RootState) => state.txt2Img.params.batchParams);
 
-  // prompt는 자주 변경되기 때문에 따로 개별 구독
+  // prompt는 자주 변경되기 때문에 따로 개별 호출
   const prompt = useSelector((state: RootState) => state.txt2Img.params.promptParams.prompt);
   const isNegativePrompt = useSelector((state: RootState) => state.txt2Img.params.promptParams.isNegativePrompt);
   const negativePrompt = useSelector((state: RootState) => state.txt2Img.params.promptParams.negativePrompt);

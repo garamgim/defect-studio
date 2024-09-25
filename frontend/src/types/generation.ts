@@ -36,8 +36,11 @@ export interface UploadImgParamsType {
   inputPath: string;
   outputPath: string;
 }
-export interface uploadImgWithMaskingParamsType extends UploadImgParamsType {
+export interface UploadImgWithMaskingParamsType extends Omit<UploadImgParamsType, 'imageList'> {
+  initImageList: string[];
+  maskImageList: string[];
   maskInputPath: string;
+  combinedImg: string | null;
 }
 
 // API 통신
