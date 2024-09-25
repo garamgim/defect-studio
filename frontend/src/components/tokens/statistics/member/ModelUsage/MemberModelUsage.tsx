@@ -17,7 +17,10 @@ const MemberModelUsage = ({ member_id }: MemberModelUsageProps) => {
   >({
     queryKey: ['ModelUsage', 'person', member_id],
     queryFn: () => getModelFrequency(member_id),
-    select: (response) => response.data,
+    select: (response) =>
+      response.data.filter((item) => {
+        return !!item.model && item.model.length > 0 && item.usage > 0;
+      }),
     staleTime: 1000 * 60 * 30, // 유효 시간 : 30분
     gcTime: 1000 * 60 * 60 // 가비지 컬렉터 시간 : 1시간
   });
