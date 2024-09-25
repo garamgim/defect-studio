@@ -2,7 +2,7 @@ import { DailyImageCount } from '@/types/statistics'; // Resoponse Data Type
 import { getDailyImageCount } from '@api/statistic_person'; // API Function
 import { useQuery } from '@tanstack/react-query'; // React Query
 import { AxiosResponse } from 'axios'; // Axios Response Type
-import MemberImageUsageGraph from './MemberImageUsageGraph';
+import MemberImageUsageGraph from './MeberImageUsageGraph';
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import DateUnitSelect from '../../common/DateUnitSelect';
@@ -26,9 +26,9 @@ const MemberImageUsage = ({ member_id }: MemberImageUsageProps) => {
         ...item,
         create_date:
           dateUnit === 'day' ? dayjs(item.create_date).format('YYYY-MM-DD') : dayjs(item.create_date).format('YYYY-MM')
-      })),
-    staleTime: 1000 * 60 * 30, // 유효 시간 : 30분
-    gcTime: 1000 * 60 * 60 // 가비지 컬렉터 시간 : 1시간
+      }))
+    // staleTime: 1000 * 60 * 30, // 유효 시간 : 30분
+    // gcTime: 1000 * 60 * 60 // 가비지 컬렉터 시간 : 1시간
   });
 
   return (

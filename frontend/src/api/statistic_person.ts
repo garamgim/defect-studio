@@ -78,7 +78,7 @@ export const getTokenUsage = async (
   if (duration?.end_date) queryString.end_date = duration.end_date;
 
   try {
-    const response = await axiosInstance.get<TokenUsage[]>(`/members/${member_id}/statistics/tokens`, {
+    const response = await axiosInstance.get<TokenUsage[]>(`/members/${member_id}/statistics/tokens/usage`, {
       params: queryString
     });
     return response;

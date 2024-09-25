@@ -30,7 +30,7 @@ export interface ModelFrequency {
 
 // 토큰 실제 사용 현황
 export interface TokenUsage {
-  use_date: string;
+  usage_date: string;
   use_type: UseType;
   token_quantity: number;
 }
