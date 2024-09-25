@@ -1,7 +1,7 @@
 // 통계와 관련된 모든 Type 정의
 
 // 도구 목록
-export type UseType = 'text_to_image' | 'remove_background' | 'clip' | 'clean_up' | 'image_to_image';
+export type UseType = 'text_to_image' | 'remove_background' | 'inpainting' | 'clip' | 'clean_up' | 'image_to_image';
 // 날짜 구간 검색
 export interface durationSearchProps {
   start_date?: string;
