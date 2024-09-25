@@ -22,7 +22,7 @@ export interface Txt2ImgState {
   isLoading: boolean;
   output: {
     processedImgsCnt: number;
-    outputImgs: string[];
+    outputImgs: string[]; // api 수정되면 제거할 예정
     firstProcessedImg: string | null;
   };
 }
@@ -102,10 +102,11 @@ const txt2ImgSlice = createSlice({
       state.params.batchParams = action.payload;
     },
 
+    // 이미지 생성 체크를 위한 로딩
     setIsLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
-
+    // output
     setProcessedImgsCount: (state, action: PayloadAction<number>) => {
       state.output.processedImgsCnt = action.payload;
     },

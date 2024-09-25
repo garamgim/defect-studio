@@ -1,246 +1,160 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
 import {
-  setWidth,
-  setHeight,
-  setBatchCount,
-  setGuidanceScale,
-  setNumInferenceSteps,
-  setSeed,
-  setIsRandomSeed,
-  setModel,
-  setScheduler,
+  setModelParams,
+  setSamplingParams,
+  setGuidanceParams,
+  setImgDimensionParams,
+  setBatchParams,
   setPrompt,
-  setNegativePrompt,
-  setBatchSize,
   setIsNegativePrompt,
-  setOutputImgUrls,
-  setIsLoading,
-  setImageList,
-  setStrength,
-  setInputPath,
-  setOutputPath,
+  setNegativePrompt,
+  setSeedParams,
   setMode,
-  setClipData
+  setClipData,
+  setImageList,
+  setInputPath,
+  setOutputPath
 } from '../../store/slices/generation/img2ImgSlice';
 import { useCallback } from 'react';
 
 export const useImg2ImgParams = () => {
   const dispatch = useDispatch();
+  const modelParams = useSelector((state: RootState) => state.img2Img.params.modelParams);
+  const samplingParams = useSelector((state: RootState) => state.img2Img.params.samplingParams);
+  const guidanceParams = useSelector((state: RootState) => state.img2Img.params.guidanceParams);
+  const imgDimensionParams = useSelector((state: RootState) => state.img2Img.params.imgDimensionParams);
+  const seedParams = useSelector((state: RootState) => state.img2Img.params.seedParams);
+  const batchParams = useSelector((state: RootState) => state.img2Img.params.batchParams);
 
-  // 상태값들 가져오기 (성능 최적화를 위해 따로따로 불러옴- 리렌더링 방지)
-  const width = useSelector((state: RootState) => state.img2Img.width);
-  const height = useSelector((state: RootState) => state.img2Img.height);
-  const guidanceScale = useSelector((state: RootState) => state.img2Img.guidanceScale);
-  const numInferenceSteps = useSelector((state: RootState) => state.img2Img.numInferenceSteps);
-  const seed = useSelector((state: RootState) => state.img2Img.seed);
-  const isRandomSeed = useSelector((state: RootState) => state.img2Img.isRandomSeed);
-  const model = useSelector((state: RootState) => state.img2Img.model);
-  const scheduler = useSelector((state: RootState) => state.img2Img.scheduler);
-  const batchCount = useSelector((state: RootState) => state.img2Img.batchCount);
-  const batchSize = useSelector((state: RootState) => state.img2Img.batchSize);
-  const prompt = useSelector((state: RootState) => state.img2Img.prompt);
-  const negativePrompt = useSelector((state: RootState) => state.img2Img.negativePrompt);
-  const isNegativePrompt = useSelector((state: RootState) => state.img2Img.isNegativePrompt);
-  const outputPath = useSelector((state: RootState) => state.img2Img.outputPath);
-  const isLoading = useSelector((state: RootState) => state.img2Img.isLoading);
-  const outputImgUrls = useSelector((state: RootState) => state.img2Img.outputImgUrls);
-  const imageList = useSelector((state: RootState) => state.img2Img.imageList);
-  const strength = useSelector((state: RootState) => state.img2Img.strength);
-  const inputPath = useSelector((state: RootState) => state.img2Img.inputPath);
-  const mode = useSelector((state: RootState) => state.img2Img.mode);
-  const clipData = useSelector((state: RootState) => state.img2Img.clipData);
+  // prompt는 자주 변경되기 때문에 따로 개별 구독
+  const prompt = useSelector((state: RootState) => state.img2Img.params.promptParams.prompt);
+  const isNegativePrompt = useSelector((state: RootState) => state.img2Img.params.promptParams.isNegativePrompt);
+  const negativePrompt = useSelector((state: RootState) => state.img2Img.params.promptParams.negativePrompt);
 
-  // 상태 업데이트 함수
-  const handleSetWidth = useCallback(
-    (value: number) => {
-      dispatch(setWidth(value));
+  // uploadImgParams도 자주 변경될 수 있으므로 따로 개별 구독
+  const mode = useSelector((state: RootState) => state.img2Img.params.uploadImgParams.mode);
+  const clipData = useSelector((state: RootState) => state.img2Img.params.uploadImgParams.clipData);
+  const imageList = useSelector((state: RootState) => state.img2Img.params.uploadImgParams.imageList);
+  const inputPath = useSelector((state: RootState) => state.img2Img.params.uploadImgParams.inputPath);
+  const outputPath = useSelector((state: RootState) => state.img2Img.params.uploadImgParams.outputPath);
+
+  // params 업데이트 함수들
+  const updateModelParams = useCallback(
+    (model: string) => {
+      dispatch(setModelParams(model));
+    },
+    [dispatch]
+  );
+  const updateSamplingParams = useCallback(
+    (scheduler: string, numInferenceSteps: number) => {
+      dispatch(setSamplingParams({ scheduler, numInferenceSteps }));
+    },
+    [dispatch]
+  );
+  const updateGuidanceParams = useCallback(
+    (guidanceScale: number) => {
+      dispatch(setGuidanceParams(guidanceScale));
+    },
+    [dispatch]
+  );
+  const updateImgDimensionParams = useCallback(
+    (width: number, height: number) => {
+      dispatch(setImgDimensionParams({ width, height }));
+    },
+    [dispatch]
+  );
+  const updateSeedParams = useCallback(
+    (seed: number, isRandomSeed: boolean) => {
+      dispatch(setSeedParams({ seed, isRandomSeed }));
+    },
+    [dispatch]
+  );
+  const updateBatchParams = useCallback(
+    (batchCount: number, batchSize: number) => {
+      dispatch(setBatchParams({ batchCount, batchSize }));
     },
     [dispatch]
   );
 
-  const handleSetHeight = useCallback(
-    (value: number) => {
-      dispatch(setHeight(value));
+  const updatePrompt = useCallback(
+    (prompt: string) => {
+      dispatch(setPrompt(prompt));
+    },
+    [dispatch]
+  );
+  const updateIsNegativePrompt = useCallback(
+    (isNegativePrompt: boolean) => {
+      dispatch(setIsNegativePrompt(isNegativePrompt));
+    },
+    [dispatch]
+  );
+  const updateNegativePrompt = useCallback(
+    (negativePRompt: string) => {
+      dispatch(setNegativePrompt(negativePRompt));
     },
     [dispatch]
   );
 
-  const handleSetBatchCount = useCallback(
-    (value: number) => {
-      dispatch(setBatchCount(value));
+  const updateMode = useCallback(
+    (mode: 'manual' | 'batch') => {
+      dispatch(setMode(mode));
     },
     [dispatch]
   );
-
-  const handleSetGuidanceScale = useCallback(
-    (value: number) => {
-      dispatch(setGuidanceScale(value));
+  const updateClipData = useCallback(
+    (clipData: string[]) => {
+      dispatch(setClipData(clipData));
     },
     [dispatch]
   );
-
-  const handleSetNumInferenceSteps = useCallback(
-    (value: number) => {
-      dispatch(setNumInferenceSteps(value));
+  const updateImageList = useCallback(
+    (imageList: string[]) => {
+      dispatch(setImageList(imageList));
     },
     [dispatch]
   );
-
-  const handleSetSeed = useCallback(
-    (value: number) => {
-      dispatch(setSeed(value));
+  const updateInputPath = useCallback(
+    (inputPath: string) => {
+      dispatch(setInputPath(inputPath));
     },
     [dispatch]
   );
-
-  const handleSetIsRandomSeed = useCallback(
-    (value: boolean) => {
-      dispatch(setIsRandomSeed(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetModel = useCallback(
-    (value: string) => {
-      dispatch(setModel(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetScheduler = useCallback(
-    (value: string) => {
-      dispatch(setScheduler(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetPrompt = useCallback(
-    (value: string) => {
-      dispatch(setPrompt(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetNegativePrompt = useCallback(
-    (value: string) => {
-      dispatch(setNegativePrompt(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetIsNegativePrompt = useCallback(
-    (value: boolean) => {
-      dispatch(setIsNegativePrompt(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetOutputImgUrls = useCallback(
-    (value: string[]) => {
-      dispatch(setOutputImgUrls(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetImageList = useCallback(
-    (value: string[]) => {
-      dispatch(setImageList(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetBatchSize = useCallback(
-    (value: number) => {
-      dispatch(setBatchSize(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetIsLoading = useCallback(
-    (value: boolean) => {
-      dispatch(setIsLoading(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetInputPath = useCallback(
-    (value: string) => {
-      dispatch(setInputPath(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetOutputPath = useCallback(
-    (value: string) => {
-      dispatch(setOutputPath(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetMode = useCallback(
-    (value: 'manual' | 'batch') => {
-      dispatch(setMode(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetClipData = useCallback(
-    (value: string[]) => {
-      dispatch(setClipData(value));
-    },
-    [dispatch]
-  );
-
-  const handleSetStrength = useCallback(
-    (value: number) => {
-      dispatch(setStrength(value));
+  const updateOutputPath = useCallback(
+    (outputPath: string) => {
+      dispatch(setOutputPath(outputPath));
     },
     [dispatch]
   );
 
   return {
-    width,
-    height,
-    guidanceScale,
-    numInferenceSteps,
-    seed,
-    isRandomSeed,
-    model,
-    scheduler,
-    batchCount,
-    batchSize,
+    modelParams,
+    samplingParams,
+    guidanceParams,
+    imgDimensionParams,
+    seedParams,
+    batchParams,
     prompt,
-    negativePrompt,
     isNegativePrompt,
-    outputPath,
-    isLoading,
-    outputImgUrls,
-    imageList,
-    strength,
-    inputPath,
+    negativePrompt,
     mode,
     clipData,
-    handleSetStrength,
-    handleSetWidth,
-    handleSetHeight,
-    handleSetGuidanceScale,
-    handleSetNumInferenceSteps,
-    handleSetSeed,
-    handleSetIsRandomSeed,
-    handleSetModel,
-    handleSetScheduler,
-    handleSetPrompt,
-    handleSetNegativePrompt,
-    handleSetBatchCount,
-    handleSetBatchSize,
-    handleSetIsNegativePrompt,
-    handleSetOutputImgUrls,
-    handleSetImageList,
-    handleSetIsLoading,
-    handleSetInputPath,
-    handleSetOutputPath,
-    handleSetMode,
-    handleSetClipData
+    imageList,
+    inputPath,
+    outputPath,
+    updateModelParams,
+    updateSamplingParams,
+    updateSeedParams,
+    updateGuidanceParams,
+    updateImgDimensionParams,
+    updateBatchParams,
+    updatePrompt,
+    updateIsNegativePrompt,
+    updateNegativePrompt,
+    updateMode,
+    updateClipData,
+    updateImageList,
+    updateInputPath,
+    updateOutputPath
   };
 };

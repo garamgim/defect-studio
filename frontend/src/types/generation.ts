@@ -30,7 +30,9 @@ export interface StrengthParamsType {
   strength: number;
 }
 export interface UploadImgParamsType {
-  mode: string;
+  mode: 'manual' | 'batch';
+  clipData: string[];
+  imageList: string[];
   inputPath: string;
   outputPath: string;
 }
