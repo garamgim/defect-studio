@@ -19,7 +19,7 @@ const MemberImageUsage = ({ member_id }: MemberImageUsageProps) => {
     DailyImageCount[],
     (string | number)[]
   >({
-    queryKey: ['dailyImageCount', member_id],
+    queryKey: ['dailyImageCount', 'person', member_id],
     queryFn: () => getDailyImageCount(member_id),
     select: (response) =>
       response.data.map((item) => ({
@@ -32,7 +32,7 @@ const MemberImageUsage = ({ member_id }: MemberImageUsageProps) => {
   });
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col text-black dark:text-white">
       <section className="flex flex-row justify-end">
         <DateUnitSelect dateUnit={dateUnit} setDateUnit={setDateUnit} />
       </section>
