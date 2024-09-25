@@ -1,21 +1,20 @@
 import { ToolFrequency } from '@/types/statistics';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement
-} from 'chart.js';
-import { Bar } from 'react-chartjs-2';
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, BarElement);
+import { Chart as ChartJS, ArcElement, Title, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
+ChartJS.register(ArcElement, Title, Tooltip, Legend);
 
 interface MemberToolUsageGraphProps {
   data: ToolFrequency[];
 }
+
+const backgroundColorList = [
+  'rgb(255, 99, 132)',
+  'rgb(54, 162, 235)',
+  'rgb(255, 205, 86)',
+  'rgb(75, 192, 192)',
+  'rgb(153, 102, 255)',
+  'rgb(255, 159, 64)'
+];
 
 const options = {
   responsive: true, // 반응형
@@ -24,20 +23,15 @@ const options = {
   },
   scales: {
     x: {
-      beginAtZero: true,
-      title: {
-        display: true,
-        text: 'Use Type' // x축 제목
+      display: false, // x축 자체를 표시하지 않음
+      grid: {
+        display: false // x축 grid 표시 안 함
       }
     },
     y: {
-      beginAtZero: true,
-      title: {
-        display: true,
-        text: 'Usage', // y축 제목
-        ticks: {
-          stepSize: 1 // y축 단위를 1로 설정
-        }
+      display: false, // y축 자체를 표시하지 않음
+      grid: {
+        display: false // y축 grid 표시 안 함
       }
     }
   }
@@ -55,14 +49,14 @@ const MemberToolUsageGraph = ({ data }: MemberToolUsageGraphProps) => {
         data: usageData,
         borderWidth: 2,
         tension: 0.1,
-        backgroundColor: 'rgb(75, 192, 192)'
+        backgroundColor: backgroundColorList
       }
     ]
   };
 
   return (
     <div className="dark:bg-white mt-3 rounded-[10px] p-2 w-full h-full">
-      <Bar options={options} data={chartData} />
+      <Doughnut options={options} data={chartData} />
     </div>
   );
 };
