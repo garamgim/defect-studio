@@ -1,50 +1,96 @@
 import axios, { AxiosResponse } from 'axios';
-import axiosInstance from './token/axiosInstance';
+import axiosInstance from '@api/token/axiosInstance';
 
-type logType = 'text_to_image' | 'image_to_image' | 'inpainting' | 'remove_background' | 'clip' | 'clean_up';
+import { DailyImageCount, ToolFrequency, ModelFrequency, TokenUsage, durationSearchProps } from '@/types/statistics';
 
-// 해당 부서 내에서 의 사람의 통계
+// 일별 이미지 수 (일별 생성한 이미지 총 수)
 
-export interface getPersonTokenRequiredData {
-  member_id: number;
-  start_date: string;
-  end_date: string;
-  use_type: logType;
-}
-
-export interface PersonTokenLogType {
-  create_date: string;
-  log_type: string;
-  use_type: string;
-  quantity: number;
-}
-
-// ----------- 개인 단위 별 요청
-
-export const getPersonTokenStatistic = async (
-  data: getPersonTokenRequiredData
-): Promise<AxiosResponse<PersonTokenLogType[]>> => {
+export const getDailyImageCount = async (member_id: number): Promise<AxiosResponse<DailyImageCount[]>> => {
   try {
-    const response = await axiosInstance.get(`/members/token-logs/use`, {
-      params: {
-        start_date: data.start_date,
-        end_date: data.end_date,
-        member_id: data.member_id,
-        use_type: data.use_type
-      }
-    });
-    console.log(response.data);
+    const response = await axiosInstance.get<DailyImageCount[]>(`/members/${member_id}/statistics/images`);
     return response;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      if (error.response?.status === 401) {
-        throw new Error('Unauthorized');
-      } else if (error.response?.status === 404) {
-        throw new Error('Not Found');
-      } else if (error.response?.status === 422) {
-        throw new Error('Unprocessable Entity');
-      } else {
-        throw new Error('Unknown Error');
+      switch (error.response?.status) {
+        case 404:
+          throw new Error('Not Found');
+        case 401:
+          throw new Error('Unauthorized');
+        default:
+          throw new Error('Unknown Error');
+      }
+    } else {
+      throw new Error('Unknown Error');
+    }
+  }
+};
+
+// 도구별(Tool별) 사용 횟수 : text_to_image, image_to_image etc..
+export const getToolFrequency = async (member_id: number): Promise<AxiosResponse<ToolFrequency[]>> => {
+  try {
+    const response = await axiosInstance.get<ToolFrequency[]>(`/members/${member_id}/statistics/tools`);
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      switch (error.response?.status) {
+        case 404:
+          throw new Error('Not Found');
+        case 401:
+          throw new Error('Unauthorized');
+        default:
+          throw new Error('Unknown Error');
+      }
+    } else {
+      throw new Error('Unknown Error');
+    }
+  }
+};
+
+// 모델별 사용 횟수
+export const getModelFrequency = async (member_id: number): Promise<AxiosResponse<ModelFrequency[]>> => {
+  try {
+    const response = await axiosInstance.get<ModelFrequency[]>(`/members/${member_id}/statistics/models`);
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      switch (error.response?.status) {
+        case 404:
+          throw new Error('Not Found');
+        case 401:
+          throw new Error('Unauthorized');
+        default:
+          throw new Error('Unknown Error');
+      }
+    } else {
+      throw new Error('Unknown Error');
+    }
+  }
+};
+
+// 토큰 사용 현황
+export const getTokenUsage = async (
+  member_id: number,
+  duration?: durationSearchProps
+): Promise<AxiosResponse<TokenUsage[]>> => {
+  // Querystring 반영, 허용 key 값은 durationSearchProps의 key 값들
+  const queryString: { [key in keyof durationSearchProps]: string } = {};
+  if (duration?.start_date) queryString.start_date = duration.start_date;
+  if (duration?.end_date) queryString.end_date = duration.end_date;
+
+  try {
+    const response = await axiosInstance.get<TokenUsage[]>(`/members/${member_id}/statistics/tokens/usage`, {
+      params: queryString
+    });
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      switch (error.response?.status) {
+        case 404:
+          throw new Error('Not Found');
+        case 401:
+          throw new Error('Unauthorized');
+        default:
+          throw new Error('Unknown Error');
       }
     } else {
       throw new Error('Unknown Error');

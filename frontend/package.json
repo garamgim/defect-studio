@@ -17,7 +17,9 @@
     "@types/react-loading-indicator": "^1.0.3",
     "antd": "^5.20.3",
     "axios": "^1.7.7",
-    "chartjs": "^0.3.24",
+    "chart.js": "^4.4.4",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "date-fns": "^4.1.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
@@ -32,10 +34,12 @@
     "react-toastify": "^10.0.5",
     "snakecase-keys": "^8.0.1",
     "styled-components": "^6.1.13",
-    "use-image": "^1.1.1"
+    "use-image": "^1.1.1",
+    "vite-tsconfig-paths": "^5.0.1"
   },
   "devDependencies": {
     "@types/electron": "^1.6.10",
+    "@types/node": "^22.6.1",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
