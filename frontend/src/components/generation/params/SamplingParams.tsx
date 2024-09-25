@@ -60,7 +60,7 @@ const SamplingParams = ({ samplingParams, updateSamplingParams }: SamplingParams
           <Row gutter={16}>
             <Col span={16}>
               <Slider
-                min={10}
+                min={1}
                 max={150}
                 value={samplingParams.numInferenceSteps}
                 onChange={(value) => handleChange('numInferenceSteps', value)}
@@ -69,7 +69,7 @@ const SamplingParams = ({ samplingParams, updateSamplingParams }: SamplingParams
             </Col>
             <Col span={8}>
               <InputNumber
-                min={10}
+                min={1}
                 max={150}
                 value={samplingParams.numInferenceSteps}
                 onChange={(value) => handleChange('numInferenceSteps', value)}

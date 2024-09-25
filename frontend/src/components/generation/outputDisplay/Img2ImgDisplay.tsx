@@ -2,16 +2,16 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 
 const Img2ImgDisplay = () => {
-  const { outputImgUrls, isLoading, width, height, uploadImgsCount } = useSelector((state: RootState) => state.img2Img);
+  const { output, params, isLoading } = useSelector((state: RootState) => state.img2Img);
 
   // 생성할 이미지 가로세로 비율 계산
-  const aspectRatio = width / height;
+  const aspectRatio = params.imgDimensionParams.width / params.imgDimensionParams.height;
 
   return (
     <div className="h-full image-display grid gap-4 overflow-y-auto custom-scrollbar2">
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mr-[16px]">
-          {Array.from({ length: uploadImgsCount }).map((_, index) => (
+          {Array.from({ length: output.processedImgsCnt }).map((_, index) => (
             <div
               key={index}
               className="relative w-full h-0"
@@ -23,9 +23,9 @@ const Img2ImgDisplay = () => {
             </div>
           ))}
         </div>
-      ) : outputImgUrls.length > 0 ? (
+      ) : output.outputImgs.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mr-[16px]">
-          {outputImgUrls.map((url, index) => (
+          {output.outputImgs.map((url, index) => (
             <div
               key={index}
               className="relative w-full h-0"

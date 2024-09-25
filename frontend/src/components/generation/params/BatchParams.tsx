@@ -23,33 +23,31 @@ const BatchParams = ({ batchParams, updateBatchParams }: BatchParamsProps) => {
       <p className="text-[14px] font-semibold text-[#222] mb-3 dark:text-gray-300">Batch Settings</p>
       <Form layout="vertical" className="space-y-4">
         <div className="flex justify-between gap-6">
-          {/* Batch count 설정 */}
-          <Form.Item label="Batch count" className="mb-0">
-            <Row gutter={16}>
-              <Col span={24}>
+          <Row gutter={16}>
+            {/* Batch count */}
+            <Col span={12}>
+              <Form.Item label="Batch count" className="mb-0">
                 <InputNumber
                   value={batchCount}
                   onChange={(value) => handleBatchChange('batchCount', value)}
                   className="w-full"
                   min={1}
                 />
-              </Col>
-            </Row>
-          </Form.Item>
+              </Form.Item>
+            </Col>
 
-          {/* Batch Size 설정 */}
-          <Form.Item label="Batch size" className="mb-0">
-            <Row gutter={16}>
-              <Col span={24}>
+            {/* Batch size */}
+            <Col span={12}>
+              <Form.Item label="Batch size" className="mb-0">
                 <InputNumber
                   value={batchSize}
                   onChange={(value) => handleBatchChange('batchSize', value)}
                   className="w-full"
                   min={1}
                 />
-              </Col>
-            </Row>
-          </Form.Item>
+              </Form.Item>
+            </Col>
+          </Row>
         </div>
       </Form>
     </div>

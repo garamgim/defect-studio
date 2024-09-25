@@ -25,9 +25,8 @@ const ImgDimensionParams = ({ imgDimensionParams, updateImgDimensionParams }: Im
           <Row gutter={16}>
             <Col span={16}>
               <Slider
-                min={128}
+                min={1}
                 max={2048}
-                step={8}
                 value={imgDimensionParams.width}
                 onChange={(value) => handleDimensionChange('width', value)}
                 tooltip={undefined}
@@ -35,7 +34,7 @@ const ImgDimensionParams = ({ imgDimensionParams, updateImgDimensionParams }: Im
             </Col>
             <Col span={8}>
               <InputNumber
-                min={128}
+                min={1}
                 max={2048}
                 value={imgDimensionParams.width}
                 onChange={(value) => handleDimensionChange('width', value)}
@@ -50,9 +49,8 @@ const ImgDimensionParams = ({ imgDimensionParams, updateImgDimensionParams }: Im
           <Row gutter={16}>
             <Col span={16}>
               <Slider
-                min={128}
+                min={1}
                 max={2048}
-                step={8}
                 value={imgDimensionParams.height}
                 onChange={(value) => handleDimensionChange('height', value)}
                 tooltip={undefined}
@@ -60,7 +58,7 @@ const ImgDimensionParams = ({ imgDimensionParams, updateImgDimensionParams }: Im
             </Col>
             <Col span={8}>
               <InputNumber
-                min={128}
+                min={1}
                 max={2048}
                 value={imgDimensionParams.height}
                 onChange={(value) => handleDimensionChange('height', value)}

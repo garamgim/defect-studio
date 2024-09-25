@@ -43,6 +43,8 @@ const Img2ImgSidebar = () => {
     updateInputPath,
     updateOutputPath,
     updateMode,
+    updatePrompt,
+    updateNegativePrompt,
     updateClipData,
     updateImageList
   } = useImg2ImgParams();
@@ -155,17 +157,15 @@ const Img2ImgSidebar = () => {
 
       {/* 프리셋 생성 */}
       <CreatePreset
-        model={modelParams.model}
-        width={imgDimensionParams.width}
-        height={imgDimensionParams.height}
-        guidanceScale={guidanceParams.guidanceScale}
-        numInferenceSteps={samplingParams.numInferenceSteps}
-        seed={seedParams.seed}
+        modelParams={modelParams}
+        batchParams={batchParams}
+        imgDimensionParams={imgDimensionParams}
+        guidanceParams={guidanceParams}
+        samplingParams={samplingParams}
+        seedParams={seedParams}
+        strengthParams={strengthParams}
         prompt={prompt}
         negativePrompt={negativePrompt}
-        batchCount={batchParams.batchCount}
-        batchSize={batchParams.batchSize}
-        scheduler={samplingParams.scheduler}
         type="image_to_image"
         isModalOpen={isCreatePresetOpen}
         closeModal={closeCreatePreset}
@@ -176,18 +176,15 @@ const Img2ImgSidebar = () => {
         isModalOpen={isLoadPresetOpen}
         closeModal={closeLoadPreset}
         type="image_to_image"
-        setModel={handleSetModel}
-        setWidth={handleSetWidth}
-        setHeight={handleSetHeight}
-        setGuidanceScale={handleSetGuidanceScale}
-        setNumInferenceSteps={handleSetNumInferenceSteps}
-        setSeed={handleSetSeed}
-        setPrompt={handleSetPrompt}
-        setNegativePrompt={handleSetNegativePrompt}
-        setBatchCount={handleSetBatchCount}
-        setBatchSize={handleSetBatchSize}
-        setScheduler={handleSetScheduler}
-        setStrength={handleSetStrength}
+        updateModelParams={updateModelParams}
+        updateSamplingParams={updateSamplingParams}
+        updateSeedParams={updateSeedParams}
+        updateGuidanceParams={updateGuidanceParams}
+        updateImgDimensionParams={updateImgDimensionParams}
+        updateBatchParams={updateBatchParams}
+        updatePrompt={updatePrompt}
+        updateNegativePrompt={updateNegativePrompt}
+        updateStrengthParams={updateStrengthParams}
       />
     </div>
   );
