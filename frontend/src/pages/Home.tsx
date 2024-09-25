@@ -1,6 +1,15 @@
 import Header from '../components/home/Header';
 import ImgModal from '../components/home/ImgModal';
-import { SetStateAction, useState } from 'react';
+import { useState } from 'react';
+
+interface Folder {
+  folder_id: number;
+  image_count: number;
+  type: string;
+  created_at: string;
+  prompt: string;
+  first_image: string;
+}
 
 // 더미 데이터 (api통신 데이터 형식 확인 후 수정)
 const folders = [
@@ -54,10 +63,10 @@ const folders = [
 
 const Home = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedFolder, setSelectedFolder] = useState(null);
+  const [selectedFolder, setSelectedFolder] = useState<null | Folder>(null);
 
   // 모달을 열고 폴더 정보를 설정하는 함수
-  const openModal = (folder: SetStateAction<null>) => {
+  const openModal = (folder: Folder) => {
     setSelectedFolder(folder);
     setIsModalVisible(true);
   };

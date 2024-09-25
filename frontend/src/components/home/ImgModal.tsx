@@ -18,7 +18,8 @@ interface ImgModalProps {
   onClose: () => void;
 }
 
-const ImgModal = ({ folder, onClose }: ImgModalProps) => {
+// 여기서는 folder id만 가지고 api통신해서 세부데이터 가져와야함
+const ImgModal = ({ onClose }: ImgModalProps) => {
   const [messageApi, contextHolder] = message.useMessage();
 
   const copyToClipboard = (text: string) => {
