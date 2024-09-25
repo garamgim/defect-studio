@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { Input, Button, Form, message } from 'antd';
 import { showToastSuccess, showToastError } from '../components/common/ToastNotification';
 import ToastNotification from '../components/common/ToastNotification';
-import { getDeviceHealth, getDeviceCudaAvailable, getDeviceCudaUsage } from '../api/settings';
+import { getDeviceHealth, getDeviceCudaAvailable } from '../api/settings';
 
 const Settings = () => {
   const [health, setHealth] = useState<boolean>(false);
   const [isHealthLoading, setHealthIsLoading] = useState<boolean>(false);
   const [cudaAvailability, setCudaAvailability] = useState<boolean>(false);
   const [isCudaAvailabilityLoading, setCudaAvailabilityIsLoading] = useState<boolean>(false);
-  const [cudaUsage, setCudaUsage] = useState<boolean>(false);
-  const [isCudaUsageLoading, setIsCudaUsageLoading] = useState<boolean>(false);
+  // const [cudaUsage, setCudaUsage] = useState<boolean>(false);
+  // const [isCudaUsageLoading, setIsCudaUsageLoading] = useState<boolean>(false);
   const [imagePath, setImagePath] = useState<string>('');
   const [modelPath, setModelPath] = useState<string>('');
 
@@ -45,21 +45,21 @@ const Settings = () => {
   };
 
   // CUDA Usage Monitoring
-  const checkCudaUsage = async () => {
-    if (!health && !cudaAvailability) {
-      message.error('Check health status first');
-    } else {
-      setIsCudaUsageLoading(true);
-      try {
-        const response = await getDeviceCudaUsage();
-        setCudaUsage(true);
-      } catch (error) {
-        setCudaUsage(false);
-      } finally {
-        setIsCudaUsageLoading(false);
-      }
-    }
-  };
+  // const checkCudaUsage = async () => {
+  //   if (!health && !cudaAvailability) {
+  //     message.error('Check health status first');
+  //   } else {
+  //     setIsCudaUsageLoading(true);
+  //     try {
+  //       const response = await getDeviceCudaUsage();
+  //       setCudaUsage(true);
+  //     } catch (error) {
+  //       setCudaUsage(false);
+  //     } finally {
+  //       setIsCudaUsageLoading(false);
+  //     }
+  //   }
+  // };
 
   // 설정 저장
   const handleSave = () => {
@@ -93,11 +93,11 @@ const Settings = () => {
           <span className="ml-3">{cudaAvailability ? 'Status of gpu enabled' : 'gpu unavailable status'}</span>
         </div>
 
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <Button type="primary" onClick={checkCudaUsage} loading={isCudaUsageLoading}>
             CUDA Usage Monitoring
           </Button>
-        </div>
+        </div> */}
 
         <Form layout="vertical" onFinish={handleSave}>
           <Form.Item

@@ -37,6 +37,8 @@ const MaskingModal = ({
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
   const [rgbColor, setRgbColor] = useState<string | null>(null);
 
+  const [, setImageScale] = useState(1); // 이미지 배율 상태관리
+
   const [tool, setTool] = useState<'brush' | 'polygon' | 'select' | null>(null);
   const [isMovingPoints, setIsMovingPoints] = useState(false);
   const [brushSize, setBrushSize] = useState<number>(10);
@@ -109,44 +111,40 @@ const MaskingModal = ({
 
     setIsMovingPoints(false); // 점 움직이는 버튼 클릭한채이면 점도 캔버스에 포함되므로 false처리함
 
-    // const stageOriginalScale = scale; // 현재의 확대 비율 저장
     const stage = stageRef.current;
 
-    // 1. Stage와 Canvas를 축소 상태로 설정
+    // 원본 크기로 배율 복원
+    const originalScaleX = stage.scaleX();
+    const originalScaleY = stage.scaleY();
     stage.scale({ x: 1, y: 1 });
-    stage.batchDraw(); // 축소 상태로 다시 그리기
+    stage.batchDraw(); // 배율 복원 후 다시 그리기
 
     try {
-      // 1. backgroundImg: 배경 이미지 레이어만 저장
+      // 1. 배경 이미지 저장 (원본 크기)
       const imageNode = stage.findOne((node: Konva.Node) => node instanceof Konva.Image) as Konva.Image;
-
       if (!imageNode) {
         return; // 이미지 노드가 없으면 리턴
       }
 
-      // 배경 이미지만 저장
       const backgroundImgBase64 = imageNode.toDataURL({
         mimeType: 'image/png',
         x: imagePos.x,
         y: imagePos.y,
-        width: imageSize.width,
-        height: imageSize.height,
-        pixelRatio: 1 // 원래 크기로 저장
+        width: imageSize.width, // 원본 크기 저장
+        height: imageSize.height, // 원본 크기 저장
+        pixelRatio: 1 // 원본 크기로 저장
       });
 
-      // 2. canvasImg: 투명한 캔버스를 흑백 이미지로 변환하여 저장
-      const canvasLayer = stageRef.current.findOne('#canvas-layer');
-
+      // 2. 캔버스 레이어를 흑백 이미지로 변환하여 저장
+      const canvasLayer = stage.findOne('#canvas-layer');
       if (!canvasLayer) {
         return; // 캔버스 레이어가 없으면 리턴
       }
 
-      // 배경 이미지 숨기고 캔버스만 보이도록 설정
       imageNode.visible(false); // 배경 이미지 비활성화
       canvasLayer.visible(true); // 캔버스만 보이게 설정
       stage.batchDraw();
 
-      // 캔버스에서 색칠된 부분만 흑백으로 변환
       const canvasImgBase64 = await convertCanvasToGrayscale(
         canvasLayer.toDataURL({
           mimeType: 'image/png',
@@ -154,7 +152,7 @@ const MaskingModal = ({
           y: imagePos.y,
           width: imageSize.width,
           height: imageSize.height,
-          pixelRatio: 1 // 축소 상태로 저장
+          pixelRatio: 1 // 축소되지 않고 원본 크기로 저장
         })
       );
 
@@ -162,61 +160,57 @@ const MaskingModal = ({
       imageNode.visible(true); // 배경 이미지 다시 보이게 설정
       canvasLayer.visible(true); // 캔버스 레이어 다시 활성화
 
-      // 3. Combined Image: 배경과 캔버스를 합친 이미지 저장
+      // 3. 결합된 이미지 저장 (배경 이미지와 캔버스 결합)
       const combinedImgBase64 = stage.toDataURL({
         mimeType: 'image/png',
         x: imagePos.x,
         y: imagePos.y,
         width: imageSize.width,
         height: imageSize.height,
-        pixelRatio: 1
+        pixelRatio: 1 // 원본 크기로 결합된 이미지 저장
       });
 
-      updateInitImageList([backgroundImgBase64]);
-      updateMaskImageList([canvasImgBase64]);
-      updateCombinedImg(combinedImgBase64);
+      updateInitImageList([backgroundImgBase64]); // 원본 크기의 배경 이미지
+      updateMaskImageList([canvasImgBase64]); // 흑백 이미지로 변환된 캔버스
+      updateCombinedImg(combinedImgBase64); // 결합된 이미지 저장
     } catch (error) {
       console.error('Error saving images:', error);
     } finally {
+      // 원래 스케일로 복원
+      stage.scale({ x: originalScaleX, y: originalScaleY });
+      stage.batchDraw(); // 스테이지 다시 그리기
       onClose();
     }
   };
 
   useEffect(() => {
     if (image && imageStatus === 'loaded') {
+      // 이미지의 원본 크기를 사용하여 스테이지에 맞는 배율을 계산
       const imgAspectRatio = image.width / image.height;
       const stageAspectRatio = stageSize.width / stageSize.height;
 
-      let newWidth = stageSize.width;
-      let newHeight = stageSize.height;
+      let newScale = 1;
+      let newWidth = image.width;
+      let newHeight = image.height;
 
+      // 스테이지 크기에 맞게 이미지의 크기와 배율을 조정
       if (imgAspectRatio > stageAspectRatio) {
+        newScale = stageSize.width / image.width;
         newWidth = stageSize.width;
         newHeight = newWidth / imgAspectRatio;
       } else {
+        newScale = stageSize.height / image.height;
         newHeight = stageSize.height;
         newWidth = newHeight * imgAspectRatio;
       }
 
-      // 여기서 의존성 배열에 들어가는 상태를 최소화하여 무한 루프를 방지
-      setImageSize((prevSize) => {
-        if (prevSize.width !== newWidth || prevSize.height !== newHeight) {
-          return { width: newWidth, height: newHeight };
-        }
-        return prevSize;
-      });
-
+      setImageScale(newScale); // 이미지 배율 설정
+      setImageSize({ width: newWidth, height: newHeight }); // 이미지 크기 설정
       const centerX = (stageSize.width - newWidth) / 2;
       const centerY = (stageSize.height - newHeight) / 2;
-
-      setImagePos((prevPos) => {
-        if (prevPos.x !== centerX || prevPos.y !== centerY) {
-          return { x: centerX, y: centerY };
-        }
-        return prevPos;
-      });
+      setImagePos({ x: centerX, y: centerY }); // 이미지 위치 설정
     }
-  }, [image, imageStatus, stageSize]); // 의존성 배열을 최소한의 값으로 설정
+  }, [image, imageStatus, stageSize]);
 
   const updateStageSize = () => {
     const modalElement = document.querySelector('.ant-modal-body');
@@ -310,7 +304,8 @@ const MaskingModal = ({
     const transform = stage.getAbsoluteTransform().copy();
     transform.invert();
     const pos = stage.getPointerPosition();
-    return pos ? transform.point(pos) : null;
+    const scale = stage.scaleX(); // scaleX와 scaleY가 동일하므로 하나만 사용
+    return pos ? { x: pos.x / scale, y: pos.y / scale } : null;
   };
 
   const handlePointDrag = (e: Konva.KonvaEventObject<DragEvent>, objIndex: number, pointIndex: number) => {
@@ -326,21 +321,25 @@ const MaskingModal = ({
     const stage = e.target.getStage();
     if (!stage) return;
 
+    // 현재 스테이지의 scale 값을 가져옴
+    const scale = stage.scaleX(); // scaleX와 scaleY가 동일하므로 하나만 사용
     const pos = stage.getPointerPosition();
     if (!pos) return;
 
-    setMousePosition(pos);
+    // 마우스 좌표를 scale에 맞게 보정
+    const correctedPos = { x: pos.x / scale, y: pos.y / scale };
+    setMousePosition(correctedPos);
 
     // 브러시 도구가 활성화되고 드로잉 중인 경우
     if (tool === 'brush' && isDrawing.current) {
       const lastObject = objects[objects.length - 1];
-      lastObject.points = lastObject.points.concat([pos.x, pos.y]);
+      lastObject.points = lastObject.points.concat([correctedPos.x, correctedPos.y]);
       setObjects([...objects.slice(0, objects.length - 1), lastObject]);
     }
 
     // 마우스 커서에 브러시 크기만큼 원을 표시
     if (tool === 'brush') {
-      setCursorPosition(pos); // 브러시 크기 원을 표시할 위치 설정
+      setCursorPosition(correctedPos); // 브러시 크기 원을 표시할 위치 설정
     }
 
     // 배경 이미지의 RGB 색상 값 얻기
@@ -357,7 +356,7 @@ const MaskingModal = ({
         canvas.height = imageNode.height();
 
         context.drawImage(imgSource, 0, 0);
-        const imageData = context.getImageData(Math.floor(pos.x), Math.floor(pos.y), 1, 1).data;
+        const imageData = context.getImageData(Math.floor(correctedPos.x), Math.floor(correctedPos.y), 1, 1).data;
         const rgb = `rgb(${imageData[0]}, ${imageData[1]}, ${imageData[2]})`;
 
         setRgbColor(rgb);
@@ -471,6 +470,24 @@ const MaskingModal = ({
           </p>
         )}
         {rgbColor && <p>RGB: {rgbColor}</p>}
+      </div>
+      <div className="flex items-center space-x-4 mt-3">
+        <Slider
+          min={1} // 최소 확대 배율
+          max={3} // 최대 확대 배율
+          step={0.05} // 슬라이더 단위
+          value={scale} // 현재 scale 상태와 연결
+          onChange={(newScale) => setScale(newScale)} // 슬라이더 값 변경 시 scale 상태 업데이트
+          style={{ width: '150px' }}
+        />
+        <InputNumber
+          min={1}
+          max={3}
+          step={0.05}
+          value={scale}
+          onChange={(newScale) => setScale(newScale ?? 1)} // 숫자 입력으로도 확대/축소 가능
+          className="w-[60px]"
+        />
       </div>
       <div className="flex flex-col h-full w-full justify-center">
         <div className="flex justify-center items-center w-full h-[80%]">
