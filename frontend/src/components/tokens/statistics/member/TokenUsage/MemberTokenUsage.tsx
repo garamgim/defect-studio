@@ -4,6 +4,7 @@ import { getTokenUsage } from '@api/statistic_person'; // API
 import { TokenUsage } from '@/types/statistics'; // Response Type
 import { calculateTotal } from '@/utils/MemberTokenUsageTotalCalculator'; // Total 계산
 import MemberTokenUsageGraph from './MemberTokenUsageGraph';
+import { staleTime, gcTime } from '../../common/constance';
 
 interface MemberTokenUsageProps {
   member_id: number;
@@ -27,8 +28,8 @@ const MemberTokenUsage = ({ member_id }: MemberTokenUsageProps) => {
         return 0;
       });
     },
-    staleTime: 1000 * 60 * 30, // 유효 시간 : 30분
-    gcTime: 1000 * 60 * 60 // 가비지 컬렉터 시간 : 1시간
+    staleTime,
+    gcTime
   });
   return (
     <div>

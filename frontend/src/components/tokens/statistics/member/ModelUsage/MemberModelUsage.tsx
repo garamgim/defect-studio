@@ -3,6 +3,7 @@ import { AxiosResponse } from 'axios'; // Axios Response Type
 import { getModelFrequency } from '@api/statistic_person'; // API
 import { ModelFrequency } from '@/types/statistics'; // Response Type
 import MemberModelUsageGraph from './MemberModelUsageGraph';
+import { staleTime, gcTime } from '../../common/constance';
 
 interface MemberModelUsageProps {
   member_id: number;
@@ -21,8 +22,8 @@ const MemberModelUsage = ({ member_id }: MemberModelUsageProps) => {
       response.data.filter((item) => {
         return !!item.model && item.model.length > 0 && item.usage > 0;
       }),
-    staleTime: 1000 * 60 * 30, // 유효 시간 : 30분
-    gcTime: 1000 * 60 * 60 // 가비지 컬렉터 시간 : 1시간
+    staleTime,
+    gcTime
   });
   return (
     <div className="flex flex-col text-black dark:text-white">
