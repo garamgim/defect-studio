@@ -19,7 +19,7 @@ export type MemberRead = {
 // 정보 요청
 export const getGuestUserInfo = async (): Promise<AxiosResponse<MemberRead[]>> => {
   try {
-    const response = await axiosInstance.get<MemberRead[]>('/admin/members/guests');
+    const response = await axiosInstance.get<MemberRead[]>('/members/guests');
     console.log(response.data);
     return response;
   } catch (error) {
@@ -39,7 +39,7 @@ export const approveGuestUser = async ({
   new_role
 }: ApproveGuestUserProps): Promise<AxiosResponse<string>> => {
   try {
-    const response = await axiosInstance.patch(`/admin/members/guests/${member_id}`, null, {
+    const response = await axiosInstance.patch(`/members/${member_id}/role`, null, {
       params: {
         new_role
       }
