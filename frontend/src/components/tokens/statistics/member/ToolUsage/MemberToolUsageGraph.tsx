@@ -31,7 +31,6 @@ const options = {
 };
 
 const MemberToolUsageGraph = ({ data }: MemberToolUsageGraphProps) => {
-  console.log(data);
   const labels = data.map((item) => item.use_type);
   const usageData = data.map((item) => item.usage);
 
