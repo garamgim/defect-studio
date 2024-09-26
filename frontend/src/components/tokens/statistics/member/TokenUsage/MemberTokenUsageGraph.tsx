@@ -46,7 +46,15 @@ const options: ChartOptions<'line'> = {
   }
 };
 
-const labels: UseType[] = ['text_to_image', 'image_to_image', 'inpainting', 'remove_background', 'clean_up', 'clip'];
+const labels: UseType[] = [
+  'text_to_image',
+  'image_to_image',
+  'inpainting',
+  'remove_background',
+  'clean_up',
+  'clip',
+  'Total'
+];
 
 const MemberTokenUsageGraph = ({ data }: MemberTokenUsageGraphProps) => {
   const chartData = {

@@ -1,20 +1,12 @@
 import { ToolFrequency } from '@/types/statistics';
 import { Chart as ChartJS, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
+import { backgroundColorList } from '@components/tokens/statistics/common/constance';
 ChartJS.register(ArcElement, Title, Tooltip, Legend);
 
 interface MemberToolUsageGraphProps {
   data: ToolFrequency[];
 }
-
-const backgroundColorList = [
-  'rgb(255, 99, 132)',
-  'rgb(54, 162, 235)',
-  'rgb(255, 205, 86)',
-  'rgb(75, 192, 192)',
-  'rgb(153, 102, 255)',
-  'rgb(255, 159, 64)'
-];
 
 const options = {
   responsive: true, // 반응형

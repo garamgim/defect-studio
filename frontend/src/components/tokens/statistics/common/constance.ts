@@ -9,5 +9,6 @@ export const backgroundColorList = [
   'rgb(255, 205, 86)',
   'rgb(75, 192, 192)',
   'rgb(153, 102, 255)',
-  'rgb(255, 159, 64)'
+  'rgb(255, 159, 64)',
+  'rgb(68, 68, 68)'
 ];
