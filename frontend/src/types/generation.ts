@@ -51,6 +51,7 @@ export interface Txt2ImgDataType {
 }
 
 export interface Txt2ImgParams {
+  gpu_device: number;
   model: string;
   scheduler: string;
   prompt: string;
@@ -71,6 +72,7 @@ export interface Img2ImgDataType {
 }
 
 export interface Img2ImgParams {
+  gpu_device: number;
   model: string;
   scheduler: string;
   prompt: string;
@@ -94,6 +96,7 @@ export interface InpaintingDataType {
 }
 
 export interface InpaintingParams {
+  gpu_device: number;
   model: string;
   scheduler: string;
   prompt: string;
@@ -119,6 +122,7 @@ export interface RemoveBgDataType {
 }
 
 export interface RemoveBgParams {
+  gpu_device: number;
   image_list: File[];
   input_path: string;
   output_path: string;
@@ -130,6 +134,7 @@ export interface CleanupDataType {
 }
 
 export interface CleanupParams {
+  gpu_device: number;
   init_image_list: File[];
   mask_image_list: File[];
 }
@@ -153,4 +158,12 @@ export interface PresetDataType {
   _id?: string; // 필요없는 정보
   member_id?: number; // 필요없는 정보
   date?: string; // 필요없는 정보
+}
+
+export interface clipDataType {
+  model: string;
+  image_list: string[];
+  mode: 'fast' | 'classic' | 'negative';
+  caption: string;
+  batch_size: number;
 }

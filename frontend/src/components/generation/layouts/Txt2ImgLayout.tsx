@@ -1,11 +1,18 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Modal, Button, Select, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../sidebar/Txt2ImgSidebar';
 import PromptParams from '../params/PromptParams';
 import Txt2ImgDisplay from '../outputDisplay/Txt2ImgDisplay';
 import { useDispatch, useSelector } from 'react-redux';
-import { setIsNegativePrompt, setIsLoading } from '../../../store/slices/generation/txt2ImgSlice';
+import {
+  setIsNegativePrompt,
+  setIsLoading,
+  setTaskId,
+  setFirstProcessedImg,
+  setProcessedImgsCnt,
+  setOutputImgs // 테스트
+} from '../../../store/slices/generation/txt2ImgSlice';
 import { setImageList as setImg2ImgImages } from '../../../store/slices/generation/img2ImgSlice';
 import { setInitImageList as setInpaintingImages } from '../../../store/slices/generation/inpaintingSlice';
 import { setImageList as setRemoveBgImages } from '../../../store/slices/generation/removeBgSlice';
@@ -16,13 +23,13 @@ import { RiFolderDownloadLine } from 'react-icons/ri';
 import { MdMoveUp } from 'react-icons/md';
 import { RiCheckboxMultipleBlankFill, RiCheckboxMultipleBlankLine } from 'react-icons/ri';
 import { AiOutlineEyeInvisible, AiOutlineEye } from 'react-icons/ai';
-import { postTxt2ImgGeneration } from '../../../api/generation';
+import { postTxt2ImgGeneration, getTaskStatus } from '../../../api/generation';
 import { RootState } from '../../../store/store';
 
 const Txt2ImgLayout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { params, isLoading, output } = useSelector((state: RootState) => state.txt2Img);
+  const { params, isLoading, output, taskId } = useSelector((state: RootState) => state.txt2Img);
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useTxt2ImgParams();
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
@@ -62,8 +69,8 @@ const Txt2ImgLayout = () => {
 
     try {
       dispatch(setIsLoading(true));
-      await postTxt2ImgGeneration('remote', data);
-      dispatch(setIsLoading(false));
+      const newTaskId = await postTxt2ImgGeneration('remote', data);
+      dispatch(setTaskId(newTaskId));
     } catch (error) {
       if (error instanceof Error) {
         message.error(`Error generating image: ${error.message}`);
@@ -73,6 +80,28 @@ const Txt2ImgLayout = () => {
       dispatch(setIsLoading(false));
     }
   };
+
+  useEffect(() => {
+    const fetchTaskStatus = async () => {
+      try {
+        if (taskId) {
+          const response = await getTaskStatus(taskId);
+          setFirstProcessedImg(response[0]);
+          setOutputImgs(response); // 테스트
+          setProcessedImgsCnt(params.batchParams.batchCount * params.batchParams.batchSize);
+        }
+      } catch (error) {
+        console.error('Failed to get task-status:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTaskStatus();
+    const intervalId = setInterval(fetchTaskStatus, 1000); // 1초마다 보냄
+
+    return () => clearInterval(intervalId);
+  }, [taskId, params.batchParams.batchCount, params.batchParams.batchSize]);
 
   const handleSelectAllImages = useCallback(() => {
     if (allSelected) {
