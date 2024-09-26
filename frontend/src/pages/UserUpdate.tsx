@@ -5,9 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import GuestUserList from '../components/userManagement/GuestUserList';
 
 import { TabsProps, Tabs } from 'antd';
+import UserList from '@/components/userManagement/UserList';
 
 const items: TabsProps['items'] = [
-  { key: 'Guest User Management', label: 'Guest User Management', children: <GuestUserList /> }
+  { key: 'Guest User Management', label: 'Guest Management', children: <GuestUserList /> },
+  { key: 'User Management', label: 'User Management', children: <UserList /> }
 ];
 
 const GuestUserUpdate = () => {

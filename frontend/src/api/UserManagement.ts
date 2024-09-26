@@ -3,7 +3,7 @@ import axiosInstance from './token/axiosInstance';
 
 export type RoleType = 'guest' | 'department_member' | 'department_admin' | 'super_admin';
 
-// Guest Member 정보 가져오기
+// Member 정보 가져오기 --------------------
 
 export type MemberRead = {
   member_id: number;
@@ -15,6 +15,8 @@ export type MemberRead = {
   department_name: string;
   token_quantity: number;
 };
+
+// Guest ------------------------------------------
 
 // 정보 요청
 export const getGuestUserInfo = async (): Promise<AxiosResponse<MemberRead[]>> => {
@@ -79,5 +81,18 @@ export const rejectGuestUser = async ({ member_id }: RejectGuestUserProps): Prom
     } else {
       throw new Error('Unexpected error occurred');
     }
+  }
+};
+
+// 이미 가입한 회원 ----------------------
+
+// 모든 회원들에 대한 요청
+export const getUserInfo = async (): Promise<AxiosResponse<MemberRead[]>> => {
+  try {
+    const response = await axiosInstance.get<MemberRead[]>('/members/all');
+    console.log(response.data);
+    return response;
+  } catch (error) {
+    throw Error('Unexpected error occurred');
   }
 };
