@@ -24,6 +24,8 @@ interface Img2ImgState {
     strengthParams: StrengthParamsType;
   };
   isLoading: boolean;
+  taskId: string | null;
+  checkedOutput: boolean;
   output: {
     processedImgsCnt: number;
     outputImgs: string[];
@@ -72,6 +74,8 @@ const initialState: Img2ImgState = {
     }
   },
   isLoading: false,
+  taskId: null,
+  checkedOutput: true,
   output: {
     processedImgsCnt: 0,
     outputImgs: [],
@@ -140,6 +144,14 @@ const img2ImgSlice = createSlice({
     setIsLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
+    // 이미지 생성 체크를 위해 받는 id값
+    setTaskId: (state, action: PayloadAction<string | null>) => {
+      state.taskId = action.payload;
+    },
+    // 이미지 생성 후 생성된 이미지 확인 했는지 체크
+    setCheckedOutput: (state, action: PayloadAction<boolean>) => {
+      state.checkedOutput = action.payload;
+    },
     // output
     setProcessedImgsCnt: (state, action: PayloadAction<number>) => {
       state.output.processedImgsCnt = action.payload;
@@ -169,6 +181,8 @@ export const {
   setSeedParams,
   setBatchParams,
   setIsLoading,
+  setTaskId,
+  setCheckedOutput,
   setProcessedImgsCnt,
   setFirstProcessedImg,
   setOutputImgs,

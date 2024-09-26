@@ -1,4 +1,4 @@
-import { Tabs, Upload, Input, Button } from 'antd';
+import { Tabs, Upload, Input, Button, Checkbox } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { FiFolderPlus } from 'react-icons/fi';
 import React from 'react';
@@ -124,6 +124,7 @@ const UploadImgParams = ({
                 <FiFolderPlus className="w-[18px] h-[18px] text-[#222]" />
               </Button>
             </div>
+            <Checkbox className="mt-2">Zip</Checkbox>
           </div>
         </div>
       )

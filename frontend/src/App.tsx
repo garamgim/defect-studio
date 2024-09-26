@@ -14,6 +14,7 @@ import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import GuestUserUpdate from './pages/GuestUserUpdate';
 import EditProfile from './pages/EditProfile';
+import History from './pages/History';
 
 function AppContent() {
   return (
@@ -38,6 +39,14 @@ function AppContent() {
             element={
               <PrivateRoute>
                 <Generation />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/history"
+            element={
+              <PrivateRoute>
+                <History />
               </PrivateRoute>
             }
           />

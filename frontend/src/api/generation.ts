@@ -39,8 +39,8 @@ export const postTxt2ImgGeneration = async (gpu_env: Txt2ImgDataType['gpu_env'],
       }
     });
 
-    if (response.status === 201) {
-      return response.data.image_list;
+    if (response.status === 200) {
+      return response.data.task_id;
     } else {
       throw new Error('Failed to generate text-to-image');
     }
@@ -125,7 +125,7 @@ export const getClip = async (imageFiles: File[]) => {
     const formData = new FormData();
 
     imageFiles.forEach((file) => {
-      formData.append('images', file);
+      formData.append('image_list', file);
     });
 
     const response = await axiosInstance.post('/generation/clip', formData, {
@@ -287,5 +287,29 @@ export const getModelList = async (member_id: number) => {
   } catch (error) {
     console.error(error);
     throw new Error('Failed to get model-list');
+  }
+};
+
+// ai 동작 진행 상황 확인
+export const getTaskStatus = async (task_id: string) => {
+  try {
+    const response = await axiosInstance.get(`/generation/tasks/${task_id}`);
+
+    if (response.status === 200) {
+      if (response.data.status === 'STARTED') {
+        return response.data.message;
+      } else if (response.data.status === 'PENDING') {
+        return response.data.message;
+      } else if (response.data.status === 'SUCCESS') {
+        return response.data.data;
+      } else {
+        return response.data.message;
+      }
+    } else {
+      throw new Error('Failed to get task-status');
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to get task-status');
   }
 };
