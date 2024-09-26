@@ -3,6 +3,7 @@ import { AxiosResponse } from 'axios'; // Axios Response Type
 import { getDepartmentToolFrequency } from '@/api/statistic_department'; // API Call
 import { ToolFrequency } from '@/types/statistics'; // Type
 import DepartmentToolUsageGraph from './DepartmentToolUsageGraph';
+import { staleTime, gcTime } from '../../common/constance';
 
 interface DepartmentToolUsageProps {
   department_id: number;
@@ -18,8 +19,8 @@ const DepartmentToolUsage = ({ department_id }: DepartmentToolUsageProps) => {
     queryKey: ['ToolUsage', 'department', department_id],
     queryFn: () => getDepartmentToolFrequency(department_id),
     select: (response) => response.data,
-    staleTime: 1000 * 60 * 30, // 유효 시간 : 30분
-    gcTime: 1000 * 60 * 60 // 가비지 컬렉터 시간 : 1시간
+    staleTime,
+    gcTime
   });
   return (
     <div className="flex flex-col text-black dark:text-white">

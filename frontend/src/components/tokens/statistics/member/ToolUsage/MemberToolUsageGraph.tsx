@@ -1,20 +1,12 @@
 import { ToolFrequency } from '@/types/statistics';
 import { Chart as ChartJS, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
+import { backgroundColorList } from '@components/tokens/statistics/common/constance';
 ChartJS.register(ArcElement, Title, Tooltip, Legend);
 
 interface MemberToolUsageGraphProps {
   data: ToolFrequency[];
 }
-
-const backgroundColorList = [
-  'rgb(255, 99, 132)',
-  'rgb(54, 162, 235)',
-  'rgb(255, 205, 86)',
-  'rgb(75, 192, 192)',
-  'rgb(153, 102, 255)',
-  'rgb(255, 159, 64)'
-];
 
 const options = {
   responsive: true, // 반응형
@@ -29,6 +21,7 @@ const options = {
       }
     },
     y: {
+      beginAtZero: true, // y축 0부터 시작
       display: false, // y축 자체를 표시하지 않음
       grid: {
         display: false // y축 grid 표시 안 함
@@ -38,7 +31,6 @@ const options = {
 };
 
 const MemberToolUsageGraph = ({ data }: MemberToolUsageGraphProps) => {
-  console.log(data);
   const labels = data.map((item) => item.use_type);
   const usageData = data.map((item) => item.usage);
 
@@ -56,7 +48,7 @@ const MemberToolUsageGraph = ({ data }: MemberToolUsageGraphProps) => {
   };
 
   return (
-    <div className="dark:bg-white mt-3 rounded-[10px] p-2 w-full h-full">
+    <div className="dark:bg-white mt-3 rounded-[10px] p-2 w-full h-[400px] flex flex-row justify-center">
       <Doughnut options={options} data={chartData} />
     </div>
   );
