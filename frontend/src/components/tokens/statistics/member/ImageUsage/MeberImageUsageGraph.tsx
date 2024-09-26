@@ -55,7 +55,7 @@ const MemberImageUsageGraph = ({ data }: MeberImageUsageGraphProps) => {
     }
   ];
   return (
-    <div className="dark:bg-white mt-3 rounded-[10px] p-2 w-full h-full">
+    <div className="dark:bg-white mt-3 rounded-[10px] p-2 w-full h-[400px] flex flex-row justify-center">
       <Line options={options} data={{ datasets }} />
     </div>
   );

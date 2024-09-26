@@ -45,7 +45,7 @@ const MemberModelUsageGraph = ({ data }: MemberModelUsageGraphProps) => {
     ]
   };
   return (
-    <div className="dark:bg-white mt-3 rounded-[10px] p-2 w-full h-full">
+    <div className="dark:bg-white mt-3 rounded-[10px] p-2 w-full h-[400px] flex flex-row justify-center">
       <Doughnut options={options} data={chartData} />
     </div>
   );
