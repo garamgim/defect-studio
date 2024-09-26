@@ -29,6 +29,7 @@ const options = {
       }
     },
     y: {
+      beginAtZero: true, // y축 0부터 시작
       display: false, // y축 자체를 표시하지 않음
       grid: {
         display: false // y축 grid 표시 안 함

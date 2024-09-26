@@ -26,6 +26,7 @@ const options: ChartOptions<'line'> = {
   },
   scales: {
     y: {
+      beginAtZero: true,
       grid: {
         display: false // y축 그리드 제거
       }
