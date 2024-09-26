@@ -12,7 +12,7 @@ import Signup from './pages/Signup';
 import PrivateRoute from './components/routing/PrivateRoute';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
-import GuestUserUpdate from './pages/GuestUserUpdate';
+import UserUpdate from './pages/UserUpdate';
 import EditProfile from './pages/EditProfile';
 
 function AppContent() {
@@ -93,7 +93,7 @@ function AppContent() {
             path="/guestUserManage"
             element={
               <PrivateRoute>
-                <GuestUserUpdate />
+                <UserUpdate />
               </PrivateRoute>
             }
           />

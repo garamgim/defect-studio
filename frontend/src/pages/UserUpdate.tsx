@@ -2,7 +2,13 @@ import { useEffect } from 'react';
 import { useGetMyInfo } from '../api/user';
 import { message } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import GuestUserList from '../components/guest/GuestUserList';
+import GuestUserList from '../components/userManagement/GuestUserList';
+
+import { TabsProps, Tabs } from 'antd';
+
+const items: TabsProps['items'] = [
+  { key: 'Guest User Management', label: 'Guest User Management', children: <GuestUserList /> }
+];
 
 const GuestUserUpdate = () => {
   const navigate = useNavigate();
@@ -26,10 +32,10 @@ const GuestUserUpdate = () => {
         {myInfo && myInfo.role === 'super_admin' && (
           <>
             <header>
-              <h1 className="text-[30px] font-bold mb-2 dark:text-gray-300">Guest User Management</h1>
-              <p className="mb-2 dark:text-gray-300">Please approve or reject the registration request. </p>
+              <h2 className="text-[24px] font-bold">User Management</h2>
+              <p>You can management Guest or Aleady User signed up</p>
             </header>
-            <GuestUserList />
+            <Tabs items={items} />
           </>
         )}
       </div>

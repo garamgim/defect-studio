@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { getGuestUserInfo, MemberRead } from '../../api/guestUser';
+import { getGuestUserInfo, MemberRead } from '../../api/UserManagement';
 import { useQuery } from '@tanstack/react-query';
 import { ConfigProvider, Table, theme } from 'antd';
 import React, { useRef, useState } from 'react';
@@ -25,9 +25,7 @@ const GuestUserList = () => {
   const { data, isPending, isError } = useQuery<AxiosResponse<MemberRead[]>, Error, TableMemberType[], string[]>({
     queryKey: ['guest_user_info'],
     queryFn: getGuestUserInfo,
-    select: (response) => response.data.map((member) => ({ ...member, key: member.member_id })),
-    staleTime: 1000 * 60 * 10, // 10분
-    gcTime: 1000 * 60 * 20 // 20분
+    select: (response) => response.data.map((member) => ({ ...member, key: member.member_id }))
   });
 
   //   검색 관련 필수

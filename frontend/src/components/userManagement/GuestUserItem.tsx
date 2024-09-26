@@ -1,8 +1,8 @@
 import { Button, Select, message } from 'antd';
-import { ApproveGuestUserProps, MemberRead, RoleType } from '../../api/guestUser';
+import { ApproveGuestUserProps, MemberRead, RoleType } from '../../api/UserManagement';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { approveGuestUser, rejectGuestUser, RejectGuestUserProps } from '../../api/guestUser';
+import { approveGuestUser, rejectGuestUser, RejectGuestUserProps } from '../../api/UserManagement';
 import { AxiosResponse } from 'axios';
 // 표 전용
 type TableMemberType = {
