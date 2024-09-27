@@ -2,7 +2,7 @@ import { Button, Select, message } from 'antd';
 import { ApproveGuestUserProps, MemberRead, RoleType } from '../../api/UserManagement';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { approveGuestUser, rejectGuestUser, RejectGuestUserProps } from '../../api/UserManagement';
+import { approveUser, rejectUser, RejectGuestUserProps } from '../../api/UserManagement';
 import { AxiosResponse } from 'axios';
 // 표 전용
 type TableMemberType = {
@@ -24,11 +24,14 @@ const GuestUserItem = ({ guestData }: GuestUserItemProps) => {
     Error,
     ApproveGuestUserProps
   >({
-    mutationFn: approveGuestUser,
+    mutationFn: approveUser,
     onSuccess: () => {
       message.success('Approved');
       queryClient.invalidateQueries({
         queryKey: ['guest_user_info']
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['user_info_list']
       });
     },
     onError: (error) => {
@@ -42,7 +45,7 @@ const GuestUserItem = ({ guestData }: GuestUserItemProps) => {
     Error,
     RejectGuestUserProps
   >({
-    mutationFn: rejectGuestUser,
+    mutationFn: rejectUser,
     onSuccess: () => {
       message.success('Rejected Guest User');
       queryClient.invalidateQueries({

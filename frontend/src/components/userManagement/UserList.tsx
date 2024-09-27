@@ -18,13 +18,14 @@ type TableMemberType = {
   key: React.Key;
 } & MemberRead;
 
-type DataIndex = keyof Pick<MemberRead, 'nickname' | 'department_name' | 'email'>; // Table 표 Colums 검색전용 데이터 인덱스 타입
+type DataIndex = keyof Pick<MemberRead, 'nickname' | 'department_name' | 'email' | 'role'>; // Table 표 Colums 검색전용 데이터 인덱스 타입
 
 const UserList = () => {
   const { data, isPending, isError } = useQuery<AxiosResponse<MemberRead[]>, Error, TableMemberType[], string[]>({
     queryKey: ['user_info_list'],
     queryFn: getUserInfo,
-    select: (response) => response.data.map((member) => ({ ...member, key: member.member_id }))
+    select: (response) =>
+      response.data.filter((item) => item.role !== 'guest').map((member) => ({ ...member, key: member.member_id }))
   });
 
   //   검색 관련 필수
@@ -141,6 +142,18 @@ const UserList = () => {
       ...getColumnSearchProps('email'),
       sorter: (a, b) => a.email.localeCompare(b.email),
       sortDirections: ['descend', 'ascend']
+    },
+    {
+      title: 'Authorization',
+      dataIndex: 'role',
+      key: 'role',
+      sorter: (a, b) => a.role.localeCompare(b.role),
+      filters: [
+        { text: 'department_member', value: 'department_member' },
+        { text: 'department_admin', value: 'department_admin' },
+        { text: 'super_admin', value: 'super_admin' }
+      ],
+      onFilter: (value, record) => record.role.indexOf(value as string) === 0
     }
   ];
 
@@ -166,7 +179,7 @@ const UserList = () => {
               pageSizeOptions: ['5', '10', '15', '20']
             }}
             expandable={{
-              rowExpandable: (record) => record.role === 'guest',
+              rowExpandable: () => true,
               expandedRowRender: (record) => <UserItem userData={record} />
             }}
           />

@@ -2,7 +2,7 @@ import { Button, Select, message } from 'antd';
 import { ApproveGuestUserProps, MemberRead, RoleType } from '../../api/UserManagement';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { approveGuestUser, rejectGuestUser, RejectGuestUserProps } from '../../api/UserManagement';
+import { approveUser, rejectUser, RejectGuestUserProps } from '../../api/UserManagement';
 import { AxiosResponse } from 'axios';
 // 표 전용
 type TableMemberType = {
@@ -24,11 +24,14 @@ const UserItem = ({ userData }: GuestUserItemProps) => {
     Error,
     ApproveGuestUserProps
   >({
-    mutationFn: approveGuestUser,
+    mutationFn: approveUser,
     onSuccess: () => {
       message.success('Approved');
       queryClient.invalidateQueries({
         queryKey: ['guest_user_info']
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['user_info_list']
       });
     },
     onError: (error) => {
@@ -42,7 +45,7 @@ const UserItem = ({ userData }: GuestUserItemProps) => {
     Error,
     RejectGuestUserProps
   >({
-    mutationFn: rejectGuestUser,
+    mutationFn: rejectUser,
     onSuccess: () => {
       message.success('Rejected Guest User');
       queryClient.invalidateQueries({
@@ -58,6 +61,7 @@ const UserItem = ({ userData }: GuestUserItemProps) => {
           <Select.Option value={'department_member'}>department_member</Select.Option>
           <Select.Option value={'department_admin'}>department_admin</Select.Option>
           <Select.Option value={'super_admin'}>super_admin</Select.Option>
+          <Select.Option value={'guest'}>guest</Select.Option>
         </Select>
       </div>
       <div className="flex flex-row ">

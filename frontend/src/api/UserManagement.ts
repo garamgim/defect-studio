@@ -36,10 +36,7 @@ export interface ApproveGuestUserProps {
   new_role: Omit<RoleType, 'guest'>;
 }
 
-export const approveGuestUser = async ({
-  member_id,
-  new_role
-}: ApproveGuestUserProps): Promise<AxiosResponse<string>> => {
+export const approveUser = async ({ member_id, new_role }: ApproveGuestUserProps): Promise<AxiosResponse<string>> => {
   try {
     const response = await axiosInstance.patch(`/members/${member_id}/role`, null, {
       params: {
@@ -66,9 +63,9 @@ export const approveGuestUser = async ({
 export interface RejectGuestUserProps {
   member_id: number;
 }
-export const rejectGuestUser = async ({ member_id }: RejectGuestUserProps): Promise<AxiosResponse<string>> => {
+export const rejectUser = async ({ member_id }: RejectGuestUserProps): Promise<AxiosResponse<string>> => {
   try {
-    const response = await axiosInstance.delete(`/admin/members/guests/${member_id}`);
+    const response = await axiosInstance.delete(`/members/${member_id}`);
     return response;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
