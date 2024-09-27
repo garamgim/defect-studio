@@ -51,6 +51,9 @@ const UserItem = ({ userData }: GuestUserItemProps) => {
       queryClient.invalidateQueries({
         queryKey: ['guest_user_info']
       });
+      queryClient.invalidateQueries({
+        queryKey: ['user_info_list']
+      });
     }
   });
 
