@@ -14,7 +14,9 @@ import { useImg2ImgParams } from '../../../hooks/generation/useImg2ImgParams';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import { useDispatch } from 'react-redux';
-import { resetState } from '../../../store/slices/generation/img2ImgSlice';
+import { MdMemory } from 'react-icons/md';
+import { resetParams, setGpuNum } from '../../../store/slices/generation/img2ImgSlice';
+import { Modal, InputNumber } from 'antd';
 
 const Img2ImgSidebar = () => {
   const dispatch = useDispatch();
@@ -82,7 +84,30 @@ const Img2ImgSidebar = () => {
   };
 
   const handleReset = () => {
-    dispatch(resetState());
+    dispatch(resetParams());
+  };
+
+  // GPU 선택
+  const [gpuNumber, setGpuNumber] = useState(0);
+  const [isGpuModalVisible, setIsGpuModalVisible] = useState(false);
+
+  const showGpuModal = () => {
+    setIsGpuModalVisible(true);
+  };
+
+  const handleGpuInputChange = (gpuNumber: number | null) => {
+    if (gpuNumber) {
+      setGpuNumber(gpuNumber);
+    }
+  };
+
+  const handleGpuModalOk = () => {
+    setGpuNum(gpuNumber);
+    setIsGpuModalVisible(false);
+  };
+
+  const handleGpuModalCancel = () => {
+    setIsGpuModalVisible(false);
   };
 
   return (
@@ -93,15 +118,19 @@ const Img2ImgSidebar = () => {
           <div className="absolute top-6 right-0 mx-6">
             <UndoOutlined
               onClick={handleReset}
-              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
+              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
             />
             <FileAddOutlined
               onClick={showCreatePreset}
-              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
+              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
             />
             <FileSearchOutlined
               onClick={showLoadPreset}
-              className="text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
+              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+            />
+            <MdMemory
+              className="text-[22px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+              onClick={showGpuModal}
             />
           </div>
         )}
@@ -154,6 +183,12 @@ const Img2ImgSidebar = () => {
           </>
         )}
       </div>
+
+      {/* gpu 선택 모달 */}
+      <Modal open={isGpuModalVisible} closable={false} onOk={handleGpuModalOk} onCancel={handleGpuModalCancel}>
+        <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Input the GPU number you want</div>
+        <InputNumber min={0} onChange={handleGpuInputChange} />
+      </Modal>
 
       {/* 프리셋 생성 */}
       <CreatePreset
