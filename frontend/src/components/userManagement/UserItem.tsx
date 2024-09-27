@@ -57,7 +57,7 @@ const UserItem = ({ userData }: GuestUserItemProps) => {
   return (
     <div className="flex flex-row justify-between">
       <div>
-        <Select onChange={setNewRole} className="w-[200px]">
+        <Select onChange={setNewRole} defaultValue={userData.role} className="w-[200px]">
           <Select.Option value={'department_member'}>department_member</Select.Option>
           <Select.Option value={'department_admin'}>department_admin</Select.Option>
           <Select.Option value={'super_admin'}>super_admin</Select.Option>
@@ -75,7 +75,7 @@ const UserItem = ({ userData }: GuestUserItemProps) => {
               disabled={newRole === 'guest'}
               className="mx-3 disabled:hidden"
             >
-              Approve
+              Change Role
             </Button>
             <Button
               onClick={() => {
@@ -84,7 +84,7 @@ const UserItem = ({ userData }: GuestUserItemProps) => {
               }}
               className="mx-3 disabled:hidden"
             >
-              Reject
+              Delete Member
             </Button>
           </>
         )}
