@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Modal, Button, Select, message, InputNumber } from 'antd';
+import { Modal, Button, Select, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../sidebar/Txt2ImgSidebar';
 import PromptParams from '../params/PromptParams';
@@ -9,10 +9,10 @@ import {
   setIsNegativePrompt,
   setIsLoading,
   setTaskId,
-  setFirstProcessedImg,
-  setProcessedImgsCnt,
-  setOutputImgs, // 테스트
-  setGpuDevice
+  setOutputImgsUrl,
+  setOutputImgsCnt,
+  resetOutputs,
+  setAllOutputsInfo
 } from '../../../store/slices/generation/txt2ImgSlice';
 import { setImageList as setImg2ImgImages } from '../../../store/slices/generation/img2ImgSlice';
 import { setInitImageList as setInpaintingImages } from '../../../store/slices/generation/inpaintingSlice';
@@ -26,12 +26,12 @@ import { RiCheckboxMultipleBlankFill, RiCheckboxMultipleBlankLine } from 'react-
 import { AiOutlineEyeInvisible, AiOutlineEye } from 'react-icons/ai';
 import { postTxt2ImgGeneration, getTaskStatus } from '../../../api/generation';
 import { RootState } from '../../../store/store';
-import { MdMemory } from 'react-icons/md';
+import { PiEmpty } from 'react-icons/pi';
 
 const Txt2ImgLayout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { params, isLoading, output, taskId, gpuDevice } = useSelector((state: RootState) => state.txt2Img);
+  const { params, isLoading, taskId, gpuNum, output, allOutputs } = useSelector((state: RootState) => state.txt2Img);
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useTxt2ImgParams();
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
@@ -54,8 +54,15 @@ const Txt2ImgLayout = () => {
   }, [isNegativePrompt, dispatch]);
 
   const handleGenerate = async () => {
+    let gpuNumber: number;
+    if (gpuNum) {
+      gpuNumber = gpuNum;
+    } else {
+      gpuNumber = 1; // settings 기본값 가져오기
+    }
+
     const data = {
-      gpu_device: gpuDevice,
+      gpu_device: gpuNumber,
       model: params.modelParams.model,
       scheduler: params.samplingParams.scheduler,
       prompt: params.promptParams.prompt,
@@ -71,14 +78,18 @@ const Txt2ImgLayout = () => {
     };
 
     try {
-      dispatch(setIsLoading(true)); // 로딩 상태 시작
-      const newTaskId = await postTxt2ImgGeneration('remote', data); // 이미지 생성 요청 후 taskId 반환
-      dispatch(setTaskId(newTaskId)); // taskId 상태에 저장
+      dispatch(setIsLoading(true));
+      const newTaskId = await postTxt2ImgGeneration('remote', data);
+
+      const imgsCnt = params.batchParams.batchCount * params.batchParams.batchSize;
+      dispatch(setOutputImgsCnt(imgsCnt));
+
+      dispatch(setTaskId(newTaskId));
     } catch (error) {
       if (error instanceof Error) {
-        message.error(`Error generating image: ${error.message}`); // 오류 메시지 표시
+        message.error(`Error generating image: ${error.message}`);
       } else {
-        message.error('An unknown error occurred'); // 알 수 없는 오류 메시지
+        message.error('An unknown error occurred');
       }
 
       dispatch(setIsLoading(false));
@@ -86,30 +97,34 @@ const Txt2ImgLayout = () => {
   };
 
   useEffect(() => {
-    let intervalId: string | number | NodeJS.Timeout | undefined; // setInterval을 위한 변수 선언
+    let intervalId: string | number | NodeJS.Timeout | undefined;
 
-    // Task 상태를 주기적으로 확인하는 함수
     const fetchTaskStatus = async () => {
       try {
         // 로딩 중이고 taskId가 있을 경우에만 상태 확인
         if (isLoading && taskId) {
           const response = await getTaskStatus(taskId);
+          console.log(response.data);
           if (response.status === 'SUCCESS') {
             clearInterval(intervalId);
-            setFirstProcessedImg(response.data[0]);
-            dispatch(setOutputImgs(response.data));
-            console.log(output.outputImgs, 'chchchch');
-            setProcessedImgsCnt(params.batchParams.batchCount * params.batchParams.batchSize);
+            dispatch(setOutputImgsUrl(response.data));
+
+            const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
+            const outputsInfo = [{ id: taskId, imgsUrl: response.data, prompt: '' }, ...allOutputs.outputsInfo];
+            dispatch(setAllOutputsInfo({ outputsCnt, outputsInfo }));
+
+            dispatch(setIsLoading(false));
+            dispatch(setTaskId(null));
           } else if (response.status === 'FAILED') {
+            dispatch(setIsLoading(false));
             clearInterval(intervalId);
             message.error('Image generation failed');
           }
         }
       } catch (error) {
         console.error('Failed to get task-status:', error);
-        clearInterval(intervalId); // 오류 발생 시 주기적 호출 중지
-      } finally {
         dispatch(setIsLoading(false));
+        clearInterval(intervalId); // 오류 발생 시 주기적 호출 중지
       }
     };
 
@@ -120,17 +135,30 @@ const Txt2ImgLayout = () => {
 
     // 컴포넌트가 언마운트되거나 taskId가 변경될 때 setInterval 정리
     return () => clearInterval(intervalId);
-  }, [taskId, params.batchParams.batchCount, params.batchParams.batchSize]); // taskId와 batch 파라미터 변화에 따라 useEffect 재실행
+  }, [
+    taskId,
+    params.batchParams.batchCount,
+    params.batchParams.batchSize,
+    isLoading,
+    allOutputs.outputsCnt,
+    allOutputs.outputsInfo,
+    dispatch,
+    output.imgsCnt
+  ]);
 
   const handleSelectAllImages = useCallback(() => {
     if (allSelected) {
       setSelectedImages([]);
     } else {
-      setSelectedImages(output.outputImgs);
+      const allImageUrls = allOutputs.outputsInfo
+        .map((outputInfo) => outputInfo.imgsUrl) // 각 outputInfo의 imgsUrl 배열 추출
+        .flat(); // 중첩 배열을 평탄화하여 하나의 배열로 합침
+
+      setSelectedImages(allImageUrls);
     }
     setAllSelected(!allSelected);
     setIsIconFilled(!isIconFilled);
-  }, [allSelected, output.outputImgs]);
+  }, [allOutputs.outputsInfo, allSelected, isIconFilled]);
 
   const handleDownloadImages = async () => {
     if (selectedImages.length === 0) {
@@ -166,10 +194,6 @@ const Txt2ImgLayout = () => {
     setIsFormatModalVisible(true);
   };
 
-  const showGpuModal = () => {
-    setIsGpuModalVisible(true);
-  };
-
   const handleFormatModalOk = () => {
     setIsFormatModalVisible(false);
     handleDownloadImages(); // 형식 선택 후 다운로드 함수 호출
@@ -198,23 +222,8 @@ const Txt2ImgLayout = () => {
     [navigate, selectedImages]
   );
 
-  // GPU 선택
-  const [gpuNumber, setGpuNumber] = useState(0);
-  const [isGpuModalVisible, setIsGpuModalVisible] = useState(false);
-
-  const handleGpuInputChange = (gpuNumber: number | null) => {
-    if (gpuNumber) {
-      setGpuNumber(gpuNumber);
-    }
-  };
-
-  const handleGpuModalOk = () => {
-    setGpuDevice(gpuNumber);
-    setIsGpuModalVisible(false);
-  };
-
-  const handleGpuModalCancel = () => {
-    setIsGpuModalVisible(false);
+  const handleEmptyImgs = () => {
+    dispatch(resetOutputs());
   };
 
   return (
@@ -236,38 +245,38 @@ const Txt2ImgLayout = () => {
 
           {/* 생성된 이미지 도구모음 */}
           <div className="flex flex-col items-center gap-6 w-[46px] text-[#222] py-10 bg-white rounded-[20px] shadow-md border border-gray-300 dark:bg-gray-600 dark:border-none ml-8 overflow-y-auto custom-scrollbar">
-            <MdMemory
+            <PiEmpty
               className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
-              onClick={showGpuModal}
+              onClick={handleEmptyImgs}
             />
             <RiFolderDownloadLine
-              className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white"
+              className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
               onClick={showFormatModal}
             />
             <MdMoveUp
-              className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white"
+              className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
               onClick={showModal}
             />
             {isIconFilled ? (
               <RiCheckboxMultipleBlankLine
-                className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white ${allSelected ? 'text-blue-500' : ''}`}
+                className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110 ${allSelected ? 'text-blue-500' : ''}`}
                 onClick={handleSelectAllImages}
               />
             ) : (
               <RiCheckboxMultipleBlankFill
-                className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white ${allSelected ? 'text-blue-500' : ''}`}
+                className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110 ${allSelected ? 'text-blue-500' : ''}`}
                 onClick={handleSelectAllImages}
               />
             )}
 
             {isSidebarVisible ? (
               <AiOutlineEye
-                className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white"
+                className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
                 onClick={toggleSidebarAndPrompt}
               />
             ) : (
               <AiOutlineEyeInvisible
-                className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white"
+                className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
                 onClick={toggleSidebarAndPrompt}
               />
             )}
@@ -295,12 +304,6 @@ const Txt2ImgLayout = () => {
           <GenerateButton onClick={handleGenerate} disabled={isLoading} />
         </div>
       )}
-
-      {/* gpu 선택 모달 */}
-      <Modal open={isGpuModalVisible} closable={false} onOk={handleGpuModalOk} onCancel={handleGpuModalCancel}>
-        <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Input the GPU number you want</div>
-        <InputNumber min={0} onChange={handleGpuInputChange} />
-      </Modal>
 
       {/* 이미지 형식 선택 모달 */}
       <Modal open={isFormatModalVisible} closable={false} onOk={handleFormatModalOk} onCancel={handleFormatModalCancel}>

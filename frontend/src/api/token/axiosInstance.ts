@@ -25,7 +25,6 @@ const setAuthorizationToken = async () => {
     if (authorizationHeader) {
       const newToken = authorizationHeader.split(' ')[1];
       localStorage.setItem('accessToken', newToken);
-      console.log('Reissued token:', newToken);
       return newToken;
     } else {
       throw new Error('No authorization header found');
@@ -52,7 +51,6 @@ const setAuthorizationToken = async () => {
 axiosInstance.interceptors.request.use(
   async (config) => {
     const token = localStorage.getItem('accessToken');
-    console.log('Access Token:', token);
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }

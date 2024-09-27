@@ -3,9 +3,12 @@ import PromptParams from '../params/PromptParams';
 import Img2ImgDisplay from '../outputDisplay/Img2ImgDisplay';
 import {
   setIsNegativePrompt,
-  setOutputImgs,
   setIsLoading,
-  setProcessedImgsCnt,
+  setTaskId,
+  setOutputImgsUrl,
+  setOutputImgsCnt,
+  resetOutputs,
+  setAllOutputsInfo,
   setClipData
 } from '../../../store/slices/generation/img2ImgSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,10 +18,11 @@ import GenerateButton from '../../common/GenerateButton';
 import { getClip } from '../../../api/generation';
 import { useImg2ImgParams } from '../../../hooks/generation/useImg2ImgParams';
 import { RootState } from '../../../store/store';
+import { message } from 'antd';
 
 const Img2ImgLayout = () => {
   const dispatch = useDispatch();
-  const { params, isLoading } = useSelector((state: RootState) => state.img2Img);
+  const { params, isLoading, gpuNum } = useSelector((state: RootState) => state.img2Img);
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useImg2ImgParams();
 
   const handleNegativePromptChange = () => {
@@ -32,13 +36,11 @@ const Img2ImgLayout = () => {
       files = params.uploadImgParams.imageList.map((base64Img, index) =>
         convertStringToFile(base64Img, `image_${index}.png`)
       );
-      dispatch(setProcessedImgsCnt(params.batchParams.batchCount * params.batchParams.batchSize));
+      dispatch(setOutputImgsCnt(params.batchParams.batchCount * params.batchParams.batchSize));
       console.log('파일: ', files);
     } else {
       const fileDataArray = await window.electron.getFilesInFolder(params.uploadImgParams.inputPath);
-      dispatch(
-        setProcessedImgsCnt(fileDataArray.length * params.batchParams.batchCount * params.batchParams.batchSize)
-      );
+      dispatch(setOutputImgsCnt(fileDataArray.length * params.batchParams.batchCount * params.batchParams.batchSize));
 
       // base64 데이터를 Blob으로 변환하고 File 객체로 생성
       files = fileDataArray.map((fileData) => {
@@ -55,7 +57,15 @@ const Img2ImgLayout = () => {
       });
     }
 
+    let gpuNumber: number;
+    if (gpuNum) {
+      gpuNumber = gpuNum;
+    } else {
+      gpuNumber = 1; // settings 기본값 가져오기
+    }
+
     const data = {
+      gpu_device: gpuNumber,
       model: params.modelParams.model,
       scheduler: params.samplingParams.scheduler,
       prompt: params.promptParams.prompt,
@@ -75,11 +85,19 @@ const Img2ImgLayout = () => {
 
     try {
       dispatch(setIsLoading(true));
-      const outputImgUrls = await postImg2ImgGeneration('remote', data);
-      dispatch(setOutputImgs(outputImgUrls));
+      const newTaskId = await postImg2ImgGeneration('remote', data);
+
+      const imgsCnt = params.batchParams.batchCount * params.batchParams.batchSize;
+      dispatch(setOutputImgsCnt(imgsCnt));
+
+      dispatch(setTaskId(newTaskId));
     } catch (error) {
-      console.error('Error generating image:', error);
-    } finally {
+      if (error instanceof Error) {
+        message.error(`Error generating image: ${error.message}`);
+      } else {
+        message.error('An unknown error occurred');
+      }
+
       dispatch(setIsLoading(false));
     }
   };

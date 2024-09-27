@@ -1,4 +1,15 @@
-// 상태 관리
+// 상태 관
+export interface OutputInfo {
+  id: string;
+  imgsUrl: string[];
+  prompt: string;
+}
+
+export interface OutputsInfoType {
+  outputsCnt: number;
+  outputsInfo: OutputInfo[];
+}
+
 export interface ModelParamsType {
   model: string;
 }

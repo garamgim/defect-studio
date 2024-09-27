@@ -6,11 +6,13 @@ import {
   GuidanceParamsType,
   PromptParamsType,
   SamplingParamsType,
-  SeedParamsType
+  SeedParamsType,
+  OutputsInfoType,
+  OutputInfo
 } from '../../../types/generation';
 
 export interface Txt2ImgState {
-  gpuDevice: number;
+  gpuNum: number | null; // 지정안하면 settings의 기본 default number 사용
   params: {
     modelParams: ModelParamsType;
     batchParams: BatchParamsType;
@@ -21,17 +23,17 @@ export interface Txt2ImgState {
     seedParams: SeedParamsType;
   };
   isLoading: boolean;
-  taskId: string | null;
   checkedOutput: boolean;
+  taskId: string | null;
   output: {
-    processedImgsCnt: number;
-    outputImgs: string[]; // api 수정되면 제거할 예정
-    firstProcessedImg: string | null;
+    imgsCnt: number;
+    imgsUrl: string[];
   };
+  allOutputs: OutputsInfoType;
 }
 
 const initialState: Txt2ImgState = {
-  gpuDevice: 0,
+  gpuNum: null,
   params: {
     modelParams: {
       model: 'stable-diffusion-2'
@@ -65,9 +67,12 @@ const initialState: Txt2ImgState = {
   taskId: null,
   checkedOutput: true,
   output: {
-    processedImgsCnt: 0,
-    outputImgs: [],
-    firstProcessedImg: null
+    imgsCnt: 0,
+    imgsUrl: []
+  },
+  allOutputs: {
+    outputsCnt: 0,
+    outputsInfo: []
   }
 };
 
@@ -75,8 +80,8 @@ const txt2ImgSlice = createSlice({
   name: 'txt2Img',
   initialState,
   reducers: {
-    setGpuDevice: (state, action: PayloadAction<number>) => {
-      state.gpuDevice = action.payload;
+    setGpuNum: (state, action: PayloadAction<number | null>) => {
+      state.gpuNum = action.payload;
     },
 
     // promptParams는 자주 업데이트 될 수 있으므로 개별 처리
@@ -124,26 +129,33 @@ const txt2ImgSlice = createSlice({
     setCheckedOutput: (state, action: PayloadAction<boolean>) => {
       state.checkedOutput = action.payload;
     },
-    // output
-    setProcessedImgsCnt: (state, action: PayloadAction<number>) => {
-      state.output.processedImgsCnt = action.payload;
+
+    // 현재 Output
+    setOutputImgsCnt: (state, action: PayloadAction<number>) => {
+      state.output.imgsCnt = action.payload;
     },
-    setFirstProcessedImg: (state, action: PayloadAction<string | null>) => {
-      state.output.firstProcessedImg = action.payload;
+    setOutputImgsUrl: (state, action: PayloadAction<string[]>) => {
+      state.output.imgsUrl = action.payload;
     },
-    setOutputImgs: (state, action: PayloadAction<string[]>) => {
-      state.output.outputImgs = action.payload;
+
+    // 전체 Outputs
+    setAllOutputsInfo: (state, action: PayloadAction<{ outputsCnt: number; outputsInfo: OutputInfo[] }>) => {
+      state.allOutputs = action.payload;
     },
 
     // params 초기화
-    resetState: (state) => {
+    resetParams: (state) => {
       Object.assign(state.params, initialState.params);
+    },
+    // 전체 작업물 초기화
+    resetOutputs: (state) => {
+      Object.assign(state.allOutputs, initialState.allOutputs);
     }
   }
 });
 
 export const {
-  setGpuDevice,
+  setGpuNum,
   setPrompt,
   setNegativePrompt,
   setIsNegativePrompt,
@@ -156,10 +168,11 @@ export const {
   setIsLoading,
   setTaskId,
   setCheckedOutput,
-  setProcessedImgsCnt,
-  setFirstProcessedImg,
-  setOutputImgs,
-  resetState
+  setOutputImgsCnt,
+  setOutputImgsUrl,
+  setAllOutputsInfo,
+  resetParams,
+  resetOutputs
 } = txt2ImgSlice.actions;
 
 export default txt2ImgSlice.reducer;

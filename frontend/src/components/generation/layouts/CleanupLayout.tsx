@@ -3,7 +3,7 @@ import Sidebar from '../sidebar/CleanupSidebar';
 import { postCleanupGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import CleanupDisplay from '../outputDisplay/CleanupDisplay';
-import { setIsLoading, setOutputImgs } from '../../../store/slices/generation/txt2ImgSlice';
+import { setIsLoading, setOutputImgs } from '../../../store/slices/generation/cleanupSlice';
 import { RootState } from '../../../store/store';
 import { useSelector, useDispatch } from 'react-redux';
 

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import CreatePreset from '../presets/CreatePreset';
 import LoadPreset from '../presets/LoadPreset';
 import ModelParam from '../params/ModelParam';
@@ -10,8 +10,10 @@ import BatchParams from '../params/BatchParams';
 import { FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import { resetState } from '../../../store/slices/generation/txt2ImgSlice';
+import { resetParams, setGpuNum } from '../../../store/slices/generation/txt2ImgSlice';
 import { useTxt2ImgParams } from '../../../hooks/generation/useTxt2ImgParams';
+import { MdMemory } from 'react-icons/md';
+import { Modal, InputNumber } from 'antd';
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -59,7 +61,30 @@ const Sidebar = () => {
   }, []);
 
   const handleReset = () => {
-    dispatch(resetState());
+    dispatch(resetParams());
+  };
+
+  // GPU 선택
+  const [gpuNumber, setGpuNumber] = useState(0);
+  const [isGpuModalVisible, setIsGpuModalVisible] = useState(false);
+
+  const showGpuModal = () => {
+    setIsGpuModalVisible(true);
+  };
+
+  const handleGpuInputChange = (gpuNumber: number | null) => {
+    if (gpuNumber) {
+      setGpuNumber(gpuNumber);
+    }
+  };
+
+  const handleGpuModalOk = () => {
+    setGpuNum(gpuNumber);
+    setIsGpuModalVisible(false);
+  };
+
+  const handleGpuModalCancel = () => {
+    setIsGpuModalVisible(false);
   };
 
   return (
@@ -67,19 +92,25 @@ const Sidebar = () => {
       <div className="relative w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* reset parameters & preset */}
         {level === 'Advanced' && (
-          <div className="absolute top-6 right-0 mx-6">
-            <UndoOutlined
-              onClick={handleReset}
-              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
-            />
-            <FileAddOutlined
-              onClick={showCreatePreset}
-              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
-            />
-            <FileSearchOutlined
-              onClick={showLoadPreset}
-              className="text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
-            />
+          <div className="absolute top-6 right-0 mr-6">
+            <div className="flex">
+              <UndoOutlined
+                onClick={handleReset}
+                className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+              />
+              <FileAddOutlined
+                onClick={showCreatePreset}
+                className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+              />
+              <FileSearchOutlined
+                onClick={showLoadPreset}
+                className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+              />
+              <MdMemory
+                className="text-[22px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                onClick={showGpuModal}
+              />
+            </div>
           </div>
         )}
 
@@ -116,6 +147,12 @@ const Sidebar = () => {
           </>
         )}
       </div>
+
+      {/* gpu 선택 모달 */}
+      <Modal open={isGpuModalVisible} closable={false} onOk={handleGpuModalOk} onCancel={handleGpuModalCancel}>
+        <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Input the GPU number you want</div>
+        <InputNumber min={0} onChange={handleGpuInputChange} />
+      </Modal>
 
       {/* 프리셋 생성 */}
       <CreatePreset
