@@ -10,6 +10,7 @@ import {
 } from '../../../types/generation';
 
 export interface Txt2ImgState {
+  gpuDevice: number;
   params: {
     modelParams: ModelParamsType;
     batchParams: BatchParamsType;
@@ -30,6 +31,7 @@ export interface Txt2ImgState {
 }
 
 const initialState: Txt2ImgState = {
+  gpuDevice: 0,
   params: {
     modelParams: {
       model: 'stable-diffusion-2'
@@ -73,6 +75,10 @@ const txt2ImgSlice = createSlice({
   name: 'txt2Img',
   initialState,
   reducers: {
+    setGpuDevice: (state, action: PayloadAction<number>) => {
+      state.gpuDevice = action.payload;
+    },
+
     // promptParams는 자주 업데이트 될 수 있으므로 개별 처리
     setPrompt: (state, action: PayloadAction<string>) => {
       state.params.promptParams.prompt = action.payload;
@@ -137,6 +143,7 @@ const txt2ImgSlice = createSlice({
 });
 
 export const {
+  setGpuDevice,
   setPrompt,
   setNegativePrompt,
   setIsNegativePrompt,
