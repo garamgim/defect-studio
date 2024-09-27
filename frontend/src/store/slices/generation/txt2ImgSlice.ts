@@ -30,6 +30,10 @@ export interface Txt2ImgState {
     imgsUrl: string[];
   };
   allOutputs: OutputsInfoType;
+
+  selectedImages: string[];
+  allSelected: boolean;
+  isSidebarVisible: boolean;
 }
 
 const initialState: Txt2ImgState = {
@@ -73,7 +77,11 @@ const initialState: Txt2ImgState = {
   allOutputs: {
     outputsCnt: 0,
     outputsInfo: []
-  }
+  },
+
+  selectedImages: [],
+  allSelected: false,
+  isSidebarVisible: false
 };
 
 const txt2ImgSlice = createSlice({
@@ -150,6 +158,16 @@ const txt2ImgSlice = createSlice({
     // 전체 작업물 초기화
     resetOutputs: (state) => {
       Object.assign(state.allOutputs, initialState.allOutputs);
+    },
+
+    setSelectedImages: (state, action: PayloadAction<string[]>) => {
+      state.selectedImages = action.payload;
+    },
+    setAllSelected: (state, action: PayloadAction<boolean>) => {
+      state.allSelected = action.payload;
+    },
+    setIsSidebarVisible: (state, action: PayloadAction<boolean>) => {
+      state.isSidebarVisible = action.payload;
     }
   }
 });
@@ -172,7 +190,10 @@ export const {
   setOutputImgsUrl,
   setAllOutputsInfo,
   resetParams,
-  resetOutputs
+  resetOutputs,
+  setAllSelected,
+  setIsSidebarVisible,
+  setSelectedImages
 } = txt2ImgSlice.actions;
 
 export default txt2ImgSlice.reducer;

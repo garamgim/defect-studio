@@ -1,29 +1,23 @@
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import React from 'react';
+import { setSelectedImages } from '@/store/slices/generation/txt2ImgSlice';
 
-interface Txt2ImgDisplayProps {
-  selectedImages: string[];
-  setSelectedImages: React.Dispatch<React.SetStateAction<string[]>>;
-}
-
-const Txt2ImgDisplay = ({ selectedImages, setSelectedImages }: Txt2ImgDisplayProps) => {
-  const { output, params, isLoading, allOutputs } = useSelector((state: RootState) => state.txt2Img);
+const Txt2ImgDisplay = () => {
+  const dispatch = useDispatch();
+  const { output, params, isLoading, allOutputs, selectedImages } = useSelector((state: RootState) => state.txt2Img);
 
   // 생성할 이미지 가로세로 비율 계산
   const aspectRatio = params.imgDimensionParams.width / params.imgDimensionParams.height;
 
   const handleImageClick = (url: string) => {
     console.log('이미지수 체크: ', output.imgsCnt);
-    setSelectedImages((prevSelected: string[]) => {
-      if (prevSelected.includes(url)) {
-        // 이미 선택된 경우 -> 선택 해제
-        return prevSelected.filter((imageUrl: string) => imageUrl !== url);
-      } else {
-        // 선택되지 않은 경우 -> 선택 추가
-        return [...prevSelected, url];
-      }
-    });
+    // 이미지 선택 로직
+    const updatedImages = selectedImages.includes(url)
+      ? selectedImages.filter((imageUrl: string) => imageUrl !== url) // 선택 해제
+      : [...selectedImages, url]; // 선택 추가
+
+    dispatch(setSelectedImages(updatedImages)); // 배열을 전달하여 상태 업데이트
   };
 
   return (
