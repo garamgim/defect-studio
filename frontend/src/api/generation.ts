@@ -296,15 +296,8 @@ export const getTaskStatus = async (task_id: string) => {
     const response = await axiosInstance.get(`/generation/tasks/${task_id}`);
 
     if (response.status === 200) {
-      if (response.data.status === 'STARTED') {
-        return response.data.message;
-      } else if (response.data.status === 'PENDING') {
-        return response.data.message;
-      } else if (response.data.status === 'SUCCESS') {
-        return response.data.data;
-      } else {
-        return response.data.message;
-      }
+      console.log('check', response.data);
+      return response.data;
     } else {
       throw new Error('Failed to get task-status');
     }
