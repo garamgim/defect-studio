@@ -33,7 +33,6 @@ const MaskingModal = ({
   updateMaskImageList,
   updateCombinedImg
 }: MaskingModalProps) => {
-
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null); // 마우스 위치 저장 (x, y값), 이미지 벗어나면 null
   const [rgbColor, setRgbColor] = useState<string | null>(null); // RGB 스트링값, 마찬가지로 이미지 벗어나면 null
 
