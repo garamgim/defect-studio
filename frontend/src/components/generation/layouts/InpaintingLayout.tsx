@@ -80,7 +80,7 @@ const InpaintingLayout = () => {
     let gpuNumber: number;
     if (gpuNum) {
       gpuNumber = gpuNum;
-    } else {
+    } else {s
       gpuNumber = 1; // settings 기본값 가져오기
     }
 
@@ -187,9 +187,11 @@ const InpaintingLayout = () => {
   return (
     <div className="flex h-full pt-4 pb-6">
       {/* 사이드바 */}
-      <div className="w-[360px] pl-8 h-full hidden md:block">
-        <Sidebar />
-      </div>
+      {isSidebarVisible && (
+        <div className="w-[360px] pl-8 h-full hidden md:block">
+          <Sidebar />
+        </div>
+      )}
 
       {/* 메인 컨텐츠 */}
       <div className="flex-1 flex flex-col px-8 w-full h-full">
@@ -208,27 +210,32 @@ const InpaintingLayout = () => {
           />
         </div>
 
-        <div className="w-full flex-none">
-          <PromptParams
-            prompt={prompt}
-            negativePrompt={negativePrompt}
-            updatePrompt={updatePrompt}
-            updateNegativePrompt={updateNegativePrompt}
-            isNegativePrompt={isNegativePrompt}
-            handleNegativePromptChange={handleNegativePromptChange}
-            // 메뉴얼 모드일 때만 props로 전달(batch에서는 clip실행 안함)
-            clipData={
-              params.uploadImgWithMaskingParams.mode === 'manual' ? params.uploadImgWithMaskingParams.clipData : []
-            }
-            handleClipClick={params.uploadImgWithMaskingParams.mode === 'manual' ? handleClipClick : undefined}
-          />
-        </div>
+        {/* 프롬프트 영역 */}
+        {isSidebarVisible && (
+          <div className="w-full flex-none mt-6">
+            <PromptParams
+              prompt={prompt}
+              negativePrompt={negativePrompt}
+              updatePrompt={updatePrompt}
+              updateNegativePrompt={updateNegativePrompt}
+              isNegativePrompt={isNegativePrompt}
+              handleNegativePromptChange={handleNegativePromptChange}
+              // 메뉴얼 모드일 때만 props로 전달(batch에서는 clip실행 안함)
+              clipData={
+                params.uploadImgWithMaskingParams.mode === 'manual' ? params.uploadImgWithMaskingParams.clipData : []
+              }
+              handleClipClick={params.uploadImgWithMaskingParams.mode === 'manual' ? handleClipClick : undefined}
+            />
+          </div>
+        )}
       </div>
 
       {/* Generate 버튼 */}
-      <div className="fixed bottom-[50px] right-[56px]">
-        <GenerateButton onClick={handleGenerate} disabled={isLoading} />
-      </div>
+      {isSidebarVisible && (
+        <div className="fixed bottom-[50px] right-[56px]">
+          <GenerateButton onClick={handleGenerate} disabled={isLoading} />
+        </div>
+      )}
     </div>
   );
 };
