@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import React from 'react';
-import { setSelectedImages } from '@/store/slices/generation/txt2ImgSlice';
+import { setSelectedImages } from '../../../store/slices/generation/txt2ImgSlice';
 
 const Txt2ImgDisplay = () => {
   const dispatch = useDispatch();
@@ -112,4 +111,4 @@ const Txt2ImgDisplay = () => {
   );
 };
 
-export default React.memo(Txt2ImgDisplay);
+export default Txt2ImgDisplay;

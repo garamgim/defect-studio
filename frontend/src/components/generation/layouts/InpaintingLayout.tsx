@@ -3,20 +3,29 @@ import PromptParams from '../params/PromptParams';
 import InpaintingDisplay from '../outputDisplay/InpaintingDisplay';
 import { useInpaintingParams } from '../../../hooks/generation/useInpaintingParams';
 import { useDispatch, useSelector } from 'react-redux';
-import { postInpaintingGeneration, getClip } from '../../../api/generation';
+import { postInpaintingGeneration, getClip, getTaskStatus } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import GenerateButton from '../../common/GenerateButton';
 import {
   setClipData,
   setIsLoading,
-  setOutputImgs,
-  setProcessedImgsCnt
+  setTaskId,
+  setOutputImgsUrl,
+  setOutputImgsCnt,
+  setAllOutputsInfo,
+  setSelectedImages,
+  setIsSidebarVisible,
+  setAllSelected
 } from '../../../store/slices/generation/inpaintingSlice';
 import { RootState } from '../../../store/store';
+import { message } from 'antd';
+import { useEffect } from 'react';
+import OutputToolbar from '../outputTool/outputToolbar';
 
 const InpaintingLayout = () => {
   const dispatch = useDispatch();
-  const { params, isLoading } = useSelector((state: RootState) => state.inpainting);
+  const { params, isLoading, gpuNum, taskId, allOutputs, output, selectedImages, isSidebarVisible, allSelected } =
+    useSelector((state: RootState) => state.inpainting);
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useInpaintingParams();
 
   const handleNegativePromptChange = () => {
@@ -34,13 +43,11 @@ const InpaintingLayout = () => {
       canvasFiles = params.uploadImgWithMaskingParams.maskImageList.map((base64Img, index) =>
         convertStringToFile(base64Img, `image_${index}.png`)
       );
-      dispatch(setProcessedImgsCnt(params.batchParams.batchCount * params.batchParams.batchSize));
+      dispatch(setOutputImgsCnt(params.batchParams.batchCount * params.batchParams.batchSize));
     } else {
       const bgFileDataArray = await window.electron.getFilesInFolder(params.uploadImgWithMaskingParams.initInputPath);
       const maskFileDataArray = await window.electron.getFilesInFolder(params.uploadImgWithMaskingParams.maskInputPath);
-      dispatch(
-        setProcessedImgsCnt(bgFileDataArray.length * params.batchParams.batchCount * params.batchParams.batchSize)
-      );
+      dispatch(setOutputImgsCnt(bgFileDataArray.length * params.batchParams.batchCount * params.batchParams.batchSize));
 
       // base64 데이터를 Blob으로 변환하고 File 객체로 생성
       bgFiles = bgFileDataArray.map((fileData) => {
@@ -70,7 +77,15 @@ const InpaintingLayout = () => {
       });
     }
 
+    let gpuNumber: number;
+    if (gpuNum) {
+      gpuNumber = gpuNum;
+    } else {
+      gpuNumber = 1; // settings 기본값 가져오기
+    }
+
     const data = {
+      gpu_device: gpuNumber,
       model: params.modelParams.model,
       scheduler: params.samplingParams.scheduler,
       prompt: params.promptParams.prompt,
@@ -93,14 +108,64 @@ const InpaintingLayout = () => {
 
     try {
       dispatch(setIsLoading(true));
-      const outputImgUrls = await postInpaintingGeneration('remote', data);
-      dispatch(setOutputImgs(outputImgUrls));
+      const newTaskId = await postInpaintingGeneration('remote', data);
+      console.log('테스크아이디: ', newTaskId);
+
+      const imgsCnt = params.batchParams.batchCount * params.batchParams.batchSize;
+      dispatch(setOutputImgsCnt(imgsCnt));
+
+      dispatch(setTaskId(newTaskId));
     } catch (error) {
-      console.error('Error generating image:', error);
-    } finally {
+      if (error instanceof Error) {
+        message.error(`Error generating image: ${error.message}`);
+      } else {
+        message.error('An unknown error occurred');
+      }
+
       dispatch(setIsLoading(false));
     }
   };
+
+  useEffect(() => {
+    let intervalId: string | number | NodeJS.Timeout | undefined;
+
+    const fetchTaskStatus = async () => {
+      try {
+        // 로딩 중이고 taskId가 있을 경우에만 상태 확인
+        if (isLoading && taskId) {
+          const response = await getTaskStatus(taskId);
+          console.log(response.data);
+          if (response.status === 'SUCCESS') {
+            clearInterval(intervalId);
+            dispatch(setOutputImgsUrl(response.data));
+
+            const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
+            const outputsInfo = [{ id: taskId, imgsUrl: response.data, prompt: '' }, ...allOutputs.outputsInfo];
+            dispatch(setAllOutputsInfo({ outputsCnt, outputsInfo }));
+
+            dispatch(setIsLoading(false));
+            dispatch(setTaskId(null));
+          } else if (response.status === 'FAILED') {
+            dispatch(setIsLoading(false));
+            clearInterval(intervalId);
+            message.error('Image generation failed');
+          }
+        }
+      } catch (error) {
+        console.error('Failed to get task-status:', error);
+        dispatch(setIsLoading(false));
+        clearInterval(intervalId); // 오류 발생 시 주기적 호출 중지
+      }
+    };
+
+    if (taskId) {
+      fetchTaskStatus(); // 처음 상태 확인
+      intervalId = setInterval(fetchTaskStatus, 1000); // 1초마다 상태 확인
+    }
+
+    // 컴포넌트가 언마운트되거나 taskId가 변경될 때 setInterval 정리
+    return () => clearInterval(intervalId);
+  }, [allOutputs.outputsCnt, allOutputs.outputsInfo, dispatch, isLoading, output.imgsCnt, taskId]);
 
   // Clip아이콘 클릭
   const handleClipClick = async () => {
@@ -128,8 +193,19 @@ const InpaintingLayout = () => {
 
       {/* 메인 컨텐츠 */}
       <div className="flex-1 flex flex-col px-8 w-full h-full">
-        <div className="flex-1 mb-8 overflow-y-auto custom-scrollbar p-4">
-          <InpaintingDisplay />
+        <div className="flex-1 overflow-y-auto custom-scrollbar py-4 pl-4 flex">
+          {/* 이미지 디스플레이 */}
+          <div className="flex-1">
+            <InpaintingDisplay />
+          </div>
+          <OutputToolbar
+            selectedImages={selectedImages}
+            isSidebarVisible={isSidebarVisible}
+            allSelected={allSelected}
+            setAllSelected={(value: boolean) => dispatch(setAllSelected(value))}
+            setIsSidebarVisible={(value: boolean) => dispatch(setIsSidebarVisible(value))}
+            setSelectedImages={(value: string[]) => dispatch(setSelectedImages(value))}
+          />
         </div>
 
         <div className="w-full flex-none">

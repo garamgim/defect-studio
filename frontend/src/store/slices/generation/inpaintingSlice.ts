@@ -8,10 +8,13 @@ import {
   SamplingParamsType,
   SeedParamsType,
   UploadImgWithMaskingParamsType,
-  StrengthParamsType
+  StrengthParamsType,
+  OutputsInfoType,
+  OutputInfo
 } from '../../../types/generation';
 
 interface InpaintingState {
+  gpuNum: number | null; // 지정안하면 settings의 기본 default number 사용
   params: {
     modelParams: ModelParamsType;
     batchParams: BatchParamsType;
@@ -27,13 +30,18 @@ interface InpaintingState {
   taskId: string | null;
   checkedOutput: boolean;
   output: {
-    processedImgsCnt: number;
-    outputImgs: string[];
-    firstProcessedImg: string | null;
+    imgsCnt: number;
+    imgsUrl: string[];
   };
+  allOutputs: OutputsInfoType;
+
+  selectedImages: string[];
+  allSelected: boolean;
+  isSidebarVisible: boolean;
 }
 
 const initialState: InpaintingState = {
+  gpuNum: null,
   params: {
     modelParams: {
       model: 'stable-diffusion-2-inpainting'
@@ -80,16 +88,27 @@ const initialState: InpaintingState = {
   taskId: null,
   checkedOutput: true,
   output: {
-    processedImgsCnt: 0,
-    outputImgs: [],
-    firstProcessedImg: null
-  }
+    imgsCnt: 0,
+    imgsUrl: []
+  },
+  allOutputs: {
+    outputsCnt: 0,
+    outputsInfo: []
+  },
+
+  selectedImages: [],
+  allSelected: false,
+  isSidebarVisible: false
 };
 
 const inpaintingSlice = createSlice({
   name: 'inpainting',
   initialState,
   reducers: {
+    setGpuNum: (state, action: PayloadAction<number | null>) => {
+      state.gpuNum = action.payload;
+    },
+
     // promptParams는 자주 업데이트 될 수 있으므로 개별 처리
     setPrompt: (state, action: PayloadAction<string>) => {
       state.params.promptParams.prompt = action.payload;
@@ -164,25 +183,43 @@ const inpaintingSlice = createSlice({
     setCheckedOutput: (state, action: PayloadAction<boolean>) => {
       state.checkedOutput = action.payload;
     },
-    // output
-    setProcessedImgsCnt: (state, action: PayloadAction<number>) => {
-      state.output.processedImgsCnt = action.payload;
+
+    // 현재 Output
+    setOutputImgsCnt: (state, action: PayloadAction<number>) => {
+      state.output.imgsCnt = action.payload;
     },
-    setFirstProcessedImg: (state, action: PayloadAction<string | null>) => {
-      state.output.firstProcessedImg = action.payload;
+    setOutputImgsUrl: (state, action: PayloadAction<string[]>) => {
+      state.output.imgsUrl = action.payload;
     },
-    setOutputImgs: (state, action: PayloadAction<string[]>) => {
-      state.output.outputImgs = action.payload;
+
+    // 전체 Outputs
+    setAllOutputsInfo: (state, action: PayloadAction<{ outputsCnt: number; outputsInfo: OutputInfo[] }>) => {
+      state.allOutputs = action.payload;
     },
 
     // params 초기화
-    resetState: (state) => {
+    resetParams: (state) => {
       Object.assign(state.params, initialState.params);
+    },
+    // 전체 작업물 초기화
+    resetOutputs: (state) => {
+      Object.assign(state.allOutputs, initialState.allOutputs);
+    },
+
+    setSelectedImages: (state, action: PayloadAction<string[]>) => {
+      state.selectedImages = action.payload;
+    },
+    setAllSelected: (state, action: PayloadAction<boolean>) => {
+      state.allSelected = action.payload;
+    },
+    setIsSidebarVisible: (state, action: PayloadAction<boolean>) => {
+      state.isSidebarVisible = action.payload;
     }
   }
 });
 
 export const {
+  setGpuNum,
   setPrompt,
   setNegativePrompt,
   setIsNegativePrompt,
@@ -195,9 +232,8 @@ export const {
   setIsLoading,
   setCheckedOutput,
   setTaskId,
-  setProcessedImgsCnt,
-  setFirstProcessedImg,
-  setOutputImgs,
+  setOutputImgsCnt,
+  setOutputImgsUrl,
   setStrengthParams,
   setMode,
   setClipData,
@@ -207,7 +243,12 @@ export const {
   setInitInputPath,
   setOutputPath,
   setCombinedImg,
-  resetState
+  setAllOutputsInfo,
+  resetParams,
+  resetOutputs,
+  setAllSelected,
+  setIsSidebarVisible,
+  setSelectedImages
 } = inpaintingSlice.actions;
 
 export default inpaintingSlice.reducer;
