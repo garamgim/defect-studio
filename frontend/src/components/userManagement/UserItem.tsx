@@ -47,7 +47,7 @@ const UserItem = ({ userData }: GuestUserItemProps) => {
   >({
     mutationFn: rejectUser,
     onSuccess: () => {
-      message.success('Rejected Guest User');
+      message.success('Removed User Account');
       queryClient.invalidateQueries({
         queryKey: ['guest_user_info']
       });
