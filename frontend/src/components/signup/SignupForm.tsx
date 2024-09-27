@@ -4,6 +4,9 @@ import { departmentType } from '@/api/department';
 import { AxiosResponse } from 'axios';
 import { useForm } from 'react-hook-form';
 import { signUpFormType } from '@/types/user';
+import { sendEmailVerifyCode } from '@api/email';
+import { message } from 'antd';
+import { useCallback } from 'react';
 
 interface SignupFormProps {
   signupForm: signUpFormType;
@@ -24,6 +27,21 @@ const SignupForm = ({ signupForm, setSignupForm, setSignUpPage }: SignupFormProp
     select: (data) => data.data
   });
 
+  const RequestSignUpButtonEvent = useCallback(
+    async (name: string, email: string) => {
+      try {
+        await sendEmailVerifyCode(name, email).catch((error) => {
+          console.log('abcd', error.response.data);
+          message.error(error.response.data.message);
+        });
+        setSignUpPage('Verifying Page');
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [setSignUpPage]
+  );
+
   const {
     register,
     handleSubmit,
@@ -39,7 +57,7 @@ const SignupForm = ({ signupForm, setSignupForm, setSignUpPage }: SignupFormProp
         <form
           onSubmit={handleSubmit((data) => {
             setSignupForm(data);
-            setSignUpPage('Verifying Page');
+            RequestSignUpButtonEvent(data.name, data.email);
           })}
         >
           {/* username (user_id) */}

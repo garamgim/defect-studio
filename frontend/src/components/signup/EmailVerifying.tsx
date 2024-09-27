@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import { sendEmailVerifyCode, checkEmailVerifyCode } from '@api/email';
+import { useNavigate } from 'react-router-dom';
+import { message } from 'antd';
 
 interface EmailVerifyingProps {
   email: string;
+  name: string;
   setSignUpPage: React.Dispatch<React.SetStateAction<'FormPage' | 'Verifying Page'>>;
 }
 
-const EmailVerifying = ({ email, setSignUpPage }: EmailVerifyingProps) => {
+const EmailVerifying = ({ email, name, setSignUpPage }: EmailVerifyingProps) => {
+  const naviagate = useNavigate();
   const [inputCode, SetInputCode] = useState<string>('');
   const [timeLeft, setTimeLeft] = useState(170); // 2분 50초는 170초
   const [timeout, setTimeoutState] = useState(false);
@@ -32,8 +37,21 @@ const EmailVerifying = ({ email, setSignUpPage }: EmailVerifyingProps) => {
 
   const handleResendCode = () => {
     setTimeLeft(180); // 제한 시간을 180초로 재설정
+    sendEmailVerifyCode(email, name); // 이메일로 인증 코드 재전송
     setCanResend(false); // "Resend Code" 버튼을 다시 비활성화
     // 여기에 코드 재전송 로직 추가
+  };
+
+  const checkCodeEvent = async (email: string, inputCode: string) => {
+    try {
+      await checkEmailVerifyCode(email, inputCode).catch((error) => {
+        throw new Error(error.response.data.message);
+      });
+      naviagate('/login');
+      // 여기에 코드 확인 로직 추가
+    } catch (error) {
+      message.error('Verification code is incorrect.');
+    }
   };
 
   return (
@@ -71,7 +89,11 @@ const EmailVerifying = ({ email, setSignUpPage }: EmailVerifyingProps) => {
         >
           Back To Form
         </button>
-        <button className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-green-600 dark:hover:bg-green-800 dark:focus:ring-green-400 active:scale-95 transition transform duration-150 ease-in-out">
+        <button
+          onClick={() => checkCodeEvent(email, inputCode)}
+          disabled={timeout}
+          className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-green-600 dark:hover:bg-green-800 dark:focus:ring-green-400 active:scale-95 transition transform duration-150 ease-in-out"
+        >
           Check
         </button>
         <button
