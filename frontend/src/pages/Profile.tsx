@@ -98,7 +98,7 @@ const Profile = () => {
                       navigate('/guestUserManage');
                     }}
                   >
-                    Set Guest User
+                    User Management
                   </Button>
                 )}
               </section>

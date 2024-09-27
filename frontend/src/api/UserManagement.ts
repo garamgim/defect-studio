@@ -3,7 +3,7 @@ import axiosInstance from './token/axiosInstance';
 
 export type RoleType = 'guest' | 'department_member' | 'department_admin' | 'super_admin';
 
-// Guest Member 정보 가져오기
+// Member 정보 가져오기 --------------------
 
 export type MemberRead = {
   member_id: number;
@@ -16,10 +16,12 @@ export type MemberRead = {
   token_quantity: number;
 };
 
+// Guest ------------------------------------------
+
 // 정보 요청
 export const getGuestUserInfo = async (): Promise<AxiosResponse<MemberRead[]>> => {
   try {
-    const response = await axiosInstance.get<MemberRead[]>('/admin/members/guests');
+    const response = await axiosInstance.get<MemberRead[]>('/members/guests');
     console.log(response.data);
     return response;
   } catch (error) {
@@ -34,12 +36,9 @@ export interface ApproveGuestUserProps {
   new_role: Omit<RoleType, 'guest'>;
 }
 
-export const approveGuestUser = async ({
-  member_id,
-  new_role
-}: ApproveGuestUserProps): Promise<AxiosResponse<string>> => {
+export const approveUser = async ({ member_id, new_role }: ApproveGuestUserProps): Promise<AxiosResponse<string>> => {
   try {
-    const response = await axiosInstance.patch(`/admin/members/guests/${member_id}`, null, {
+    const response = await axiosInstance.patch(`/members/${member_id}/role`, null, {
       params: {
         new_role
       }
@@ -64,9 +63,9 @@ export const approveGuestUser = async ({
 export interface RejectGuestUserProps {
   member_id: number;
 }
-export const rejectGuestUser = async ({ member_id }: RejectGuestUserProps): Promise<AxiosResponse<string>> => {
+export const rejectUser = async ({ member_id }: RejectGuestUserProps): Promise<AxiosResponse<string>> => {
   try {
-    const response = await axiosInstance.delete(`/admin/members/guests/${member_id}`);
+    const response = await axiosInstance.delete(`/members/${member_id}`);
     return response;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -79,5 +78,18 @@ export const rejectGuestUser = async ({ member_id }: RejectGuestUserProps): Prom
     } else {
       throw new Error('Unexpected error occurred');
     }
+  }
+};
+
+// 이미 가입한 회원 ----------------------
+
+// 모든 회원들에 대한 요청
+export const getUserInfo = async (): Promise<AxiosResponse<MemberRead[]>> => {
+  try {
+    const response = await axiosInstance.get<MemberRead[]>('/members/all');
+    console.log(response.data);
+    return response;
+  } catch (error) {
+    throw Error('Unexpected error occurred');
   }
 };
