@@ -15,7 +15,7 @@ import CreatePreset from '../presets/CreatePreset';
 import LoadPreset from '../presets/LoadPreset';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import { setCombinedImg, resetState } from '../../../store/slices/generation/inpaintingSlice';
+import { setCombinedImg, resetParams } from '../../../store/slices/generation/inpaintingSlice';
 import { useDispatch } from 'react-redux';
 
 const InpaintingSidebar = () => {
@@ -98,7 +98,7 @@ const InpaintingSidebar = () => {
   };
 
   const handleReset = () => {
-    dispatch(resetState());
+    dispatch(resetParams());
   };
 
   return (

@@ -72,8 +72,8 @@ export const postImg2ImgGeneration = async (gpu_env: Img2ImgDataType['gpu_env'],
       }
     });
 
-    if (response.status === 201) {
-      return response.data.image_list; // image_list 배열 반환
+    if (response.status === 200) {
+      return response.data.task_id;
     } else {
       throw new Error('Failed to generate image-to-image');
     }
@@ -108,8 +108,8 @@ export const postInpaintingGeneration = async (
       }
     });
 
-    if (response.status === 201) {
-      return response.data.image_list; // image_list 배열 반환
+    if (response.status === 200) {
+      return response.data.task_id;
     } else {
       throw new Error('Failed to generate image-to-image');
     }
