@@ -8,9 +8,7 @@ import {
   SamplingParamsType,
   SeedParamsType,
   UploadImgWithMaskingParamsType,
-  StrengthParamsType,
-  OutputsInfoType,
-  OutputInfo
+  StrengthParamsType
 } from '../../../types/generation';
 
 interface InpaintingState {
@@ -26,18 +24,6 @@ interface InpaintingState {
     uploadImgWithMaskingParams: UploadImgWithMaskingParamsType;
     strengthParams: StrengthParamsType;
   };
-  isLoading: boolean;
-  taskId: string | null;
-  checkedOutput: boolean;
-  output: {
-    imgsCnt: number;
-    imgsUrl: string[];
-  };
-  allOutputs: OutputsInfoType;
-
-  selectedImages: string[];
-  allSelected: boolean;
-  isSidebarVisible: boolean;
 }
 
 const initialState: InpaintingState = {
@@ -78,27 +64,13 @@ const initialState: InpaintingState = {
       combinedImg: null,
       initInputPath: '',
       maskInputPath: '',
-      outputPath: ''
+      outputPath: '',
+      isZipDownload: false
     },
     strengthParams: {
       strength: 0.75
     }
-  },
-  isLoading: false,
-  taskId: null,
-  checkedOutput: true,
-  output: {
-    imgsCnt: 0,
-    imgsUrl: []
-  },
-  allOutputs: {
-    outputsCnt: 0,
-    outputsInfo: []
-  },
-
-  selectedImages: [],
-  allSelected: false,
-  isSidebarVisible: false
+  }
 };
 
 const inpaintingSlice = createSlice({
@@ -148,6 +120,9 @@ const inpaintingSlice = createSlice({
     setOutputPath: (state, action: PayloadAction<string>) => {
       state.params.uploadImgWithMaskingParams.outputPath = action.payload;
     },
+    setIsZipDownload: (state, action: PayloadAction<boolean>) => {
+      state.params.uploadImgWithMaskingParams.isZipDownload = action.payload;
+    },
 
     setModelParams: (state, action: PayloadAction<string>) => {
       state.params.modelParams.model = action.payload;
@@ -171,49 +146,9 @@ const inpaintingSlice = createSlice({
       state.params.batchParams = action.payload;
     },
 
-    // 이미지 생성 체크를 위한 로딩
-    setIsLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
-    },
-    // 이미지 생성 체크를 위해 받는 id값
-    setTaskId: (state, action: PayloadAction<string | null>) => {
-      state.taskId = action.payload;
-    },
-    // 이미지 생성 후 생성된 이미지 확인 했는지 체크
-    setCheckedOutput: (state, action: PayloadAction<boolean>) => {
-      state.checkedOutput = action.payload;
-    },
-
-    // 현재 Output
-    setOutputImgsCnt: (state, action: PayloadAction<number>) => {
-      state.output.imgsCnt = action.payload;
-    },
-    setOutputImgsUrl: (state, action: PayloadAction<string[]>) => {
-      state.output.imgsUrl = action.payload;
-    },
-
-    // 전체 Outputs
-    setAllOutputsInfo: (state, action: PayloadAction<{ outputsCnt: number; outputsInfo: OutputInfo[] }>) => {
-      state.allOutputs = action.payload;
-    },
-
     // params 초기화
     resetParams: (state) => {
       Object.assign(state.params, initialState.params);
-    },
-    // 전체 작업물 초기화
-    resetOutputs: (state) => {
-      Object.assign(state.allOutputs, initialState.allOutputs);
-    },
-
-    setSelectedImages: (state, action: PayloadAction<string[]>) => {
-      state.selectedImages = action.payload;
-    },
-    setAllSelected: (state, action: PayloadAction<boolean>) => {
-      state.allSelected = action.payload;
-    },
-    setIsSidebarVisible: (state, action: PayloadAction<boolean>) => {
-      state.isSidebarVisible = action.payload;
     }
   }
 });
@@ -229,11 +164,6 @@ export const {
   setImgDimensionParams,
   setSeedParams,
   setBatchParams,
-  setIsLoading,
-  setCheckedOutput,
-  setTaskId,
-  setOutputImgsCnt,
-  setOutputImgsUrl,
   setStrengthParams,
   setMode,
   setClipData,
@@ -243,12 +173,8 @@ export const {
   setInitInputPath,
   setOutputPath,
   setCombinedImg,
-  setAllOutputsInfo,
   resetParams,
-  resetOutputs,
-  setAllSelected,
-  setIsSidebarVisible,
-  setSelectedImages
+  setIsZipDownload
 } = inpaintingSlice.actions;
 
 export default inpaintingSlice.reducer;

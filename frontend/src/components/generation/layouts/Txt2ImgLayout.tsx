@@ -11,7 +11,7 @@ import {
   setOutputImgsUrl,
   setOutputImgsCnt,
   setAllOutputsInfo,
-  setSelectedImages,
+  setselectedImgs,
   setIsSidebarVisible,
   setAllSelected
 } from '../../../store/slices/generation/txt2ImgSlice';
@@ -23,8 +23,18 @@ import OutputToolbar from '../outputTool/outputToolbar';
 
 const Txt2ImgLayout = () => {
   const dispatch = useDispatch();
-  const { params, isLoading, taskId, gpuNum, output, allOutputs, selectedImages, isSidebarVisible, allSelected } =
-    useSelector((state: RootState) => state.txt2Img);
+  const {
+    params,
+    isLoading,
+    taskId,
+    gpuNum,
+    output,
+    allOutputs,
+    selectedImgs,
+    isSidebarVisible,
+    allSelected,
+    allImageUrls
+  } = useSelector((state: RootState) => state.txt2Img);
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useTxt2ImgParams();
 
   const handleNegativePromptChange = useCallback(() => {
@@ -82,10 +92,10 @@ const Txt2ImgLayout = () => {
         // 로딩 중이고 taskId가 있을 경우에만 상태 확인
         if (isLoading && taskId) {
           const response = await getTaskStatus(taskId);
-          console.log(response.data);
-          if (response.status === 'SUCCESS') {
+          if (response.task_status === 'SUCCESS') {
             clearInterval(intervalId);
-            dispatch(setOutputImgsUrl(response.data));
+            console.log(response.result_data_log.first_image_url);
+            dispatch(setOutputImgsUrl(response.result_data_log.first_image_url));
 
             const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
             const outputsInfo = [{ id: taskId, imgsUrl: response.data, prompt: '' }, ...allOutputs.outputsInfo];
@@ -141,12 +151,13 @@ const Txt2ImgLayout = () => {
             <Txt2ImgDisplay />
           </div>
           <OutputToolbar
-            selectedImages={selectedImages}
+            selectedImgs={selectedImgs}
             isSidebarVisible={isSidebarVisible}
             allSelected={allSelected}
             setAllSelected={(value: boolean) => dispatch(setAllSelected(value))}
             setIsSidebarVisible={(value: boolean) => dispatch(setIsSidebarVisible(value))}
-            setSelectedImages={(value: string[]) => dispatch(setSelectedImages(value))}
+            setselectedImgs={(value: string[]) => dispatch(setselectedImgs(value))}
+            allImageUrls={allImageUrls}
           />
         </div>
 

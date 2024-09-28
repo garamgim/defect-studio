@@ -103,7 +103,7 @@ const MaskingModal = ({
       };
     });
   };
-  const handleSaveImages = async () => {
+  const handlesaveImgs = async () => {
     if (!stageRef.current) {
       return;
     }
@@ -687,7 +687,7 @@ const MaskingModal = ({
             <Button onClick={onClose} className="border-none bg-white text-blue-500">
               Cancel
             </Button>
-            <Button onClick={handleSaveImages} type="primary" className="bg-blue-500 text-white">
+            <Button onClick={handlesaveImgs} type="primary" className="bg-blue-500 text-white">
               Apply
             </Button>
           </div>

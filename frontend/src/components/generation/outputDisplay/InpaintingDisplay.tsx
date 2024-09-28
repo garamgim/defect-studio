@@ -1,10 +1,10 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
-import { setSelectedImages } from '../../../store/slices/generation/inpaintingSlice';
+import { setselectedImgs } from '../../../store/slices/generation/inpaintingSlice';
 
 const InpaintingDisplay = () => {
   const dispatch = useDispatch();
-  const { output, params, isLoading, allOutputs, selectedImages } = useSelector((state: RootState) => state.inpainting);
+  const { output, params, isLoading, allOutputs, selectedImgs } = useSelector((state: RootState) => state.inpainting);
 
   // 생성할 이미지 가로세로 비율 계산
   const aspectRatio = params.imgDimensionParams.width / params.imgDimensionParams.height;
@@ -12,11 +12,12 @@ const InpaintingDisplay = () => {
   const handleImageClick = (url: string) => {
     console.log('이미지수 체크: ', output.imgsCnt);
     // 이미지 선택 로직
-    const updatedImages = selectedImages.includes(url)
-      ? selectedImages.filter((imageUrl: string) => imageUrl !== url) // 선택 해제
-      : [...selectedImages, url]; // 선택 추가
+    const updatedImages = selectedImgs.includes(url)
+      ? selectedImgs.filter((imageUrl: string) => imageUrl !== url) // 선택 해제
+      : [...selectedImgs, url]; // 선택 추가
 
-    dispatch(setSelectedImages(updatedImages)); // 배열을 전달하여 상태 업데이트
+    dispatch(setselectedImgs(updatedImages)); // 배열을 전달하여 상태 업데이트
+    console.log('checccck: ', updatedImages);
   };
 
   return (
@@ -56,7 +57,7 @@ const InpaintingDisplay = () => {
                   src={url}
                   alt={`Generated image ${imgIndex}`} // 이미지 인덱스 반영
                   className={`absolute top-0 left-0 w-full h-full object-cover rounded-xl ${
-                    selectedImages.includes(url)
+                    selectedImgs.includes(url)
                       ? 'border-4 border-blue-500'
                       : 'border border-gray-300 dark:border-gray-700'
                   }`}
@@ -92,7 +93,7 @@ const InpaintingDisplay = () => {
                   src={url}
                   alt={`Generated image ${imgIndex}`} // 이미지 인덱스 반영
                   className={`absolute top-0 left-0 w-full h-full object-cover rounded-xl ${
-                    selectedImages.includes(url)
+                    selectedImgs.includes(url)
                       ? 'border-4 border-blue-500'
                       : 'border border-gray-300 dark:border-gray-700'
                   }`}

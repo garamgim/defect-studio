@@ -6,9 +6,7 @@ import {
   GuidanceParamsType,
   PromptParamsType,
   SamplingParamsType,
-  SeedParamsType,
-  OutputsInfoType,
-  OutputInfo
+  SeedParamsType
 } from '../../../types/generation';
 
 export interface Txt2ImgState {
@@ -22,18 +20,6 @@ export interface Txt2ImgState {
     samplingParams: SamplingParamsType;
     seedParams: SeedParamsType;
   };
-  isLoading: boolean;
-  checkedOutput: boolean;
-  taskId: string | null;
-  output: {
-    imgsCnt: number;
-    imgsUrl: string[];
-  };
-  allOutputs: OutputsInfoType;
-
-  selectedImages: string[];
-  allSelected: boolean;
-  isSidebarVisible: boolean;
 }
 
 const initialState: Txt2ImgState = {
@@ -66,22 +52,7 @@ const initialState: Txt2ImgState = {
       batchCount: 1,
       batchSize: 1
     }
-  },
-  isLoading: false,
-  taskId: null,
-  checkedOutput: true,
-  output: {
-    imgsCnt: 0,
-    imgsUrl: []
-  },
-  allOutputs: {
-    outputsCnt: 0,
-    outputsInfo: []
-  },
-
-  selectedImages: [],
-  allSelected: false,
-  isSidebarVisible: false
+  }
 };
 
 const txt2ImgSlice = createSlice({
@@ -125,49 +96,9 @@ const txt2ImgSlice = createSlice({
       state.params.batchParams = action.payload;
     },
 
-    // 이미지 생성 체크를 위한 로딩
-    setIsLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
-    },
-    // 이미지 생성 체크를 위해 받는 id값
-    setTaskId: (state, action: PayloadAction<string | null>) => {
-      state.taskId = action.payload;
-    },
-    // 이미지 생성 후 생성된 이미지 확인 했는지 체크
-    setCheckedOutput: (state, action: PayloadAction<boolean>) => {
-      state.checkedOutput = action.payload;
-    },
-
-    // 현재 Output
-    setOutputImgsCnt: (state, action: PayloadAction<number>) => {
-      state.output.imgsCnt = action.payload;
-    },
-    setOutputImgsUrl: (state, action: PayloadAction<string[]>) => {
-      state.output.imgsUrl = action.payload;
-    },
-
-    // 전체 Outputs
-    setAllOutputsInfo: (state, action: PayloadAction<{ outputsCnt: number; outputsInfo: OutputInfo[] }>) => {
-      state.allOutputs = action.payload;
-    },
-
     // params 초기화
     resetParams: (state) => {
       Object.assign(state.params, initialState.params);
-    },
-    // 전체 작업물 초기화
-    resetOutputs: (state) => {
-      Object.assign(state.allOutputs, initialState.allOutputs);
-    },
-
-    setSelectedImages: (state, action: PayloadAction<string[]>) => {
-      state.selectedImages = action.payload;
-    },
-    setAllSelected: (state, action: PayloadAction<boolean>) => {
-      state.allSelected = action.payload;
-    },
-    setIsSidebarVisible: (state, action: PayloadAction<boolean>) => {
-      state.isSidebarVisible = action.payload;
     }
   }
 });
@@ -183,17 +114,7 @@ export const {
   setImgDimensionParams,
   setSeedParams,
   setBatchParams,
-  setIsLoading,
-  setTaskId,
-  setCheckedOutput,
-  setOutputImgsCnt,
-  setOutputImgsUrl,
-  setAllOutputsInfo,
-  resetParams,
-  resetOutputs,
-  setAllSelected,
-  setIsSidebarVisible,
-  setSelectedImages
+  resetParams
 } = txt2ImgSlice.actions;
 
 export default txt2ImgSlice.reducer;

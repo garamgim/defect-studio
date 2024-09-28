@@ -15,21 +15,23 @@ import { setInitImageList as setCleanupImages } from '../../../store/slices/gene
 import { RootState } from '../../../store/store';
 
 interface OutputToolbarProps {
-  selectedImages: string[];
+  selectedImgs: string[];
   isSidebarVisible: boolean;
   allSelected: boolean;
-  setSelectedImages: (selectedImages: string[]) => void;
+  setselectedImgs: (selectedImgs: string[]) => void;
   setIsSidebarVisible: (isSidebarVisible: boolean) => void;
   setAllSelected: (allSelected: boolean) => void;
+  allImageUrls: string[];
 }
 
 const OutputToolbar = ({
-  selectedImages,
+  selectedImgs,
   isSidebarVisible,
   allSelected,
-  setSelectedImages,
+  setselectedImgs,
   setIsSidebarVisible,
-  setAllSelected
+  setAllSelected,
+  allImageUrls
 }: OutputToolbarProps) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -53,7 +55,7 @@ const OutputToolbar = ({
   };
 
   const handleDownloadImages = async () => {
-    if (selectedImages.length === 0) {
+    if (selectedImgs.length === 0) {
       message.warning('Please select at least one image to save.');
       return;
     }
@@ -62,7 +64,7 @@ const OutputToolbar = ({
       message.info('Folder selection was canceled.');
       return;
     }
-    const response = await window.electron.saveImages(selectedImages, folderPath, selectedImageFormat);
+    const response = await window.electron.saveImgs(selectedImgs, folderPath, selectedImageFormat);
     if (response.success) {
       message.success('Image saved successfully!');
     } else {
@@ -103,14 +105,15 @@ const OutputToolbar = ({
   };
 
   const handleSelectAllImages = useCallback(() => {
+    console.log(selectedImgs);
     if (allSelected) {
-      setSelectedImages([]);
+      setselectedImgs([]);
     } else {
       const allImageUrls = allOutputs.outputsInfo
         .map((outputInfo) => outputInfo.imgsUrl) // 각 outputInfo의 imgsUrl 배열 추출
         .flat(); // 중첩 배열을 평탄화하여 하나의 배열로 합침
 
-      setSelectedImages(allImageUrls);
+      setselectedImgs(allImageUrls);
     }
     setAllSelected(!allSelected);
     setIsIconFilled(!isIconFilled);
@@ -120,12 +123,12 @@ const OutputToolbar = ({
     (path: string) => {
       const action = routeToActionMap[path];
       if (action) {
-        action(selectedImages);
+        action(selectedImgs);
       }
       navigate(path);
       setIsModalVisible(false);
     },
-    [navigate, selectedImages]
+    [navigate, selectedImgs]
   );
 
   return (
