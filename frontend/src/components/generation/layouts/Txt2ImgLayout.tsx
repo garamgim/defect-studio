@@ -72,10 +72,17 @@ const Txt2ImgLayout = () => {
           const response = await getTaskStatus(taskId);
           if (response.task_status === 'SUCCESS') {
             clearInterval(intervalId);
-            dispatch(setOutputImgsUrl({ tab: 'txt2Img', value: response.result_data_log.first_image_url }));
+            dispatch(setOutputImgsUrl({ tab: 'txt2Img', value: response.result_data }));
 
             const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
-            const outputsInfo = [{ id: taskId, imgsUrl: response.data, prompt: '' }, ...allOutputs.outputsInfo];
+            const outputsInfo = [
+              {
+                id: response.result_data_log.id,
+                imgsUrl: response.result_data,
+                prompt: response.result_data_log.prompt
+              },
+              ...allOutputs.outputsInfo
+            ];
             dispatch(setAllOutputsInfo({ tab: 'txt2Img', outputsCnt, outputsInfo }));
 
             dispatch(setIsLoading({ tab: 'txt2Img', value: false }));

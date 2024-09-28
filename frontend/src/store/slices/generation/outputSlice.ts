@@ -150,9 +150,13 @@ const outputSlice = createSlice({
       };
     },
 
-    // 전체 작업물 초기화
+    // 전체 작업물 초기화 (과거 작업물을 초기화시키고, 사이드바도 보이게 변경)
     resetOutputs: (state, action: PayloadAction<keyof MultiTabOutputState>) => {
-      state[action.payload] = initialState[action.payload];
+      state[action.payload].allOutputs = {
+        outputsCnt: initialState[action.payload].allOutputs.outputsCnt,
+        outputsInfo: initialState[action.payload].allOutputs.outputsInfo
+      };
+      state[action.payload].isSidebarVisible = initialState[action.payload].isSidebarVisible;
     },
 
     setSelectedImgs: (state, action: PayloadAction<{ tab: keyof MultiTabOutputState; value: string[] }>) => {
