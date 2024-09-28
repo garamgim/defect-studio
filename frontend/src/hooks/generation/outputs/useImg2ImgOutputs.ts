@@ -8,12 +8,14 @@ export const useImg2ImgOutputs = () => {
   const output = useSelector((state: RootState) => state.generatedOutput.img2Img.output);
   const allOutputs = useSelector((state: RootState) => state.generatedOutput.img2Img.allOutputs);
   const isSidebarVisible = useSelector((state: RootState) => state.generatedOutput.img2Img.isSidebarVisible);
+  const isCheckedOutput = useSelector((state: RootState) => state.generatedOutput.img2Img.isCheckedOutput);
 
   return {
     isLoading,
     taskId,
     output,
     allOutputs,
-    isSidebarVisible
+    isSidebarVisible,
+    isCheckedOutput
   };
 };

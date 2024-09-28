@@ -3,7 +3,7 @@ import { OutputsInfoType, OutputInfo } from '../../../types/generation';
 
 export interface OutputState {
   isLoading: boolean;
-  checkedOutput: boolean;
+  isCheckedOutput: boolean;
   taskId: string | null;
   output: {
     imgsCnt: number;
@@ -30,7 +30,7 @@ const initialState: MultiTabOutputState = {
   txt2Img: {
     isLoading: false,
     taskId: null,
-    checkedOutput: true,
+    isCheckedOutput: true,
     output: {
       imgsCnt: 0,
       imgsUrl: []
@@ -47,7 +47,7 @@ const initialState: MultiTabOutputState = {
   img2Img: {
     isLoading: false,
     taskId: null,
-    checkedOutput: true,
+    isCheckedOutput: true,
     output: {
       imgsCnt: 0,
       imgsUrl: []
@@ -64,7 +64,7 @@ const initialState: MultiTabOutputState = {
   inpainting: {
     isLoading: false,
     taskId: null,
-    checkedOutput: true,
+    isCheckedOutput: true,
     output: {
       imgsCnt: 0,
       imgsUrl: []
@@ -81,7 +81,7 @@ const initialState: MultiTabOutputState = {
   removeBg: {
     isLoading: false,
     taskId: null,
-    checkedOutput: true,
+    isCheckedOutput: true,
     output: {
       imgsCnt: 0,
       imgsUrl: []
@@ -98,7 +98,7 @@ const initialState: MultiTabOutputState = {
   cleanup: {
     isLoading: false,
     taskId: null,
-    checkedOutput: true,
+    isCheckedOutput: true,
     output: {
       imgsCnt: 0,
       imgsUrl: []
@@ -127,8 +127,8 @@ const outputSlice = createSlice({
       state[action.payload.tab].taskId = action.payload.value;
     },
     // 이미지 생성 후 생성된 이미지 확인 했는지 체크
-    setCheckedOutput: (state, action: PayloadAction<{ tab: keyof MultiTabOutputState; value: boolean }>) => {
-      state[action.payload.tab].checkedOutput = action.payload.value;
+    setIsCheckedOutput: (state, action: PayloadAction<{ tab: keyof MultiTabOutputState; value: boolean }>) => {
+      state[action.payload.tab].isCheckedOutput = action.payload.value;
     },
 
     // 현재 Output
@@ -178,7 +178,7 @@ const outputSlice = createSlice({
 export const {
   setIsLoading,
   setTaskId,
-  setCheckedOutput,
+  setIsCheckedOutput,
   setOutputImgsCnt,
   setOutputImgsUrl,
   setAllOutputsInfo,

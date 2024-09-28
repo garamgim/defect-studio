@@ -17,7 +17,7 @@ const Txt2ImgDisplay = () => {
     // 이미지 선택 로직
     const updatedImages = selectedImgs.includes(url)
       ? selectedImgs.filter((imageUrl: string) => imageUrl !== url)
-      : [...selectedImgs, url]; 
+      : [...selectedImgs, url];
 
     dispatch(setSelectedImgs({ tab: 'txt2Img', value: updatedImages }));
   };

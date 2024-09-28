@@ -8,12 +8,14 @@ export const useCleanupOutputs = () => {
   const output = useSelector((state: RootState) => state.generatedOutput.cleanup.output);
   const allOutputs = useSelector((state: RootState) => state.generatedOutput.cleanup.allOutputs);
   const isSidebarVisible = useSelector((state: RootState) => state.generatedOutput.cleanup.isSidebarVisible);
+  const isCheckedOutput = useSelector((state: RootState) => state.generatedOutput.cleanup.isCheckedOutput);
 
   return {
     isLoading,
     taskId,
     output,
     allOutputs,
-    isSidebarVisible
+    isSidebarVisible,
+    isCheckedOutput
   };
 };

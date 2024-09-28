@@ -109,7 +109,7 @@ const OutputToolbar = ({ type }: OutputToolbarProps) => {
   return (
     <>
       {/* 생성된 이미지 도구 모음 */}
-      <div className="flex flex-col items-center gap-6 w-[46px] text-[#222] py-10 bg-white rounded-[20px] shadow-md border border-gray-300 dark:bg-gray-600 dark:border-none ml-8 overflow-y-auto custom-scrollbar">
+      <div className="flex flex-col items-center gap-7 w-[46px] text-[#222] py-12 bg-white rounded-[20px] shadow-md border border-gray-300 dark:bg-gray-600 dark:border-none ml-8 overflow-y-auto custom-scrollbar">
         <Tooltip title="Clear">
           <PiEmpty
             className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"

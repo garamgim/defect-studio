@@ -1,5 +1,5 @@
 import Sidebar from '../sidebar/RemoveBgSidebar';
-import GenerateButton from '../../common/GenerateButton';
+import GenerateButton from '../common/GenerateButton';
 import { postRemoveBgGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import RemoveBgDisplay from '../outputDisplay/RemoveBgDisplay';
