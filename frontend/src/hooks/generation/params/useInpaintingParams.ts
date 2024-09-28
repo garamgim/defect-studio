@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store/store';
+import { RootState } from '../../../store/store';
 import {
   setModelParams,
   setSamplingParams,
@@ -19,7 +19,7 @@ import {
   setInitInputPath,
   setOutputPath,
   setCombinedImg
-} from '../../store/slices/generation/inpaintingSlice';
+} from '../../../store/slices/generation/inpaintingSlice';
 import { useCallback } from 'react';
 
 export const useInpaintingParams = () => {

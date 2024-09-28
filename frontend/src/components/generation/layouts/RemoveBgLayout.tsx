@@ -3,7 +3,7 @@ import GenerateButton from '../../common/GenerateButton';
 import { postRemoveBgGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import RemoveBgDisplay from '../outputDisplay/RemoveBgDisplay';
-import { useRemoveBgParams } from '../../../hooks/generation/useRemoveBgParams';
+import { useRemoveBgParams } from '../../../hooks/generation/params/useRemoveBgParams';
 import { RootState } from '../../../store/store';
 import { useSelector, useDispatch } from 'react-redux';
 import { setIsLoading, setTaskId, setOutputImgsCnt } from '../../../store/slices/generation/outputSlice';

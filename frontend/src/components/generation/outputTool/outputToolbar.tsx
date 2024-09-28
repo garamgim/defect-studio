@@ -5,7 +5,7 @@ import { AiOutlineEyeInvisible, AiOutlineEye } from 'react-icons/ai';
 import { PiEmpty } from 'react-icons/pi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useState } from 'react';
-import { Modal, Select, Button, message } from 'antd';
+import { Modal, Select, Button, message, Tooltip } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import {
   resetOutputs,
@@ -110,43 +110,57 @@ const OutputToolbar = ({ type }: OutputToolbarProps) => {
     <>
       {/* 생성된 이미지 도구 모음 */}
       <div className="flex flex-col items-center gap-6 w-[46px] text-[#222] py-10 bg-white rounded-[20px] shadow-md border border-gray-300 dark:bg-gray-600 dark:border-none ml-8 overflow-y-auto custom-scrollbar">
-        {/* 이미지 비우기 도구 */}
-        <PiEmpty
-          className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
-          onClick={handleEmptyImgs}
-        />
-        {/* 이미지 다운 도구 */}
-        <RiFolderDownloadLine
-          className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
-          onClick={showFormatModal}
-        />
-        {/* 이미지 다른 탭 이동 도구 */}
-        <MdMoveUp
-          className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
-          onClick={showModal}
-        />
+        <Tooltip title="Clear">
+          <PiEmpty
+            className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
+            onClick={handleEmptyImgs}
+          />
+        </Tooltip>
+
+        <Tooltip title="Download">
+          <RiFolderDownloadLine
+            className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
+            onClick={showFormatModal}
+          />
+        </Tooltip>
+
+        <Tooltip title="Move Image">
+          <MdMoveUp
+            className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
+            onClick={showModal}
+          />
+        </Tooltip>
+
         {isIconFilled ? (
-          <RiCheckboxMultipleBlankLine
-            className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110 ${isAllSelected ? 'text-blue-500' : ''}`}
-            onClick={handleSelectAllImages}
-          />
+          <Tooltip title="Select All">
+            <RiCheckboxMultipleBlankLine
+              className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110 ${isAllSelected ? 'text-blue-500' : ''}`}
+              onClick={handleSelectAllImages}
+            />
+          </Tooltip>
         ) : (
-          <RiCheckboxMultipleBlankFill
-            className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110 ${isAllSelected ? 'text-blue-500' : ''}`}
-            onClick={handleSelectAllImages}
-          />
+          <Tooltip title="Unselect All">
+            <RiCheckboxMultipleBlankFill
+              className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110 ${isAllSelected ? 'text-blue-500' : ''}`}
+              onClick={handleSelectAllImages}
+            />
+          </Tooltip>
         )}
         {/* 사이드바 숨김 도구 */}
         {isSidebarVisible ? (
-          <AiOutlineEye
-            className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
-            onClick={toggleSidebarAndPrompt}
-          />
+          <Tooltip title="Hide Sidebar">
+            <AiOutlineEye
+              className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
+              onClick={toggleSidebarAndPrompt}
+            />
+          </Tooltip>
         ) : (
-          <AiOutlineEyeInvisible
-            className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
-            onClick={toggleSidebarAndPrompt}
-          />
+          <Tooltip title="Show Sidebar">
+            <AiOutlineEyeInvisible
+              className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
+              onClick={toggleSidebarAndPrompt}
+            />
+          </Tooltip>
         )}
       </div>
 

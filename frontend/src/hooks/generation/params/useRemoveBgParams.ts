@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store/store';
-import { setImageList, setInputPath, setOutputPath, setMode } from '../../store/slices/generation/removeBgSlice';
+import { RootState } from '../../../store/store';
+import { setImageList, setInputPath, setOutputPath, setMode } from '../../../store/slices/generation/removeBgSlice';
 import { useCallback } from 'react';
 
 export const useRemoveBgParams = () => {

@@ -8,14 +8,16 @@ import { postImg2ImgGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import GenerateButton from '../../common/GenerateButton';
 import { getClip } from '../../../api/generation';
-import { useImg2ImgParams } from '../../../hooks/generation/useImg2ImgParams';
+import { useImg2ImgParams } from '../../../hooks/generation/params/useImg2ImgParams';
 import { RootState } from '../../../store/store';
 import { message } from 'antd';
+import OutputToolbar from '../outputTool/OutputToolbar';
+import { useImg2ImgOutputs } from '../../../hooks/generation/outputs/useImg2ImgOutputs';
 
 const Img2ImgLayout = () => {
   const dispatch = useDispatch();
   const { params, gpuNum } = useSelector((state: RootState) => state.img2Img);
-  const { isLoading } = useSelector((state: RootState) => state.generatedOutput.img2Img);
+  const { isLoading, taskId, output, allOutputs, isSidebarVisible } = useImg2ImgOutputs();
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useImg2ImgParams();
 
   const handleNegativePromptChange = () => {
@@ -125,35 +127,46 @@ const Img2ImgLayout = () => {
   return (
     <div className="flex h-full pt-4 pb-6">
       {/* 사이드바 */}
-      <div className="w-[360px] pl-8 h-full hidden md:block">
-        <Sidebar />
-      </div>
+      {isSidebarVisible && (
+        <div className="w-[360px] pl-8 h-full hidden md:block">
+          <Sidebar />
+        </div>
+      )}
 
       {/* 메인 컨텐츠 */}
       <div className="flex-1 flex flex-col px-8 w-full h-full">
-        <div className="flex-1 mb-8 overflow-y-auto custom-scrollbar p-4">
-          <Img2ImgDisplay />
+        <div className="flex-1 overflow-y-auto custom-scrollbar py-4 pl-4 flex">
+          {/* 이미지 디스플레이 */}
+          <div className="flex-1">
+            <Img2ImgDisplay />
+          </div>
+          <OutputToolbar type="img2Img" />
         </div>
 
-        <div className="w-full flex-none">
-          <PromptParams
-            prompt={prompt}
-            negativePrompt={negativePrompt}
-            updatePrompt={updatePrompt}
-            updateNegativePrompt={updateNegativePrompt}
-            isNegativePrompt={isNegativePrompt}
-            handleNegativePromptChange={handleNegativePromptChange}
-            // 메뉴얼 모드일 때만 props로 전달(batch에서는 clip실행 안함)
-            clipData={params.uploadImgParams.mode === 'manual' ? params.uploadImgParams.clipData : []}
-            handleClipClick={params.uploadImgParams.mode === 'manual' ? handleClipClick : undefined}
-          />
-        </div>
+        {/* 프롬프트 영역 */}
+        {isSidebarVisible && (
+          <div className="w-full flex-none mt-6">
+            <PromptParams
+              prompt={prompt}
+              negativePrompt={negativePrompt}
+              updatePrompt={updatePrompt}
+              updateNegativePrompt={updateNegativePrompt}
+              isNegativePrompt={isNegativePrompt}
+              handleNegativePromptChange={handleNegativePromptChange}
+              // 메뉴얼 모드일 때만 props로 전달(batch에서는 clip실행 안함)
+              clipData={params.uploadImgParams.mode === 'manual' ? params.uploadImgParams.clipData : []}
+              handleClipClick={params.uploadImgParams.mode === 'manual' ? handleClipClick : undefined}
+            />
+          </div>
+        )}
       </div>
 
       {/* Generate 버튼 */}
-      <div className="fixed bottom-[50px] right-[56px]">
-        <GenerateButton onClick={handleGenerate} disabled={isLoading} />
-      </div>
+      {isSidebarVisible && (
+        <div className="fixed bottom-[50px] right-[56px]">
+          <GenerateButton onClick={handleGenerate} disabled={isLoading} />
+        </div>
+      )}
     </div>
   );
 };

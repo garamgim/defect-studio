@@ -1,7 +1,7 @@
 import Sidebar from '../sidebar/InpaintingSidebar';
 import PromptParams from '../params/PromptParams';
 import InpaintingDisplay from '../outputDisplay/InpaintingDisplay';
-import { useInpaintingParams } from '../../../hooks/generation/useInpaintingParams';
+import { useInpaintingParams } from '../../../hooks/generation/params/useInpaintingParams';
 import { useDispatch, useSelector } from 'react-redux';
 import { postInpaintingGeneration, getClip, getTaskStatus } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
