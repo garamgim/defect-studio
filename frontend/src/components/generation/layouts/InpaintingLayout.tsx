@@ -12,19 +12,19 @@ import {
   setTaskId,
   setOutputImgsUrl,
   setOutputImgsCnt,
-  setAllOutputsInfo
+  setAllOutputsInfo,
+  setIsCheckedOutput
 } from '../../../store/slices/generation/outputSlice';
 import { RootState } from '../../../store/store';
 import { message } from 'antd';
 import { useEffect } from 'react';
 import OutputToolbar from '../outputTool/OutputToolbar';
+import { useInpaintingOutputs } from '../../../hooks/generation/outputs/useInpaintingOutputs';
 
 const InpaintingLayout = () => {
   const dispatch = useDispatch();
   const { params, gpuNum } = useSelector((state: RootState) => state.inpainting);
-  const { isLoading, taskId, allOutputs, output, isSidebarVisible } = useSelector(
-    (state: RootState) => state.generatedOutput.inpainting
-  );
+  const { isLoading, taskId, output, allOutputs, isSidebarVisible } = useInpaintingOutputs();
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useInpaintingParams();
 
   // 파일 변환 로직을 함수로 분리하여 중복 제거
@@ -97,26 +97,24 @@ const InpaintingLayout = () => {
       if (isLoading && taskId) {
         try {
           const response = await getTaskStatus(taskId);
-          if (response.status === 'SUCCESS') {
-            clearInterval(intervalId);
-            dispatch(setOutputImgsUrl(response.data));
+          if (response.task_status === 'SUCCESS') {
+            clearInterval(intervalId); // 성공 시 상태 확인 중지
+            dispatch(setOutputImgsUrl({ tab: 'inpainting', value: response.result_data }));
 
             const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
-            const outputsInfo = [{ id: taskId, imgsUrl: response.data, prompt: '' }, ...allOutputs.outputsInfo];
-            dispatch(
-              setAllOutputsInfo({
-                tab: 'inpainting',
-                outputsCnt,
-                outputsInfo
-              })
-            );
+            const outputsInfo = [
+              {
+                id: response.result_data_log.id,
+                imgsUrl: response.result_data,
+                prompt: response.result_data_log.prompt
+              },
+              ...allOutputs.outputsInfo
+            ];
+            dispatch(setAllOutputsInfo({ tab: 'inpainting', outputsCnt, outputsInfo }));
 
             dispatch(setIsLoading({ tab: 'inpainting', value: false }));
+            dispatch(setIsCheckedOutput({ tab: 'inpainting', value: false }));
             dispatch(setTaskId({ tab: 'inpainting', value: null }));
-          } else if (response.status === 'FAILED') {
-            message.error('Image generation failed');
-            dispatch(setIsLoading({ tab: 'inpainting', value: false }));
-            clearInterval(intervalId);
           }
         } catch (error) {
           console.error('Failed to get task status:', error);
