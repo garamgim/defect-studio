@@ -4,35 +4,22 @@ import { RiCheckboxMultipleBlankFill, RiCheckboxMultipleBlankLine } from 'react-
 import { AiOutlineEyeInvisible, AiOutlineEye } from 'react-icons/ai';
 import { PiEmpty } from 'react-icons/pi';
 import { useDispatch, useSelector } from 'react-redux';
-import { resetOutputs } from '@/store/slices/generation/txt2ImgSlice';
 import { useCallback, useState } from 'react';
 import { Modal, Select, Button, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { setImageList as setImg2ImgImages } from '../../../store/slices/generation/img2ImgSlice';
-import { setInitImageList as setInpaintingImages } from '../../../store/slices/generation/inpaintingSlice';
-import { setImageList as setRemoveBgImages } from '../../../store/slices/generation/removeBgSlice';
-import { setInitImageList as setCleanupImages } from '../../../store/slices/generation/cleanupSlice';
+import {
+  resetOutputs,
+  setSelectedImgs,
+  setIsAllSelected,
+  setIsSidebarVisible
+} from '../../../store/slices/generation/outputSlice';
 import { RootState } from '../../../store/store';
 
 interface OutputToolbarProps {
-  selectedImgs: string[];
-  isSidebarVisible: boolean;
-  allSelected: boolean;
-  setselectedImgs: (selectedImgs: string[]) => void;
-  setIsSidebarVisible: (isSidebarVisible: boolean) => void;
-  setAllSelected: (allSelected: boolean) => void;
-  allImageUrls: string[];
+  type: 'txt2Img' | 'img2Img' | 'inpainting' | 'removeBg' | 'cleanup';
 }
 
-const OutputToolbar = ({
-  selectedImgs,
-  isSidebarVisible,
-  allSelected,
-  setselectedImgs,
-  setIsSidebarVisible,
-  setAllSelected,
-  allImageUrls
-}: OutputToolbarProps) => {
+const OutputToolbar = ({ type }: OutputToolbarProps) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -41,7 +28,10 @@ const OutputToolbar = ({
   const [isFormatModalVisible, setIsFormatModalVisible] = useState(false);
   const [selectedImageFormat, setSelectedImageFormat] = useState<string>('png');
 
-  const { allOutputs } = useSelector((state: RootState) => state.txt2Img);
+  // 해당 타입의 state를 불러옵니다.
+  const { allOutputs, selectedImgs, isAllSelected, isSidebarVisible } = useSelector(
+    (state: RootState) => state.generatedOutput[type]
+  );
 
   const imageFormats = [
     { value: 'png', label: 'PNG' },
@@ -51,7 +41,7 @@ const OutputToolbar = ({
   ];
 
   const handleEmptyImgs = () => {
-    dispatch(resetOutputs());
+    dispatch(resetOutputs(type));
   };
 
   const handleDownloadImages = async () => {
@@ -73,7 +63,7 @@ const OutputToolbar = ({
   };
 
   const toggleSidebarAndPrompt = () => {
-    setIsSidebarVisible(!isSidebarVisible);
+    dispatch(setIsSidebarVisible({ tab: type, value: !isSidebarVisible }));
   };
 
   const showModal = () => {
@@ -97,68 +87,56 @@ const OutputToolbar = ({
     setIsFormatModalVisible(false);
   };
 
-  const routeToActionMap: { [key: string]: (images: string[]) => void } = {
-    '/generation/image-to-image': (images) => dispatch(setImg2ImgImages(images)),
-    '/generation/inpainting': (images) => dispatch(setInpaintingImages(images)),
-    '/generation/remove-background': (images) => dispatch(setRemoveBgImages(images)),
-    '/generation/cleanup': (images) => dispatch(setCleanupImages(images))
-  };
-
   const handleSelectAllImages = useCallback(() => {
-    console.log(selectedImgs);
-    if (allSelected) {
-      setselectedImgs([]);
+    if (isAllSelected) {
+      dispatch(setSelectedImgs({ tab: type, value: [] }));
     } else {
-      const allImageUrls = allOutputs.outputsInfo
-        .map((outputInfo) => outputInfo.imgsUrl) // 각 outputInfo의 imgsUrl 배열 추출
-        .flat(); // 중첩 배열을 평탄화하여 하나의 배열로 합침
-
-      setselectedImgs(allImageUrls);
+      const allImageUrls = allOutputs.outputsInfo.map((outputInfo) => outputInfo.imgsUrl).flat();
+      dispatch(setSelectedImgs({ tab: type, value: allImageUrls }));
     }
-    setAllSelected(!allSelected);
+    dispatch(setIsAllSelected({ tab: type, value: !isAllSelected }));
     setIsIconFilled(!isIconFilled);
-  }, [allOutputs.outputsInfo, allSelected, isIconFilled]);
+  }, [allOutputs.outputsInfo, isAllSelected, isIconFilled, type, dispatch]);
 
   const goToPage = useCallback(
     (path: string) => {
-      const action = routeToActionMap[path];
-      if (action) {
-        action(selectedImgs);
-      }
       navigate(path);
       setIsModalVisible(false);
     },
-    [navigate, selectedImgs]
+    [navigate]
   );
 
   return (
     <>
-      {/* 생성된 이미지 도구모음 */}
+      {/* 생성된 이미지 도구 모음 */}
       <div className="flex flex-col items-center gap-6 w-[46px] text-[#222] py-10 bg-white rounded-[20px] shadow-md border border-gray-300 dark:bg-gray-600 dark:border-none ml-8 overflow-y-auto custom-scrollbar">
+        {/* 이미지 비우기 도구 */}
         <PiEmpty
           className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
           onClick={handleEmptyImgs}
         />
+        {/* 이미지 다운 도구 */}
         <RiFolderDownloadLine
           className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
           onClick={showFormatModal}
         />
+        {/* 이미지 다른 탭 이동 도구 */}
         <MdMoveUp
           className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
           onClick={showModal}
         />
         {isIconFilled ? (
           <RiCheckboxMultipleBlankLine
-            className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110 ${allSelected ? 'text-blue-500' : ''}`}
+            className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110 ${isAllSelected ? 'text-blue-500' : ''}`}
             onClick={handleSelectAllImages}
           />
         ) : (
           <RiCheckboxMultipleBlankFill
-            className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110 ${allSelected ? 'text-blue-500' : ''}`}
+            className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110 ${isAllSelected ? 'text-blue-500' : ''}`}
             onClick={handleSelectAllImages}
           />
         )}
-
+        {/* 사이드바 숨김 도구 */}
         {isSidebarVisible ? (
           <AiOutlineEye
             className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
@@ -186,7 +164,7 @@ const OutputToolbar = ({
         </Select>
       </Modal>
 
-      {/* 액션 선택 모달 */}
+      {/* 이미지 선택 후 탭 이동 모달 */}
       <Modal open={isModalVisible} onCancel={handleCancel} footer={null}>
         <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Select a tab to navigate</div>
         <div className="flex flex-col gap-4 my-10">

@@ -65,21 +65,23 @@ const Sidebar = () => {
   };
 
   // GPU 선택
-  const [gpuNumber, setGpuNumber] = useState(0);
+  const [gpuNumer, setGpuNumer] = useState(0);
   const [isGpuModalVisible, setIsGpuModalVisible] = useState(false);
 
   const showGpuModal = () => {
     setIsGpuModalVisible(true);
   };
 
-  const handleGpuInputChange = (gpuNumber: number | null) => {
-    if (gpuNumber) {
-      setGpuNumber(gpuNumber);
+  const handleGpuInputChange = (gpuNumer: number | null) => {
+    if (gpuNumer) {
+      setGpuNumer(gpuNumer);
     }
   };
 
   const handleGpuModalOk = () => {
-    setGpuNum(gpuNumber);
+    if (gpuNumer !== null) {
+      dispatch(setGpuNum(gpuNumer)); // Dispatch the selected GPU number
+    }
     setIsGpuModalVisible(false);
   };
 

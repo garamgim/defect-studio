@@ -4,37 +4,26 @@ import Sidebar from '../sidebar/Txt2ImgSidebar';
 import PromptParams from '../params/PromptParams';
 import Txt2ImgDisplay from '../outputDisplay/Txt2ImgDisplay';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  setIsNegativePrompt,
-  setIsLoading,
-  setTaskId,
-  setOutputImgsUrl,
-  setOutputImgsCnt,
-  setAllOutputsInfo,
-  setselectedImgs,
-  setIsSidebarVisible,
-  setAllSelected
-} from '../../../store/slices/generation/txt2ImgSlice';
+import { setIsNegativePrompt } from '../../../store/slices/generation/txt2ImgSlice';
 import { useTxt2ImgParams } from '../../../hooks/generation/useTxt2ImgParams';
 import GenerateButton from '../../common/GenerateButton';
 import { postTxt2ImgGeneration, getTaskStatus } from '../../../api/generation';
 import { RootState } from '../../../store/store';
-import OutputToolbar from '../outputTool/outputToolbar';
+import OutputToolbar from '../outputTool/OutputToolbar';
+import {
+  setIsLoading,
+  setOutputImgsCnt,
+  setTaskId,
+  setOutputImgsUrl,
+  setAllOutputsInfo
+} from '../../../store/slices/generation/outputSlice';
 
 const Txt2ImgLayout = () => {
   const dispatch = useDispatch();
-  const {
-    params,
-    isLoading,
-    taskId,
-    gpuNum,
-    output,
-    allOutputs,
-    selectedImgs,
-    isSidebarVisible,
-    allSelected,
-    allImageUrls
-  } = useSelector((state: RootState) => state.txt2Img);
+  const { params, gpuNum } = useSelector((state: RootState) => state.txt2Img);
+  const { isLoading, taskId, output, allOutputs, isSidebarVisible } = useSelector(
+    (state: RootState) => state.generatedOutput.txt2Img
+  );
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useTxt2ImgParams();
 
   const handleNegativePromptChange = useCallback(() => {
@@ -42,12 +31,7 @@ const Txt2ImgLayout = () => {
   }, [isNegativePrompt, dispatch]);
 
   const handleGenerate = async () => {
-    let gpuNumber: number;
-    if (gpuNum) {
-      gpuNumber = gpuNum;
-    } else {
-      gpuNumber = 1; // settings 기본값 가져오기
-    }
+    const gpuNumber = gpuNum || 1; // gpuNum이 없으면 기본값 1 사용
 
     const data = {
       gpu_device: gpuNumber,
@@ -66,21 +50,16 @@ const Txt2ImgLayout = () => {
     };
 
     try {
-      dispatch(setIsLoading(true));
+      dispatch(setIsLoading({ tab: 'txt2Img', value: true }));
       const newTaskId = await postTxt2ImgGeneration('remote', data);
 
       const imgsCnt = params.batchParams.batchCount * params.batchParams.batchSize;
-      dispatch(setOutputImgsCnt(imgsCnt));
+      dispatch(setOutputImgsCnt({ tab: 'txt2Img', value: imgsCnt }));
 
-      dispatch(setTaskId(newTaskId));
+      dispatch(setTaskId({ tab: 'txt2Img', value: newTaskId }));
     } catch (error) {
-      if (error instanceof Error) {
-        message.error(`Error generating image: ${error.message}`);
-      } else {
-        message.error('An unknown error occurred');
-      }
-
-      dispatch(setIsLoading(false));
+      message.error(`Error generating image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
     }
   };
 
@@ -94,25 +73,24 @@ const Txt2ImgLayout = () => {
           const response = await getTaskStatus(taskId);
           if (response.task_status === 'SUCCESS') {
             clearInterval(intervalId);
-            console.log(response.result_data_log.first_image_url);
-            dispatch(setOutputImgsUrl(response.result_data_log.first_image_url));
+            dispatch(setOutputImgsUrl({ tab: 'txt2Img', value: response.result_data_log.first_image_url }));
 
             const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
             const outputsInfo = [{ id: taskId, imgsUrl: response.data, prompt: '' }, ...allOutputs.outputsInfo];
-            dispatch(setAllOutputsInfo({ outputsCnt, outputsInfo }));
+            dispatch(setAllOutputsInfo({ tab: 'txt2Img', outputsCnt, outputsInfo }));
 
-            dispatch(setIsLoading(false));
-            dispatch(setTaskId(null));
+            dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
+            dispatch(setTaskId({ tab: 'txt2Img', value: null }));
           } else if (response.status === 'FAILED') {
-            dispatch(setIsLoading(false));
+            dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
             clearInterval(intervalId);
             message.error('Image generation failed');
           }
         }
       } catch (error) {
-        console.error('Failed to get task-status:', error);
-        dispatch(setIsLoading(false));
-        clearInterval(intervalId); // 오류 발생 시 주기적 호출 중지
+        console.error('Failed to get task status:', error);
+        dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
+        clearInterval(intervalId);
       }
     };
 
@@ -123,16 +101,7 @@ const Txt2ImgLayout = () => {
 
     // 컴포넌트가 언마운트되거나 taskId가 변경될 때 setInterval 정리
     return () => clearInterval(intervalId);
-  }, [
-    taskId,
-    params.batchParams.batchCount,
-    params.batchParams.batchSize,
-    isLoading,
-    allOutputs.outputsCnt,
-    allOutputs.outputsInfo,
-    dispatch,
-    output.imgsCnt
-  ]);
+  }, [taskId, isLoading, allOutputs.outputsCnt, allOutputs.outputsInfo, output.imgsCnt, dispatch]);
 
   return (
     <div className="flex h-full pt-4 pb-6">
@@ -150,15 +119,7 @@ const Txt2ImgLayout = () => {
           <div className="flex-1">
             <Txt2ImgDisplay />
           </div>
-          <OutputToolbar
-            selectedImgs={selectedImgs}
-            isSidebarVisible={isSidebarVisible}
-            allSelected={allSelected}
-            setAllSelected={(value: boolean) => dispatch(setAllSelected(value))}
-            setIsSidebarVisible={(value: boolean) => dispatch(setIsSidebarVisible(value))}
-            setselectedImgs={(value: string[]) => dispatch(setselectedImgs(value))}
-            allImageUrls={allImageUrls}
-          />
+          <OutputToolbar type="txt2Img" />
         </div>
 
         {/* 프롬프트 영역 */}

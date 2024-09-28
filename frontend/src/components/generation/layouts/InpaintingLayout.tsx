@@ -6,83 +6,57 @@ import { useDispatch, useSelector } from 'react-redux';
 import { postInpaintingGeneration, getClip, getTaskStatus } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import GenerateButton from '../../common/GenerateButton';
+import { setClipData, setIsNegativePrompt } from '../../../store/slices/generation/inpaintingSlice';
 import {
-  setClipData,
   setIsLoading,
   setTaskId,
   setOutputImgsUrl,
   setOutputImgsCnt,
-  setAllOutputsInfo,
-  setselectedImgs,
-  setIsSidebarVisible,
-  setAllSelected
-} from '../../../store/slices/generation/inpaintingSlice';
+  setAllOutputsInfo
+} from '../../../store/slices/generation/outputSlice';
 import { RootState } from '../../../store/store';
 import { message } from 'antd';
 import { useEffect } from 'react';
-import OutputToolbar from '../outputTool/outputToolbar';
+import OutputToolbar from '../outputTool/OutputToolbar';
 
 const InpaintingLayout = () => {
   const dispatch = useDispatch();
-  const { params, isLoading, gpuNum, taskId, allOutputs, output, selectedImgs, isSidebarVisible, allSelected } =
-    useSelector((state: RootState) => state.inpainting);
+  const { params, gpuNum } = useSelector((state: RootState) => state.inpainting);
+  const { isLoading, taskId, allOutputs, output, isSidebarVisible } = useSelector(
+    (state: RootState) => state.generatedOutput.inpainting
+  );
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useInpaintingParams();
 
-  const handleNegativePromptChange = () => {
-    !isNegativePrompt;
+  // 파일 변환 로직을 함수로 분리하여 중복 제거
+  const convertBase64ToFileArray = (base64Array: string[], fileType: string) => {
+    return base64Array.map((base64Img, index) => convertStringToFile(base64Img, `${fileType}_${index}.png`));
   };
 
-  let bgFiles;
-  let canvasFiles;
-
   const handleGenerate = async () => {
+    let bgFiles: File[], canvasFiles: File[];
+
     if (params.uploadImgWithMaskingParams.mode === 'manual') {
-      bgFiles = params.uploadImgWithMaskingParams.initImageList.map((base64Img, index) =>
-        convertStringToFile(base64Img, `image_${index}.png`)
+      bgFiles = convertBase64ToFileArray(params.uploadImgWithMaskingParams.initImageList, 'image');
+      canvasFiles = convertBase64ToFileArray(params.uploadImgWithMaskingParams.maskImageList, 'mask');
+      dispatch(
+        setOutputImgsCnt({ tab: 'inpainting', value: params.batchParams.batchCount * params.batchParams.batchSize })
       );
-      canvasFiles = params.uploadImgWithMaskingParams.maskImageList.map((base64Img, index) =>
-        convertStringToFile(base64Img, `image_${index}.png`)
-      );
-      dispatch(setOutputImgsCnt(params.batchParams.batchCount * params.batchParams.batchSize));
     } else {
       const bgFileDataArray = await window.electron.getFilesInFolder(params.uploadImgWithMaskingParams.initInputPath);
       const maskFileDataArray = await window.electron.getFilesInFolder(params.uploadImgWithMaskingParams.maskInputPath);
-      dispatch(setOutputImgsCnt(bgFileDataArray.length * params.batchParams.batchCount * params.batchParams.batchSize));
 
-      // base64 데이터를 Blob으로 변환하고 File 객체로 생성
-      bgFiles = bgFileDataArray.map((fileData) => {
-        const byteString = atob(fileData.data);
-        const arrayBuffer = new ArrayBuffer(byteString.length);
-        const uintArray = new Uint8Array(arrayBuffer);
+      bgFiles = bgFileDataArray.map(({ data, name }) => convertStringToFile(data, name));
+      canvasFiles = maskFileDataArray.map(({ data, name }) => convertStringToFile(data, name));
 
-        for (let i = 0; i < byteString.length; i++) {
-          uintArray[i] = byteString.charCodeAt(i);
-        }
-
-        const blob = new Blob([arrayBuffer], { type: fileData.type });
-        return new File([blob], fileData.name, { type: fileData.type });
-      });
-
-      canvasFiles = maskFileDataArray.map((fileData) => {
-        const byteString = atob(fileData.data);
-        const arrayBuffer = new ArrayBuffer(byteString.length);
-        const uintArray = new Uint8Array(arrayBuffer);
-
-        for (let i = 0; i < byteString.length; i++) {
-          uintArray[i] = byteString.charCodeAt(i);
-        }
-
-        const blob = new Blob([arrayBuffer], { type: fileData.type });
-        return new File([blob], fileData.name, { type: fileData.type });
-      });
+      dispatch(
+        setOutputImgsCnt({
+          tab: 'inpainting',
+          value: bgFileDataArray.length * params.batchParams.batchCount * params.batchParams.batchSize
+        })
+      );
     }
 
-    let gpuNumber: number;
-    if (gpuNum) {
-      gpuNumber = gpuNum;
-    } else {
-      gpuNumber = 1; // settings 기본값 가져오기
-    }
+    const gpuNumber = gpuNum || 1; // GPU 번호 설정 간소화
 
     const data = {
       gpu_device: gpuNumber,
@@ -98,76 +72,69 @@ const InpaintingLayout = () => {
       batch_count: params.batchParams.batchCount,
       batch_size: params.batchParams.batchSize,
       strength: params.strengthParams.strength,
-      input_path: params.uploadImgWithMaskingParams.initInputPath,
       init_image_list: bgFiles,
       mask_image_list: canvasFiles,
-      init_input_path: '',
-      mask_input_path: '',
-      output_path: '' // 추후 settings 페이지 경로 넣을 예정
+      init_input_path: params.uploadImgWithMaskingParams.initInputPath,
+      mask_input_path: params.uploadImgWithMaskingParams.maskInputPath,
+      output_path: '' // 추후 설정
     };
 
     try {
-      dispatch(setIsLoading(true));
+      dispatch(setIsLoading({ tab: 'inpainting', value: true }));
       const newTaskId = await postInpaintingGeneration('remote', data);
-      console.log('테스크아이디: ', newTaskId);
 
-      const imgsCnt = params.batchParams.batchCount * params.batchParams.batchSize;
-      dispatch(setOutputImgsCnt(imgsCnt));
-
-      dispatch(setTaskId(newTaskId));
+      dispatch(setTaskId({ tab: 'inpainting', value: newTaskId }));
     } catch (error) {
-      if (error instanceof Error) {
-        message.error(`Error generating image: ${error.message}`);
-      } else {
-        message.error('An unknown error occurred');
-      }
-
-      dispatch(setIsLoading(false));
+      message.error(`Error generating image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      dispatch(setIsLoading({ tab: 'inpainting', value: false }));
     }
   };
 
   useEffect(() => {
-    let intervalId: string | number | NodeJS.Timeout | undefined;
+    let intervalId: NodeJS.Timeout | undefined;
 
     const fetchTaskStatus = async () => {
-      try {
-        // 로딩 중이고 taskId가 있을 경우에만 상태 확인
-        if (isLoading && taskId) {
+      if (isLoading && taskId) {
+        try {
           const response = await getTaskStatus(taskId);
-          console.log(response.data);
           if (response.status === 'SUCCESS') {
             clearInterval(intervalId);
             dispatch(setOutputImgsUrl(response.data));
 
             const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
             const outputsInfo = [{ id: taskId, imgsUrl: response.data, prompt: '' }, ...allOutputs.outputsInfo];
-            dispatch(setAllOutputsInfo({ outputsCnt, outputsInfo }));
+            dispatch(
+              setAllOutputsInfo({
+                tab: 'inpainting',
+                outputsCnt,
+                outputsInfo
+              })
+            );
 
-            dispatch(setIsLoading(false));
-            dispatch(setTaskId(null));
+            dispatch(setIsLoading({ tab: 'inpainting', value: false }));
+            dispatch(setTaskId({ tab: 'inpainting', value: null }));
           } else if (response.status === 'FAILED') {
-            dispatch(setIsLoading(false));
-            clearInterval(intervalId);
             message.error('Image generation failed');
+            dispatch(setIsLoading({ tab: 'inpainting', value: false }));
+            clearInterval(intervalId);
           }
+        } catch (error) {
+          console.error('Failed to get task status:', error);
+          dispatch(setIsLoading({ tab: 'inpainting', value: false }));
+          clearInterval(intervalId);
         }
-      } catch (error) {
-        console.error('Failed to get task-status:', error);
-        dispatch(setIsLoading(false));
-        clearInterval(intervalId); // 오류 발생 시 주기적 호출 중지
       }
     };
 
     if (taskId) {
-      fetchTaskStatus(); // 처음 상태 확인
+      fetchTaskStatus();
       intervalId = setInterval(fetchTaskStatus, 1000); // 1초마다 상태 확인
     }
 
-    // 컴포넌트가 언마운트되거나 taskId가 변경될 때 setInterval 정리
-    return () => clearInterval(intervalId);
-  }, [allOutputs.outputsCnt, allOutputs.outputsInfo, dispatch, isLoading, output.imgsCnt, taskId]);
+    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 정리
+  }, [taskId, isLoading, dispatch, allOutputs.outputsCnt, output.imgsCnt, allOutputs.outputsInfo]);
 
-  // Clip아이콘 클릭
+  // Clip 아이콘 클릭
   const handleClipClick = async () => {
     if (params.uploadImgWithMaskingParams.clipData.length === 0) {
       try {
@@ -182,6 +149,10 @@ const InpaintingLayout = () => {
         console.error('Error generating clip data:', error);
       }
     }
+  };
+
+  const handleNegativePromptChange = () => {
+    dispatch(setIsNegativePrompt(!isNegativePrompt));
   };
 
   return (
@@ -200,14 +171,7 @@ const InpaintingLayout = () => {
           <div className="flex-1">
             <InpaintingDisplay />
           </div>
-          <OutputToolbar
-            selectedImgs={selectedImgs}
-            isSidebarVisible={isSidebarVisible}
-            allSelected={allSelected}
-            setAllSelected={(value: boolean) => dispatch(setAllSelected(value))}
-            setIsSidebarVisible={(value: boolean) => dispatch(setIsSidebarVisible(value))}
-            setselectedImgs={(value: string[]) => dispatch(setselectedImgs(value))}
-          />
+          <OutputToolbar type="inpainting" />
         </div>
 
         {/* 프롬프트 영역 */}
@@ -220,7 +184,6 @@ const InpaintingLayout = () => {
               updateNegativePrompt={updateNegativePrompt}
               isNegativePrompt={isNegativePrompt}
               handleNegativePromptChange={handleNegativePromptChange}
-              // 메뉴얼 모드일 때만 props로 전달(batch에서는 clip실행 안함)
               clipData={
                 params.uploadImgWithMaskingParams.mode === 'manual' ? params.uploadImgWithMaskingParams.clipData : []
               }

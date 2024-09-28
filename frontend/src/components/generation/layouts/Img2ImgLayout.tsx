@@ -1,16 +1,8 @@
 import Sidebar from '../sidebar/Img2ImgSidebar';
 import PromptParams from '../params/PromptParams';
 import Img2ImgDisplay from '../outputDisplay/Img2ImgDisplay';
-import {
-  setIsNegativePrompt,
-  setIsLoading,
-  setTaskId,
-  setOutputImgsUrl,
-  setOutputImgsCnt,
-  resetOutputs,
-  setAllOutputsInfo,
-  setClipData
-} from '../../../store/slices/generation/img2ImgSlice';
+import { setIsNegativePrompt, setClipData } from '../../../store/slices/generation/img2ImgSlice';
+import { setIsLoading, setTaskId, setOutputImgsCnt } from '../../../store/slices/generation/outputSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { postImg2ImgGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
@@ -22,7 +14,8 @@ import { message } from 'antd';
 
 const Img2ImgLayout = () => {
   const dispatch = useDispatch();
-  const { params, isLoading, gpuNum } = useSelector((state: RootState) => state.img2Img);
+  const { params, gpuNum } = useSelector((state: RootState) => state.img2Img);
+  const { isLoading } = useSelector((state: RootState) => state.generatedOutput.img2Img);
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useImg2ImgParams();
 
   const handleNegativePromptChange = () => {
@@ -36,11 +29,18 @@ const Img2ImgLayout = () => {
       files = params.uploadImgParams.imageList.map((base64Img, index) =>
         convertStringToFile(base64Img, `image_${index}.png`)
       );
-      dispatch(setOutputImgsCnt(params.batchParams.batchCount * params.batchParams.batchSize));
+      dispatch(
+        setOutputImgsCnt({ tab: 'img2Img', value: params.batchParams.batchCount * params.batchParams.batchSize })
+      );
       console.log('파일: ', files);
     } else {
       const fileDataArray = await window.electron.getFilesInFolder(params.uploadImgParams.inputPath);
-      dispatch(setOutputImgsCnt(fileDataArray.length * params.batchParams.batchCount * params.batchParams.batchSize));
+      dispatch(
+        setOutputImgsCnt({
+          tab: 'img2Img',
+          value: fileDataArray.length * params.batchParams.batchCount * params.batchParams.batchSize
+        })
+      );
 
       // base64 데이터를 Blob으로 변환하고 File 객체로 생성
       files = fileDataArray.map((fileData) => {
@@ -84,11 +84,11 @@ const Img2ImgLayout = () => {
     };
 
     try {
-      dispatch(setIsLoading(true));
+      dispatch(setIsLoading({ tab: 'img2Img', value: true }));
       const newTaskId = await postImg2ImgGeneration('remote', data);
 
       const imgsCnt = params.batchParams.batchCount * params.batchParams.batchSize;
-      dispatch(setOutputImgsCnt(imgsCnt));
+      dispatch(setOutputImgsCnt({ tab: 'img2Img', value: imgsCnt }));
 
       dispatch(setTaskId(newTaskId));
     } catch (error) {
@@ -98,7 +98,7 @@ const Img2ImgLayout = () => {
         message.error('An unknown error occurred');
       }
 
-      dispatch(setIsLoading(false));
+      dispatch(setIsLoading({ tab: 'img2Img', value: false }));
     }
   };
 

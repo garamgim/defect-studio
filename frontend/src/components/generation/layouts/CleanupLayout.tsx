@@ -3,13 +3,14 @@ import Sidebar from '../sidebar/CleanupSidebar';
 import { postCleanupGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import CleanupDisplay from '../outputDisplay/CleanupDisplay';
-import { setIsLoading, setOutputImgs } from '../../../store/slices/generation/cleanupSlice';
+import { setIsLoading } from '../../../store/slices/generation/outputSlice';
 import { RootState } from '../../../store/store';
 import { useSelector, useDispatch } from 'react-redux';
 
 const Cleanup = () => {
   const dispatch = useDispatch();
-  const { params, isLoading } = useSelector((state: RootState) => state.cleanup);
+  const { params } = useSelector((state: RootState) => state.cleanup);
+  const { isLoading } = useSelector((state: RootState) => state.generatedOutput.cleanup);
   let bgFiles;
   let canvasFiles;
 
