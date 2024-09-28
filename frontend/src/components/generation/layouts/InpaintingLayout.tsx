@@ -13,7 +13,7 @@ import {
   setOutputImgsUrl,
   setOutputImgsCnt,
   setAllOutputsInfo,
-  setSelectedImages,
+  setselectedImgs,
   setIsSidebarVisible,
   setAllSelected
 } from '../../../store/slices/generation/inpaintingSlice';
@@ -24,7 +24,7 @@ import OutputToolbar from '../outputTool/outputToolbar';
 
 const InpaintingLayout = () => {
   const dispatch = useDispatch();
-  const { params, isLoading, gpuNum, taskId, allOutputs, output, selectedImages, isSidebarVisible, allSelected } =
+  const { params, isLoading, gpuNum, taskId, allOutputs, output, selectedImgs, isSidebarVisible, allSelected } =
     useSelector((state: RootState) => state.inpainting);
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useInpaintingParams();
 
@@ -80,7 +80,7 @@ const InpaintingLayout = () => {
     let gpuNumber: number;
     if (gpuNum) {
       gpuNumber = gpuNum;
-    } else {s
+    } else {
       gpuNumber = 1; // settings 기본값 가져오기
     }
 
@@ -201,12 +201,12 @@ const InpaintingLayout = () => {
             <InpaintingDisplay />
           </div>
           <OutputToolbar
-            selectedImages={selectedImages}
+            selectedImgs={selectedImgs}
             isSidebarVisible={isSidebarVisible}
             allSelected={allSelected}
             setAllSelected={(value: boolean) => dispatch(setAllSelected(value))}
             setIsSidebarVisible={(value: boolean) => dispatch(setIsSidebarVisible(value))}
-            setSelectedImages={(value: string[]) => dispatch(setSelectedImages(value))}
+            setselectedImgs={(value: string[]) => dispatch(setselectedImgs(value))}
           />
         </div>
 

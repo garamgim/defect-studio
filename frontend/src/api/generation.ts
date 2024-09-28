@@ -248,6 +248,7 @@ export const getPresetDetail = async (preset_id: string) => {
     const response = await axiosInstance.get(`/generation/presets/${preset_id}`);
 
     if (response.status === 200) {
+      console.log('preset: ', response.data);
       return response.data;
     } else {
       throw new Error('Failed to get preset-detail');
@@ -296,7 +297,7 @@ export const getTaskStatus = async (task_id: string) => {
     const response = await axiosInstance.get(`/generation/tasks/${task_id}`);
 
     if (response.status === 200) {
-      console.log('check', response.data);
+      console.log('respone.data', response.data);
       return response.data;
     } else {
       throw new Error('Failed to get task-status');

@@ -1,10 +1,9 @@
-// 상태 관
+// 상태 관리 타입
 export interface OutputInfo {
   id: string;
   imgsUrl: string[];
   prompt: string;
 }
-
 export interface OutputsInfoType {
   outputsCnt: number;
   outputsInfo: OutputInfo[];
@@ -46,6 +45,7 @@ export interface UploadImgParamsType {
   imageList: string[];
   inputPath: string;
   outputPath: string;
+  isZipDownload: boolean;
 }
 export interface UploadImgWithMaskingParamsType extends Omit<UploadImgParamsType, 'imageList' | 'inputPath'> {
   initInputPath: string;
@@ -55,7 +55,7 @@ export interface UploadImgWithMaskingParamsType extends Omit<UploadImgParamsType
   combinedImg: string | null;
 }
 
-// API 통신
+// API 통신 타입
 export interface Txt2ImgDataType {
   gpu_env: 'local' | 'remote';
   data: Txt2ImgParams;
@@ -165,10 +165,6 @@ export interface PresetDataType {
   sampling_steps?: number;
   sampling_method?: string;
   seed?: number;
-
-  _id?: string; // 필요없는 정보
-  member_id?: number; // 필요없는 정보
-  date?: string; // 필요없는 정보
 }
 
 export interface clipDataType {
