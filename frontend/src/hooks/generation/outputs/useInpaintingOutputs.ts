@@ -8,12 +8,14 @@ export const useInpaintingOutputs = () => {
   const output = useSelector((state: RootState) => state.generatedOutput.inpainting.output);
   const allOutputs = useSelector((state: RootState) => state.generatedOutput.inpainting.allOutputs);
   const isSidebarVisible = useSelector((state: RootState) => state.generatedOutput.inpainting.isSidebarVisible);
+  const isCheckedOutput = useSelector((state: RootState) => state.generatedOutput.inpainting.isCheckedOutput);
 
   return {
     isLoading,
     taskId,
     output,
     allOutputs,
-    isSidebarVisible
+    isSidebarVisible,
+    isCheckedOutput
   };
 };

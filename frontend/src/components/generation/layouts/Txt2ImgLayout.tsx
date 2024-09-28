@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setIsNegativePrompt } from '../../../store/slices/generation/txt2ImgSlice';
 import { useTxt2ImgParams } from '../../../hooks/generation/params/useTxt2ImgParams';
 import { useTxt2ImgOutputs } from '../../../hooks/generation/outputs/useTxt2ImgOutputs';
-import GenerateButton from '../../common/GenerateButton';
+import GenerateButton from '../common/GenerateButton';
 import { postTxt2ImgGeneration, getTaskStatus } from '../../../api/generation';
 import { RootState } from '../../../store/store';
 import OutputToolbar from '../outputTool/OutputToolbar';
@@ -16,13 +16,14 @@ import {
   setOutputImgsCnt,
   setTaskId,
   setOutputImgsUrl,
-  setAllOutputsInfo
+  setAllOutputsInfo,
+  setIsCheckedOutput
 } from '../../../store/slices/generation/outputSlice';
 
 const Txt2ImgLayout = () => {
   const dispatch = useDispatch();
   const { params, gpuNum } = useSelector((state: RootState) => state.txt2Img);
-  const { isLoading, taskId, output, allOutputs, isSidebarVisible } = useTxt2ImgOutputs();
+  const { isLoading, taskId, output, allOutputs, isSidebarVisible, isCheckedOutput } = useTxt2ImgOutputs();
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useTxt2ImgParams();
 
   const handleNegativePromptChange = useCallback(() => {
@@ -63,34 +64,37 @@ const Txt2ImgLayout = () => {
   };
 
   useEffect(() => {
-    let intervalId: string | number | NodeJS.Timeout | undefined;
-
     const fetchTaskStatus = async () => {
       try {
-        // 로딩 중이고 taskId가 있을 경우에만 상태 확인
-        if (isLoading && taskId) {
-          const response = await getTaskStatus(taskId);
-          if (response.task_status === 'SUCCESS') {
-            clearInterval(intervalId);
-            dispatch(setOutputImgsUrl({ tab: 'txt2Img', value: response.result_data }));
+        // taskId가 있을 경우에만 상태를 확인
+        if (taskId) {
+          console.log(isLoading, taskId, 'check', isCheckedOutput);
+          if (isLoading && taskId) {
+            const response = await getTaskStatus(taskId);
 
-            const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
-            const outputsInfo = [
-              {
-                id: response.result_data_log.id,
-                imgsUrl: response.result_data,
-                prompt: response.result_data_log.prompt
-              },
-              ...allOutputs.outputsInfo
-            ];
-            dispatch(setAllOutputsInfo({ tab: 'txt2Img', outputsCnt, outputsInfo }));
+            if (response.task_status === 'SUCCESS') {
+              clearInterval(intervalId); // 성공 시 상태 확인 중지
+              dispatch(setOutputImgsUrl({ tab: 'txt2Img', value: response.result_data }));
 
-            dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
-            dispatch(setTaskId({ tab: 'txt2Img', value: null }));
-          } else if (response.status === 'FAILED') {
-            dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
-            clearInterval(intervalId);
-            message.error('Image generation failed');
+              const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
+              const outputsInfo = [
+                {
+                  id: response.result_data_log.id,
+                  imgsUrl: response.result_data,
+                  prompt: response.result_data_log.prompt
+                },
+                ...allOutputs.outputsInfo
+              ];
+              dispatch(setAllOutputsInfo({ tab: 'txt2Img', outputsCnt, outputsInfo }));
+
+              dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
+              dispatch(setIsCheckedOutput({ tab: 'txt2Img', value: false }));
+              dispatch(setTaskId({ tab: 'txt2Img', value: null }));
+            } else if (response.task_status === 'FAILED') {
+              clearInterval(intervalId);
+              dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
+              message.error('Image generation failed');
+            }
           }
         }
       } catch (error) {
@@ -100,14 +104,11 @@ const Txt2ImgLayout = () => {
       }
     };
 
-    if (taskId) {
-      fetchTaskStatus(); // 처음 상태 확인
-      intervalId = setInterval(fetchTaskStatus, 1000); // 1초마다 상태 확인
-    }
+    const intervalId = setInterval(fetchTaskStatus, 1000); // const로 선언하고 바로 초기화
 
-    // 컴포넌트가 언마운트되거나 taskId가 변경될 때 setInterval 정리
+    // 컴포넌트가 언마운트될 때 setInterval 정리
     return () => clearInterval(intervalId);
-  }, [taskId, isLoading, allOutputs.outputsCnt, allOutputs.outputsInfo, output.imgsCnt, dispatch]);
+  }, [taskId, isLoading, allOutputs.outputsCnt, allOutputs.outputsInfo, output.imgsCnt, dispatch, isCheckedOutput]);
 
   return (
     <div className="flex h-full pt-4 pb-6">

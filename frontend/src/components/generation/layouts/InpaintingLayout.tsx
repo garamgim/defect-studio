@@ -5,7 +5,7 @@ import { useInpaintingParams } from '../../../hooks/generation/params/useInpaint
 import { useDispatch, useSelector } from 'react-redux';
 import { postInpaintingGeneration, getClip, getTaskStatus } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
-import GenerateButton from '../../common/GenerateButton';
+import GenerateButton from '../common/GenerateButton';
 import { setClipData, setIsNegativePrompt } from '../../../store/slices/generation/inpaintingSlice';
 import {
   setIsLoading,

@@ -6,7 +6,7 @@ import { setIsLoading, setTaskId, setOutputImgsCnt } from '../../../store/slices
 import { useDispatch, useSelector } from 'react-redux';
 import { postImg2ImgGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
-import GenerateButton from '../../common/GenerateButton';
+import GenerateButton from '../common/GenerateButton';
 import { getClip } from '../../../api/generation';
 import { useImg2ImgParams } from '../../../hooks/generation/params/useImg2ImgParams';
 import { RootState } from '../../../store/store';

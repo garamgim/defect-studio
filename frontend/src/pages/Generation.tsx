@@ -1,19 +1,80 @@
-import { useState } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import TextToImage from '../components/generation/layouts/Txt2ImgLayout';
 import ImageToImage from '../components/generation/layouts/Img2ImgLayout';
 import Inpainting from '../components/generation/layouts/InpaintingLayout';
 import RemoveBackground from '../components/generation/layouts/RemoveBgLayout';
 import Cleanup from '../components/generation/layouts/CleanupLayout';
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from 'react-icons/ai';
-import { FaImage, FaMagic, FaPaintBrush, FaEraser, FaTrash } from 'react-icons/fa';
+import { FaImage, FaMagic, FaPaintBrush, FaEraser, FaTrash, FaSpinner, FaCircle } from 'react-icons/fa';
+
+import { useDispatch } from 'react-redux';
+import { setIsCheckedOutput } from '../store/slices/generation/outputSlice';
+
+import { useTxt2ImgOutputs } from '../hooks/generation/outputs/useTxt2ImgOutputs';
+import { useImg2ImgOutputs } from '../hooks/generation/outputs/useImg2ImgOutputs';
+import { useInpaintingOutputs } from '../hooks/generation/outputs/useInpaintingOutputs';
+import { useRemoveBgOutputs } from '../hooks/generation/outputs/useRemoveBgOutputs';
+import { useCleanupOutputs } from '../hooks/generation/outputs/useCleanupOutputs';
 
 const Generation = () => {
-  // 사이드바 열림/닫힘 상태 관리
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const location = useLocation(); // 현재 경로 감지
+  const dispatch = useDispatch();
 
+  // 각 탭의 로딩 상태와 체크 상태를 가져옴
+  const { isLoading: txt2imgLoading, isCheckedOutput: txt2imgChecked } = useTxt2ImgOutputs();
+  const { isLoading: img2imgLoading, isCheckedOutput: img2imgChecked } = useImg2ImgOutputs();
+  const { isLoading: inpaintingLoading, isCheckedOutput: inpaintingChecked } = useInpaintingOutputs();
+  const { isLoading: removeBgLoading, isCheckedOutput: removeBgChecked } = useRemoveBgOutputs();
+  const { isLoading: cleanupLoading, isCheckedOutput: cleanupChecked } = useCleanupOutputs();
+
+  // 사이드바 열림/닫힘 상태 관리
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  // 탭 변경 시 isCheckedOutput 업데이트
+  useEffect(() => {
+    switch (location.pathname) {
+      case '/generation/text-to-image':
+        if (!txt2imgChecked) {
+          dispatch(setIsCheckedOutput({ tab: 'txt2Img', value: true }));
+        }
+        break;
+      case '/generation/image-to-image':
+        if (!img2imgChecked) {
+          dispatch(setIsCheckedOutput({ tab: 'img2Img', value: true }));
+        }
+        break;
+      case '/generation/inpainting':
+        if (!inpaintingChecked) {
+          dispatch(setIsCheckedOutput({ tab: 'inpainting', value: true }));
+        }
+        break;
+      case '/generation/remove-background':
+        if (!removeBgChecked) {
+          dispatch(setIsCheckedOutput({ tab: 'removeBg', value: true }));
+        }
+        break;
+      case '/generation/cleanup':
+        if (!cleanupChecked) {
+          dispatch(setIsCheckedOutput({ tab: 'cleanup', value: true }));
+        }
+        break;
+      default:
+        break;
+    }
+  }, [location.pathname, dispatch, txt2imgChecked, img2imgChecked, inpaintingChecked, removeBgChecked, cleanupChecked]);
+
+  // 각 탭의 아이콘 옆에 표시할 상태 아이콘 (로딩 중 vs 로딩 완료 vs 체크 안된 상태)
+  const renderStatusIcon = (isLoading: boolean, isCheckedOutput: boolean) => {
+    if (isLoading) {
+      return <FaSpinner className="absolute w-[12px] top-0 left-[10px] text-black dark:text-white animate-spin" />;
+    } else if (!isCheckedOutput) {
+      return <FaCircle className="absolute w-[6px] top-0 left-[14px] text-red-500" />;
+    }
+    return null; // 체크된 상태면 아무것도 표시하지 않음
   };
 
   return (
@@ -22,44 +83,58 @@ const Generation = () => {
       <div
         className={`fixed top-0 left-0 bg-white shadow-lg z-20 h-full transition-transform duration-300 ease-in-out overflow-y-auto custom-scrollbar pb-[150px] ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } w-20 dark:bg-gray-800 dark:border-r dark:border-gray-600`}
+        } w-20 dark:bg-gray-800 dark:border-r dark:border-gray-600 border-gray-300`}
         style={{ top: '60px' }}
       >
         <nav className="flex flex-col items-center">
           <div className="mt-6 flex flex-col items-center space-y-8">
+            {/* Txt2Img Tab */}
             <Link
               to="text-to-image"
-              className="flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
+              className="relative flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
             >
               <FaImage className="w-[20px] h-[20px] dark:text-slate-400" />
+              {renderStatusIcon(txt2imgLoading, txt2imgChecked)}
               <span className="flex text-[12px] mt-1 dark:text-slate-400">Txt2Img</span>
             </Link>
+
+            {/* Img2Img Tab */}
             <Link
               to="image-to-image"
-              className="flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
+              className="relative flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
             >
               <FaMagic className="w-[20px] h-[20px] dark:text-slate-400" />
+              {renderStatusIcon(img2imgLoading, img2imgChecked)}
               <span className="flex text-[12px] mt-1 dark:text-slate-400">Img2Img</span>
             </Link>
+
+            {/* Inpainting Tab */}
             <Link
               to="inpainting"
-              className="flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
+              className="relative flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
             >
               <FaPaintBrush className="w-[20px] h-[20px] dark:text-slate-400" />
+              {renderStatusIcon(inpaintingLoading, inpaintingChecked)}
               <span className="flex text-[12px] mt-1 dark:text-slate-400">Inpaint</span>
             </Link>
+
+            {/* Remove Background Tab */}
             <Link
               to="remove-background"
-              className="flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
+              className="relative flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
             >
               <FaEraser className="w-[20px] h-[20px] dark:text-slate-400" />
+              {renderStatusIcon(removeBgLoading, removeBgChecked)}
               <span className="flex text-[12px] mt-1 text-center dark:text-slate-400">Remove BG</span>
             </Link>
+
+            {/* Cleanup Tab */}
             <Link
               to="cleanup"
-              className="flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
+              className="relative flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
             >
               <FaTrash className="w-[20px] h-[20px] dark:text-slate-400" />
+              {renderStatusIcon(cleanupLoading, cleanupChecked)}
               <span className="flex text-[12px] mt-1 dark:text-slate-400">Cleanup</span>
             </Link>
           </div>

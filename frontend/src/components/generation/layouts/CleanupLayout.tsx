@@ -1,4 +1,4 @@
-import GenerateButton from '../../common/GenerateButton';
+import GenerateButton from '../common/GenerateButton';
 import Sidebar from '../sidebar/CleanupSidebar';
 import { postCleanupGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
