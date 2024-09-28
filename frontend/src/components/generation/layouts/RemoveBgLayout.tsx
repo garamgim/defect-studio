@@ -6,11 +6,12 @@ import RemoveBgDisplay from '../outputDisplay/RemoveBgDisplay';
 import { useRemoveBgParams } from '../../../hooks/generation/useRemoveBgParams';
 import { RootState } from '../../../store/store';
 import { useSelector, useDispatch } from 'react-redux';
-import { setOutputImgs, setIsLoading } from '../../../store/slices/generation/removeBgSlice';
+import { setIsLoading, setTaskId, setOutputImgsCnt } from '../../../store/slices/generation/outputSlice';
 
 const RemoveBackground = () => {
   const dispatch = useDispatch();
-  const { params, isLoading } = useSelector((state: RootState) => state.removeBg);
+  const { params, getNum } = useSelector((state: RootState) => state.removeBg);
+  const { isLoading } = useSelector((state: RootState) => state.generatedOutput.removeBg);
   useRemoveBgParams();
 
   let files;
@@ -45,13 +46,13 @@ const RemoveBackground = () => {
     };
 
     try {
-      setIsLoading(true);
+      setIsLoading({ tab: 'removeBg', value: true });
       const outputImgUrls = await postRemoveBgGeneration('remote', data);
-      setOutputImgs(outputImgUrls);
+      setOutputImgs({ tab: 'removeBg', value: keyoutputImgUrls });
     } catch (error) {
       console.error('Error removing background:', error);
     } finally {
-      dispatch(setIsLoading(false));
+      dispatch(setIsLoading({ tab: 'removeBg', value: false }));
     }
   };
 
