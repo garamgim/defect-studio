@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from 'antd';
 import { FormatPainterOutlined } from '@ant-design/icons';
 import MaskingModal from '../masking/MaskingModal';
-import { useCleanupParams } from '../../../hooks/generation/useCleanupParams';
+import { useCleanupParams } from '../../../hooks/generation/params/useCleanupParams';
 import { setCombinedImg } from '../../../store/slices/generation/inpaintingSlice';
 import UploadImgWithMaskingParams from '../params/UploadImgWithMaskingParams';
 

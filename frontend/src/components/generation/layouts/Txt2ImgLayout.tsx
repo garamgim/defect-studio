@@ -5,7 +5,8 @@ import PromptParams from '../params/PromptParams';
 import Txt2ImgDisplay from '../outputDisplay/Txt2ImgDisplay';
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsNegativePrompt } from '../../../store/slices/generation/txt2ImgSlice';
-import { useTxt2ImgParams } from '../../../hooks/generation/useTxt2ImgParams';
+import { useTxt2ImgParams } from '../../../hooks/generation/params/useTxt2ImgParams';
+import { useTxt2ImgOutputs } from '../../../hooks/generation/outputs/useTxt2ImgOutputs';
 import GenerateButton from '../../common/GenerateButton';
 import { postTxt2ImgGeneration, getTaskStatus } from '../../../api/generation';
 import { RootState } from '../../../store/store';
@@ -21,9 +22,7 @@ import {
 const Txt2ImgLayout = () => {
   const dispatch = useDispatch();
   const { params, gpuNum } = useSelector((state: RootState) => state.txt2Img);
-  const { isLoading, taskId, output, allOutputs, isSidebarVisible } = useSelector(
-    (state: RootState) => state.generatedOutput.txt2Img
-  );
+  const { isLoading, taskId, output, allOutputs, isSidebarVisible } = useTxt2ImgOutputs();
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useTxt2ImgParams();
 
   const handleNegativePromptChange = useCallback(() => {

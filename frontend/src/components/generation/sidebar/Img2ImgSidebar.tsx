@@ -10,13 +10,13 @@ import BatchParams from '../params/BatchParams';
 import GuidanceScaleParam from '../params/GuidanceScaleParam';
 import CreatePreset from '../presets/CreatePreset';
 import LoadPreset from '../presets/LoadPreset';
-import { useImg2ImgParams } from '../../../hooks/generation/useImg2ImgParams';
+import { useImg2ImgParams } from '../../../hooks/generation/params/useImg2ImgParams';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import { useDispatch } from 'react-redux';
 import { MdMemory } from 'react-icons/md';
 import { resetParams, setGpuNum } from '../../../store/slices/generation/img2ImgSlice';
-import { Modal, InputNumber } from 'antd';
+import { Modal, InputNumber, Tooltip } from 'antd';
 
 const Img2ImgSidebar = () => {
   const dispatch = useDispatch();
@@ -88,21 +88,23 @@ const Img2ImgSidebar = () => {
   };
 
   // GPU 선택
-  const [gpuNumber, setGpuNumber] = useState(0);
+  const [gpuNumer, setGpuNumer] = useState(0);
   const [isGpuModalVisible, setIsGpuModalVisible] = useState(false);
 
   const showGpuModal = () => {
     setIsGpuModalVisible(true);
   };
 
-  const handleGpuInputChange = (gpuNumber: number | null) => {
-    if (gpuNumber) {
-      setGpuNumber(gpuNumber);
+  const handleGpuInputChange = (gpuNumer: number | null) => {
+    if (gpuNumer) {
+      setGpuNumer(gpuNumer);
     }
   };
 
   const handleGpuModalOk = () => {
-    setGpuNum(gpuNumber);
+    if (gpuNumer !== null) {
+      dispatch(setGpuNum(gpuNumer));
+    }
     setIsGpuModalVisible(false);
   };
 
@@ -113,25 +115,37 @@ const Img2ImgSidebar = () => {
   return (
     <div className="w-full h-full mr-6">
       <div className="relative w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
-        {/* reset parameters & preset */}
         {level === 'Advanced' && (
-          <div className="absolute top-6 right-0 mx-6">
-            <UndoOutlined
-              onClick={handleReset}
-              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
-            />
-            <FileAddOutlined
-              onClick={showCreatePreset}
-              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
-            />
-            <FileSearchOutlined
-              onClick={showLoadPreset}
-              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
-            />
-            <MdMemory
-              className="text-[22px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
-              onClick={showGpuModal}
-            />
+          <div className="absolute top-6 right-0 mr-6">
+            <div className="flex">
+              <Tooltip title="Reset Parameters">
+                <UndoOutlined
+                  onClick={handleReset}
+                  className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                />
+              </Tooltip>
+
+              <Tooltip title="Create Preset">
+                <FileAddOutlined
+                  onClick={showCreatePreset}
+                  className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                />
+              </Tooltip>
+
+              <Tooltip title="Load Preset">
+                <FileSearchOutlined
+                  onClick={showLoadPreset}
+                  className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                />
+              </Tooltip>
+
+              <Tooltip title="Enter GPU Number">
+                <MdMemory
+                  className="text-[22px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                  onClick={showGpuModal}
+                />
+              </Tooltip>
+            </div>
           </div>
         )}
 

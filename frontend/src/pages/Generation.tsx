@@ -7,7 +7,6 @@ import RemoveBackground from '../components/generation/layouts/RemoveBgLayout';
 import Cleanup from '../components/generation/layouts/CleanupLayout';
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from 'react-icons/ai';
 import { FaImage, FaMagic, FaPaintBrush, FaEraser, FaTrash } from 'react-icons/fa';
-import { FaCircle } from 'react-icons/fa6';
 
 const Generation = () => {
   // 사이드바 열림/닫힘 상태 관리
@@ -33,49 +32,35 @@ const Generation = () => {
               className="flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
             >
               <FaImage className="w-[20px] h-[20px] dark:text-slate-400" />
-              <span className="flex text-[12px] mt-1 dark:text-slate-400">
-                Txt2Img <FaCircle className="ml-[5px] text-red-500 w-[6px] h-[6px]" />
-              </span>
+              <span className="flex text-[12px] mt-1 dark:text-slate-400">Txt2Img</span>
             </Link>
             <Link
               to="image-to-image"
               className="flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
             >
               <FaMagic className="w-[20px] h-[20px] dark:text-slate-400" />
-              <span className="flex text-[12px] mt-1 dark:text-slate-400">
-                Img2Img
-                <FaCircle className="ml-[5px] text-red-500 w-[6px] h-[6px]" />
-              </span>
+              <span className="flex text-[12px] mt-1 dark:text-slate-400">Img2Img</span>
             </Link>
             <Link
               to="inpainting"
               className="flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
             >
               <FaPaintBrush className="w-[20px] h-[20px] dark:text-slate-400" />
-              <span className="flex text-[12px] mt-1 dark:text-slate-400">
-                Inpaint
-                <FaCircle className="ml-[5px] text-red-500 w-[6px] h-[6px]" />
-              </span>
+              <span className="flex text-[12px] mt-1 dark:text-slate-400">Inpaint</span>
             </Link>
             <Link
               to="remove-background"
               className="flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
             >
               <FaEraser className="w-[20px] h-[20px] dark:text-slate-400" />
-              <span className="flex text-[12px] mt-1 text-center dark:text-slate-400">
-                Remove BG
-                <FaCircle className="ml-[5px] text-red-500 w-[6px] h-[6px]" />
-              </span>
+              <span className="flex text-[12px] mt-1 text-center dark:text-slate-400">Remove BG</span>
             </Link>
             <Link
               to="cleanup"
               className="flex flex-col justify-center items-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition duration-300 px-4 w-full py-2 dark:hover:bg-gray-900"
             >
               <FaTrash className="w-[20px] h-[20px] dark:text-slate-400" />
-              <span className="flex text-[12px] mt-1 dark:text-slate-400">
-                Cleanup
-                <FaCircle className="ml-[5px] text-red-500 w-[6px] h-[6px]" />
-              </span>
+              <span className="flex text-[12px] mt-1 dark:text-slate-400">Cleanup</span>
             </Link>
           </div>
         </nav>

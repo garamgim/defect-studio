@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button } from 'antd';
+import { Button, Modal, InputNumber, Tooltip } from 'antd';
 import { FormatPainterOutlined, FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
 import ModelParam from '../params/InpaintingModelParam';
 import MaskingModal from '../masking/MaskingModal';
@@ -10,12 +10,13 @@ import BatchParams from '../params/BatchParams';
 import StrengthParam from '../params/StrengthParam';
 import GuidanceScaleParam from '../params/GuidanceScaleParam';
 import UploadImgWithMaskingParams from '../params/UploadImgWithMaskingParams';
-import { useInpaintingParams } from '../../../hooks/generation/useInpaintingParams';
+import { useInpaintingParams } from '../../../hooks/generation/params/useInpaintingParams';
 import CreatePreset from '../presets/CreatePreset';
 import LoadPreset from '../presets/LoadPreset';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import { setCombinedImg, resetParams } from '../../../store/slices/generation/inpaintingSlice';
+import { MdMemory } from 'react-icons/md';
+import { setCombinedImg, resetParams, setGpuNum } from '../../../store/slices/generation/inpaintingSlice';
 import { useDispatch } from 'react-redux';
 
 const InpaintingSidebar = () => {
@@ -101,24 +102,65 @@ const InpaintingSidebar = () => {
     dispatch(resetParams());
   };
 
+  // GPU 선택
+  const [gpuNumer, setGpuNumer] = useState(0);
+  const [isGpuModalVisible, setIsGpuModalVisible] = useState(false);
+
+  const showGpuModal = () => {
+    setIsGpuModalVisible(true);
+  };
+
+  const handleGpuInputChange = (gpuNumer: number | null) => {
+    if (gpuNumer) {
+      setGpuNumer(gpuNumer);
+    }
+  };
+
+  const handleGpuModalOk = () => {
+    if (gpuNumer !== null) {
+      dispatch(setGpuNum(gpuNumer));
+    }
+    setIsGpuModalVisible(false);
+  };
+
+  const handleGpuModalCancel = () => {
+    setIsGpuModalVisible(false);
+  };
+
   return (
     <div className="w-full h-full mr-6">
       <div className="relative w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
-        {/* reset parameters & preset */}
         {level === 'Advanced' && (
-          <div className="absolute top-6 right-0 mx-6">
-            <UndoOutlined
-              onClick={handleReset}
-              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
-            />
-            <FileAddOutlined
-              onClick={showCreatePreset}
-              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
-            />
-            <FileSearchOutlined
-              onClick={showLoadPreset}
-              className="text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
-            />
+          <div className="absolute top-6 right-0 mr-6">
+            <div className="flex">
+              <Tooltip title="Reset Parameters">
+                <UndoOutlined
+                  onClick={handleReset}
+                  className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                />
+              </Tooltip>
+
+              <Tooltip title="Create Preset">
+                <FileAddOutlined
+                  onClick={showCreatePreset}
+                  className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                />
+              </Tooltip>
+
+              <Tooltip title="Load Preset">
+                <FileSearchOutlined
+                  onClick={showLoadPreset}
+                  className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                />
+              </Tooltip>
+
+              <Tooltip title="Enter GPU Number">
+                <MdMemory
+                  className="text-[22px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                  onClick={showGpuModal}
+                />
+              </Tooltip>
+            </div>
           </div>
         )}
 
@@ -205,6 +247,12 @@ const InpaintingSidebar = () => {
           updateCombinedImg={updateCombinedImg}
         />
       )}
+
+      {/* gpu 선택 모달 */}
+      <Modal open={isGpuModalVisible} closable={false} onOk={handleGpuModalOk} onCancel={handleGpuModalCancel}>
+        <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Input the GPU number you want</div>
+        <InputNumber min={0} onChange={handleGpuInputChange} />
+      </Modal>
 
       {/* 프리셋 생성 */}
       <CreatePreset

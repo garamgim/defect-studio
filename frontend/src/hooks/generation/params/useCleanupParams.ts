@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store/store';
+import { RootState } from '../../../store/store';
 import {
   setInitImageList,
   setMaskImageList,
@@ -8,7 +8,7 @@ import {
   setOutputPath,
   setMode,
   setCombinedImg
-} from '../../store/slices/generation/cleanupSlice';
+} from '../../../store/slices/generation/cleanupSlice';
 import { useCallback } from 'react';
 
 export const useCleanupParams = () => {

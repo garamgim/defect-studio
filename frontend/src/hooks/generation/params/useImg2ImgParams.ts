@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store/store';
+import { RootState } from '../../../store/store';
 import {
   setModelParams,
   setSamplingParams,
@@ -16,7 +16,7 @@ import {
   setImageList,
   setInputPath,
   setOutputPath
-} from '../../store/slices/generation/img2ImgSlice';
+} from '../../../store/slices/generation/img2ImgSlice';
 import { useCallback } from 'react';
 
 export const useImg2ImgParams = () => {

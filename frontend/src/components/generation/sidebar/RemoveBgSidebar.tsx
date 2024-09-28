@@ -1,5 +1,5 @@
 import UploadImage from '../params/UploadImgParams';
-import { useRemoveBgParams } from '../../../hooks/generation/useRemoveBgParams';
+import { useRemoveBgParams } from '../../../hooks/generation/params/useRemoveBgParams';
 
 const RemoveBgSidebar = () => {
   const { inputPath, outputPath, imageList, updateInputPath, updateOutputPath, updateImageList, updateMode } =
