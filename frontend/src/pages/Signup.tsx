@@ -36,9 +36,7 @@ const Signup = () => {
         <div
           className={`transition-opacity duration-500 ${signUpPage === 'Verifying Page' ? 'opacity-100' : 'opacity-0'} transform scale-95`}
         >
-          {signUpPage === 'Verifying Page' && (
-            <EmailVerifying email={signupForm.email} name={signupForm.name} setSignUpPage={setSignUpPage} />
-          )}
+          {signUpPage === 'Verifying Page' && <EmailVerifying signUpInfo={signupForm} setSignUpPage={setSignUpPage} />}
         </div>
       </Suspense>
     </div>

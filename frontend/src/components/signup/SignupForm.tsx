@@ -55,9 +55,9 @@ const SignupForm = ({ signupForm, setSignupForm, setSignUpPage }: SignupFormProp
     return (
       <section className="flex flex-col items-center mt-[120px] mb-10">
         <form
-          onSubmit={handleSubmit((data) => {
-            setSignupForm(data);
-            RequestSignUpButtonEvent(data.name, data.email);
+          onSubmit={handleSubmit(async (data) => {
+            await setSignupForm(data);
+            await RequestSignUpButtonEvent(data.name, data.email);
           })}
         >
           {/* username (user_id) */}
@@ -200,10 +200,19 @@ const SignupForm = ({ signupForm, setSignupForm, setSignUpPage }: SignupFormProp
               Department
             </label>
             <select
-              name=""
-              id=""
+              {...register('department_id', {
+                required: 'Department is required',
+                min: {
+                  value: 1,
+                  message: 'Please select a department'
+                }
+              })}
+              id="department"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full h-[50px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
+              <option value={0} disabled>
+                Select Department
+              </option>
               {department_list?.map((department) => (
                 <option key={department.department_id} value={department.department_id}>
                   {department.department_name}

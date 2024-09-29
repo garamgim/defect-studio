@@ -2,19 +2,27 @@ import React, { useEffect, useState } from 'react';
 import { sendEmailVerifyCode, checkEmailVerifyCode } from '@api/email';
 import { useNavigate } from 'react-router-dom';
 import { message } from 'antd';
+import { signUpFormType } from '@/types/user';
+import { signupRequest } from '@api/signupHTTP';
 
 interface EmailVerifyingProps {
-  email: string;
-  name: string;
+  signUpInfo: signUpFormType;
   setSignUpPage: React.Dispatch<React.SetStateAction<'FormPage' | 'Verifying Page'>>;
 }
 
-const EmailVerifying = ({ email, name, setSignUpPage }: EmailVerifyingProps) => {
+const EmailVerifying = ({ signUpInfo, setSignUpPage }: EmailVerifyingProps) => {
   const naviagate = useNavigate();
   const [inputCode, SetInputCode] = useState<string>('');
   const [timeLeft, setTimeLeft] = useState(170); // 2분 50초는 170초
   const [timeout, setTimeoutState] = useState(false);
   const [canResend, setCanResend] = useState(false); // "Resend Code" 버튼 활성화 상태
+
+  // 이메일이 없거나 빈 문자열인 경우 FormPage로 이동
+  useEffect(() => {
+    if (!signUpInfo || signUpInfo.email === '') {
+      setSignUpPage('FormPage');
+    }
+  }, [signUpInfo]);
 
   useEffect(() => {
     // 타이머가 0이 될 때까지 매 초마다 timeLeft를 감소
@@ -37,7 +45,7 @@ const EmailVerifying = ({ email, name, setSignUpPage }: EmailVerifyingProps) => 
 
   const handleResendCode = () => {
     setTimeLeft(180); // 제한 시간을 180초로 재설정
-    sendEmailVerifyCode(email, name); // 이메일로 인증 코드 재전송
+    sendEmailVerifyCode(signUpInfo.email, signUpInfo.name); // 이메일로 인증 코드 재전송
     setCanResend(false); // "Resend Code" 버튼을 다시 비활성화
     // 여기에 코드 재전송 로직 추가
   };
@@ -47,7 +55,10 @@ const EmailVerifying = ({ email, name, setSignUpPage }: EmailVerifyingProps) => 
       await checkEmailVerifyCode(email, inputCode).catch((error) => {
         throw new Error(error.response.data.message);
       });
+      await signupRequest(signUpInfo); // 회원가입 요청
       naviagate('/login');
+      message.success('Email verification is successful. Ask the administrator to approve your account.');
+
       // 여기에 코드 확인 로직 추가
     } catch (error) {
       message.error('Verification code is incorrect.');
@@ -57,7 +68,7 @@ const EmailVerifying = ({ email, name, setSignUpPage }: EmailVerifyingProps) => 
   return (
     <div className="flex flex-col items-center align-middle mt-[120px] mb-10 font-samsung  text-black dark:text-white">
       <header className="mb-5 flex flex-col w-[500px] justify-center align-middle items-center">
-        <p className="text-[20px] font-bold">Email Verifying : {email}</p>
+        <p className="text-[20px] font-bold">Email Verifying : {signUpInfo.email}</p>
 
         <p className="text-center">
           A verification code has been sent to your email. Please check your email and enter the received code.
@@ -84,13 +95,14 @@ const EmailVerifying = ({ email, name, setSignUpPage }: EmailVerifyingProps) => 
       </section>
       <section className="mt-5 flex flex-row justify-between w-[400px] ">
         <button
+          disabled={!canResend}
           className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-600 dark:hover:bg-blue-800 dark:focus:ring-blue-400 active:scale-95 transition transform duration-150 ease-in-out"
           onClick={() => setSignUpPage('FormPage')}
         >
           Back To Form
         </button>
         <button
-          onClick={() => checkCodeEvent(email, inputCode)}
+          onClick={() => checkCodeEvent(signUpInfo.email, inputCode)}
           disabled={timeout}
           className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-green-600 dark:hover:bg-green-800 dark:focus:ring-green-400 active:scale-95 transition transform duration-150 ease-in-out"
         >
