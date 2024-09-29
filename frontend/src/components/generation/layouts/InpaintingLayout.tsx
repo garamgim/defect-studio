@@ -29,10 +29,23 @@ const InpaintingLayout = () => {
   const { isLoading: clipIsLoading, taskId: clipTaskId } = useClipOutputs();
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useInpaintingParams();
 
+  // Ctrl + Enter 키를 감지하여 handleGenerate 실행
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === 'Enter') {
+        handleGenerate();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [prompt]);
+
   const convertBase64ToFileArray = (base64Array: string[], fileType: string) => {
-    return base64Array.map((base64Img, index) =>
-      convertStringToFile(base64Img, `${fileType}_${index}.png`, 'image/png')
-    );
+    return base64Array.map((base64Img, index) => convertStringToFile(base64Img, `${fileType}_${index}.png`));
   };
 
   const handleGenerate = async () => {
@@ -48,8 +61,8 @@ const InpaintingLayout = () => {
       const bgFileDataArray = await window.electron.getFilesInFolder(params.uploadImgWithMaskingParams.initInputPath);
       const maskFileDataArray = await window.electron.getFilesInFolder(params.uploadImgWithMaskingParams.maskInputPath);
 
-      bgFiles = bgFileDataArray.map(({ data, name }) => convertStringToFile(data, name, 'image/png'));
-      canvasFiles = maskFileDataArray.map(({ data, name }) => convertStringToFile(data, name, 'image/png'));
+      bgFiles = bgFileDataArray.map(({ data, name }) => convertStringToFile(data, name));
+      canvasFiles = maskFileDataArray.map(({ data, name }) => convertStringToFile(data, name));
 
       dispatch(
         setOutputImgsCnt({
@@ -136,6 +149,12 @@ const InpaintingLayout = () => {
             dispatch(setIsLoading({ tab: 'inpainting', value: false }));
             dispatch(setIsCheckedOutput({ tab: 'inpainting', value: false }));
             dispatch(setTaskId({ tab: 'inpainting', value: null }));
+          } else if (response.detail.task_status === 'FAILURE') {
+            clearInterval(intervalId);
+            dispatch(setIsLoading({ tab: 'inpainting', value: false }));
+            dispatch(setTaskId({ tab: 'inpainting', value: null }));
+            console.error('Image generation failed:', response.detail.result_data || 'Unknown error');
+            alert(`Image generation failed: ${response.detail.result_data || 'Unknown error'}`);
           }
         } catch (error) {
           console.error('Failed to get task status:', error);
@@ -158,11 +177,7 @@ const InpaintingLayout = () => {
     if (params.uploadImgWithMaskingParams.clipData.length === 0) {
       try {
         if (params.uploadImgWithMaskingParams.initImageList.length > 0) {
-          const file = convertStringToFile(
-            params.uploadImgWithMaskingParams.initImageList[0],
-            'image.png',
-            'image/png'
-          );
+          const file = convertStringToFile(params.uploadImgWithMaskingParams.initImageList[0], 'image.png');
 
           const gpuNumber = gpuNum || 1; // GPU 번호 설정 간소화
 

@@ -30,8 +30,24 @@ const Txt2ImgLayout = () => {
     dispatch(setIsNegativePrompt(!isNegativePrompt));
   }, [isNegativePrompt, dispatch]);
 
+  // Ctrl + Enter 키를 감지하여 handleGenerate 실행
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === 'Enter') {
+        handleGenerate();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [prompt]);
+
   const handleGenerate = async () => {
     const gpuNumber = gpuNum || 1; // gpuNum이 없으면 기본값 1 사용
+    console.log('pp', params.promptParams.prompt);
 
     const data = {
       gpu_device: gpuNumber,
@@ -90,10 +106,12 @@ const Txt2ImgLayout = () => {
               dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
               dispatch(setIsCheckedOutput({ tab: 'txt2Img', value: false }));
               dispatch(setTaskId({ tab: 'txt2Img', value: null }));
-            } else if (response.task_status === 'FAILED') {
+            } else if (response.detail.task_status === 'FAILURE') {
               clearInterval(intervalId);
               dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
-              message.error('Image generation failed');
+              dispatch(setTaskId({ tab: 'txt2Img', value: null }));
+              console.error('Image generation failed:', response.detail.result_data || 'Unknown error');
+              alert(`Image generation failed: ${response.detail.result_data || 'Unknown error'}`);
             }
           }
         }

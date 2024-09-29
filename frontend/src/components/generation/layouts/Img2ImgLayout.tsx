@@ -33,12 +33,27 @@ const Img2ImgLayout = () => {
     dispatch(setIsNegativePrompt(!isNegativePrompt));
   };
 
+  // Ctrl + Enter 키를 감지하여 handleGenerate 실행
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === 'Enter') {
+        handleGenerate();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [prompt]);
+
   let files;
 
   const handleGenerate = async () => {
     if (params.uploadImgParams.mode === 'manual') {
       files = params.uploadImgParams.imageList.map((base64Img, index) =>
-        convertStringToFile(base64Img, `image_${index}.png`, 'image/png')
+        convertStringToFile(base64Img, `image_${index}.png`)
       );
       dispatch(
         setOutputImgsCnt({ tab: 'img2Img', value: params.batchParams.batchCount * params.batchParams.batchSize })
@@ -53,7 +68,7 @@ const Img2ImgLayout = () => {
       );
 
       files = fileDataArray.map((fileData) => {
-        return convertStringToFile(fileData.data, fileData.name, fileData.type);
+        return convertStringToFile(fileData.data, fileData.name);
       });
     }
 
@@ -137,6 +152,12 @@ const Img2ImgLayout = () => {
             dispatch(setIsLoading({ tab: 'img2Img', value: false }));
             dispatch(setIsCheckedOutput({ tab: 'img2Img', value: false }));
             dispatch(setTaskId({ tab: 'img2Img', value: null }));
+          } else if (response.detail.task_status === 'FAILURE') {
+            clearInterval(intervalId);
+            dispatch(setIsLoading({ tab: 'img2Img', value: false }));
+            dispatch(setTaskId({ tab: 'img2Img', value: null }));
+            console.error('Image generation failed:', response.detail.result_data || 'Unknown error');
+            alert(`Image generation failed: ${response.detail.result_data || 'Unknown error'}`);
           }
         } catch (error) {
           console.error('Failed to get task status:', error);
@@ -152,14 +173,23 @@ const Img2ImgLayout = () => {
     }
 
     return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 정리
-  }, [taskId, isLoading, dispatch, allOutputs.outputsCnt, output.imgsCnt, allOutputs.outputsInfo]);
+  }, [
+    taskId,
+    isLoading,
+    dispatch,
+    allOutputs.outputsCnt,
+    output.imgsCnt,
+    allOutputs.outputsInfo,
+    params.uploadImgParams.outputPath,
+    params.uploadImgParams.isZipDownload
+  ]);
 
   // Clip아이콘 클릭
   const handleClipClick = useCallback(async () => {
     if (params.uploadImgParams.clipData.length === 0) {
       try {
         if (params.uploadImgParams.imageList.length > 0) {
-          const file = convertStringToFile(params.uploadImgParams.imageList[0], 'image.png', 'image/png');
+          const file = convertStringToFile(params.uploadImgParams.imageList[0], 'image.png');
 
           const gpuNumber = gpuNum || 1; // GPU 번호 설정 간소화
 

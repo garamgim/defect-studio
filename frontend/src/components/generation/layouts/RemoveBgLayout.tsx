@@ -31,7 +31,7 @@ const RemoveBackground = () => {
   const handleGenerate = async () => {
     if (params.uploadImgParams.mode === 'manual') {
       files = params.uploadImgParams.imageList.map((base64Img, index) =>
-        convertStringToFile(base64Img, `image_${index}.png`, 'image/png')
+        convertStringToFile(base64Img, `image_${index}.png`)
       );
       dispatch(setOutputImgsCnt({ tab: 'removeBg', value: 1 }));
     } else {
@@ -127,6 +127,12 @@ const RemoveBackground = () => {
             dispatch(setIsLoading({ tab: 'removeBg', value: false }));
             dispatch(setIsCheckedOutput({ tab: 'removeBg', value: false }));
             dispatch(setTaskId({ tab: 'removeBg', value: null }));
+          } else if (response.detail.task_status === 'FAILURE') {
+            clearInterval(intervalId);
+            dispatch(setIsLoading({ tab: 'removeBg', value: false }));
+            dispatch(setTaskId({ tab: 'removeBg', value: null }));
+            console.error('Image generation failed:', response.detail.result_data || 'Unknown error');
+            alert(`Image generation failed: ${response.detail.result_data || 'Unknown error'}`);
           }
         } catch (error) {
           console.error('Failed to get task status:', error);
