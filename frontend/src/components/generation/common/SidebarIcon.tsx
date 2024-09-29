@@ -11,7 +11,15 @@ interface SidebarIconProps {
 }
 
 const SidebarIcon = ({ tabKey, Icon, label, to }: SidebarIconProps) => {
-  const { isLoading, isCheckedOutput } = useSelector((state: RootState) => state.generatedOutput[tabKey]);
+  const { isLoading, isCheckedOutput } = useSelector((state: RootState) => {
+    if (tabKey === 'clip') {
+      return {};
+    }
+    return {
+      isLoading: state.generatedOutput[tabKey].isLoading,
+      isCheckedOutput: state.generatedOutput[tabKey].isCheckedOutput
+    };
+  });
 
   return (
     <Link

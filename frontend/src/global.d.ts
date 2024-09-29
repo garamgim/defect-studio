@@ -14,6 +14,12 @@ declare global {
   }
 
   interface ElectronAPI {
+    saveImgsWithZip(
+      images: string[],
+      folderPath: string,
+      format: string,
+      isZipDownload: boolean
+    ): Promise<saveImgsResponse>;
     saveImgs: (selectedImgs: string[], folderPath: string, format: string) => Promise<saveImgsResponse>;
     selectFolder: () => Promise<string | null>;
     getFilesInFolder: (folderPath: string) => Promise<FileData[]>;

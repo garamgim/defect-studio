@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import fs from 'fs';
 import axios from 'axios';
+import AdmZip from 'adm-zip';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -108,11 +109,37 @@ ipcMain.handle('select-folder', async () => {
   return result.filePaths[0]; // 선택된 폴더의 경로 반환
 });
 
+ipcMain.handle('save-images', async (_, { images, folderPath, format }) => {
+  try {
+    // 폴더 경로가 유효한지 확인
+    if (!fs.existsSync(folderPath)) {
+      throw new Error('The folder does not exist.');
+    }
+
+    // 모든 이미지 다운로드 처리
+    const downloadPromises = images.map((imageUrl: string, index: number) => {
+      const filePath = path.join(folderPath, `image_${index + 1}.${format}`);
+      return downloadImage(imageUrl, filePath);
+    });
+
+    await Promise.all(downloadPromises); // 병렬로 다운로드 처리
+
+    return { success: true };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return { success: false, error: error.message };
+    } else {
+      return { success: false, error: 'An unknown error occurred.' };
+    }
+  }
+});
+
+// 이미지 다운로드 및 저장 함수
 async function downloadImage(url: string, filePath: string): Promise<void> {
   const response = await axios({
     url,
     method: 'GET',
-    responseType: 'stream' // Download as a stream
+    responseType: 'stream'
   });
 
   return new Promise((resolve, reject) => {
@@ -125,31 +152,7 @@ async function downloadImage(url: string, filePath: string): Promise<void> {
   });
 }
 
-ipcMain.handle('save-images', async (_, { images, folderPath, format }) => {
-  try {
-    // 폴더 경로가 유효한지 확인
-    if (!fs.existsSync(folderPath)) {
-      throw new Error('The folder does not exist.');
-    }
-
-    // 각 이미지 URL을 반복하며 다운로드
-    for (let i = 0; i < images.length; i++) {
-      const imageUrl = images[i];
-      const filePath = path.join(folderPath, `image_${i + 1}.${format}`);
-
-      // 이미지 다운로드 및 저장
-      await downloadImage(imageUrl, filePath);
-    }
-    return { success: true };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return { success: false, error: error.message };
-    } else {
-      return { success: false, error: 'An unknown error occurred.' };
-    }
-  }
-});
-
+// 폴더 내 이미지 파일 가져오기
 ipcMain.handle('get-files-in-folder', async (_, folderPath) => {
   try {
     const files = fs.readdirSync(folderPath);
@@ -158,7 +161,6 @@ ipcMain.handle('get-files-in-folder', async (_, folderPath) => {
       return ['.jpg', '.jpeg', '.png', '.gif'].includes(ext);
     });
 
-    // 파일을 읽고 File-like 객체로 변환하여 반환
     const fileDataPromises = imageFiles.map((fileName) => {
       const filePath = path.join(folderPath, fileName);
       const fileBuffer = fs.readFileSync(filePath);
@@ -175,5 +177,45 @@ ipcMain.handle('get-files-in-folder', async (_, folderPath) => {
   } catch (error) {
     console.error('Error reading folder:', error);
     return [];
+  }
+});
+
+ipcMain.handle('save-images-with-zip', async (_, { images, folderPath, format, isZipDownload }) => {
+  try {
+    // 폴더 경로가 유효한지 확인
+    if (!fs.existsSync(folderPath)) {
+      throw new Error('The folder does not exist.');
+    }
+
+    const downloadedFiles = [];
+
+    // 이미지 다운로드 및 저장
+    for (let i = 0; i < images.length; i++) {
+      const imageUrl = images[i];
+      const filePath = path.join(folderPath, `image_${i + 1}.${format}`);
+
+      // 이미지 다운로드
+      await downloadImage(imageUrl, filePath);
+      downloadedFiles.push(filePath); // 다운로드된 파일 경로 저장
+    }
+
+    // ZIP으로 압축할 경우
+    if (isZipDownload) {
+      const zip = new AdmZip();
+      downloadedFiles.forEach((file) => zip.addLocalFile(file)); // 다운로드된 파일을 ZIP에 추가
+
+      const zipFilePath = path.join(folderPath, `images_${Date.now()}.zip`);
+      zip.writeZip(zipFilePath); // ZIP 파일로 작성
+
+      return { success: true, zipFilePath }; // ZIP 파일 경로 반환
+    }
+
+    return { success: true, filePaths: downloadedFiles }; // 개별 파일 경로 반환
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return { success: false, error: error.message };
+    } else {
+      return { success: false, error: 'An unknown error occurred.' };
+    }
   }
 });
