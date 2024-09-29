@@ -1,13 +1,10 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store/store';
+import { useDispatch } from 'react-redux';
 import { setSelectedImgs } from '../../../store/slices/generation/outputSlice';
+import { useInpaintingOutputs } from '../../../hooks/generation/outputs/useInpaintingOutputs';
 
 const InpaintingDisplay = () => {
   const dispatch = useDispatch();
-  const { output, isLoading, allOutputs, selectedImgs } = useSelector(
-    (state: RootState) => state.generatedOutput.inpainting
-  );
-
+  const { output, isLoading, allOutputs, selectedImgs } = useInpaintingOutputs();
   const handleImageClick = (url: string) => {
     console.log('이미지수 체크: ', output.imgsCnt);
     const updatedImages = selectedImgs.includes(url)

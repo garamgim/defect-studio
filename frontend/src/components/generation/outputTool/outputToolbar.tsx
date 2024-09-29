@@ -109,24 +109,24 @@ const OutputToolbar = ({ type }: OutputToolbarProps) => {
   return (
     <>
       {/* 생성된 이미지 도구 모음 */}
-      <div className="flex flex-col items-center gap-7 w-[46px] text-[#222] py-12 bg-white rounded-[20px] shadow-md border border-gray-300 dark:bg-gray-600 dark:border-none ml-8 overflow-y-auto custom-scrollbar">
+      <div className="max-h-[320px] flex flex-col justify-center items-center gap-7 w-[46px] text-[#222] bg-white rounded-[20px] shadow-md border border-gray-300 dark:bg-gray-600 dark:border-none ml-8 overflow-y-auto custom-scrollbar p-2">
         <Tooltip title="Clear">
           <PiEmpty
-            className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
+            className="flex-shrink-0 w-[21px] h-[21px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
             onClick={handleEmptyImgs}
           />
         </Tooltip>
 
         <Tooltip title="Download">
           <RiFolderDownloadLine
-            className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
+            className="flex-shrink-0 w-[21px] h-[21px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
             onClick={showFormatModal}
           />
         </Tooltip>
 
         <Tooltip title="Move Image">
           <MdMoveUp
-            className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
+            className="flex-shrink-0 w-[21px] h-[21px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
             onClick={showModal}
           />
         </Tooltip>
@@ -134,14 +134,14 @@ const OutputToolbar = ({ type }: OutputToolbarProps) => {
         {isIconFilled ? (
           <Tooltip title="Select All">
             <RiCheckboxMultipleBlankLine
-              className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110 ${isAllSelected ? 'text-blue-500' : ''}`}
+              className={`flex-shrink-0 w-[21px] h-[21px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110 ${isAllSelected ? 'text-blue-500' : ''}`}
               onClick={handleSelectAllImages}
             />
           </Tooltip>
         ) : (
           <Tooltip title="Unselect All">
             <RiCheckboxMultipleBlankFill
-              className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110 ${isAllSelected ? 'text-blue-500' : ''}`}
+              className={`flex-shrink-0 w-[21px] h-[21px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110 ${isAllSelected ? 'text-blue-500' : ''}`}
               onClick={handleSelectAllImages}
             />
           </Tooltip>
@@ -150,14 +150,14 @@ const OutputToolbar = ({ type }: OutputToolbarProps) => {
         {isSidebarVisible ? (
           <Tooltip title="Hide Sidebar">
             <AiOutlineEye
-              className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
+              className="flex-shrink-0 w-[21px] h-[21px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
               onClick={toggleSidebarAndPrompt}
             />
           </Tooltip>
         ) : (
           <Tooltip title="Show Sidebar">
             <AiOutlineEyeInvisible
-              className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
+              className="flex-shrink-0 w-[21px] h-[21px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white transition-transform transform hover:scale-110"
               onClick={toggleSidebarAndPrompt}
             />
           </Tooltip>

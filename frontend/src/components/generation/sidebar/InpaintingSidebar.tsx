@@ -39,6 +39,8 @@ const InpaintingSidebar = () => {
     maskInputPath,
     initInputPath,
     outputPath,
+    isZipDownload,
+    updateIsZipDownload,
     updateModelParams,
     updateSamplingParams,
     updateStrengthParams,
@@ -180,6 +182,8 @@ const InpaintingSidebar = () => {
           updateMaskInputPath={updateMaskInputPath}
           updateOutputPath={updateOutputPath}
           updateMode={updateMode}
+          isZipDownload={isZipDownload}
+          updateIsZipDownload={updateIsZipDownload}
         />
 
         {initImageList[0] && (

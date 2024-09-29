@@ -167,10 +167,11 @@ export interface PresetDataType {
   seed?: number;
 }
 
-export interface clipDataType {
-  model: string;
-  image_list: string[];
-  mode: 'fast' | 'classic' | 'negative';
-  caption: string;
-  batch_size: number;
+export interface ClipDataType {
+  gpu_device: number;
+  model?: string;
+  image_list: File[];
+  mode?: 'fast' | 'classic' | 'negative';
+  caption?: string;
+  batch_size?: number;
 }

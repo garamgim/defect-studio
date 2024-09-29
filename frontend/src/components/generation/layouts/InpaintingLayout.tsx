@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { postInpaintingGeneration, getClip, getTaskStatus } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import GenerateButton from '../common/GenerateButton';
-import { setClipData, setIsNegativePrompt } from '../../../store/slices/generation/inpaintingSlice';
+import { setIsNegativePrompt, setClipData } from '../../../store/slices/generation/inpaintingSlice';
 import {
   setIsLoading,
   setTaskId,
@@ -17,17 +17,18 @@ import {
 } from '../../../store/slices/generation/outputSlice';
 import { RootState } from '../../../store/store';
 import { message } from 'antd';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import OutputToolbar from '../outputTool/OutputToolbar';
 import { useInpaintingOutputs } from '../../../hooks/generation/outputs/useInpaintingOutputs';
+import { useClipOutputs } from '../../../hooks/generation/outputs/useClipOutputs';
 
 const InpaintingLayout = () => {
   const dispatch = useDispatch();
   const { params, gpuNum } = useSelector((state: RootState) => state.inpainting);
   const { isLoading, taskId, output, allOutputs, isSidebarVisible } = useInpaintingOutputs();
+  const { isLoading: clipIsLoading, taskId: clipTaskId } = useClipOutputs();
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useInpaintingParams();
 
-  // 파일 변환 로직을 함수로 분리하여 중복 제거
   const convertBase64ToFileArray = (base64Array: string[], fileType: string) => {
     return base64Array.map((base64Img, index) => convertStringToFile(base64Img, `${fileType}_${index}.png`));
   };
@@ -132,22 +133,68 @@ const InpaintingLayout = () => {
     return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 정리
   }, [taskId, isLoading, dispatch, allOutputs.outputsCnt, output.imgsCnt, allOutputs.outputsInfo]);
 
-  // Clip 아이콘 클릭
-  const handleClipClick = async () => {
+  // Clip아이콘 클릭
+  const handleClipClick = useCallback(async () => {
     if (params.uploadImgWithMaskingParams.clipData.length === 0) {
       try {
         if (params.uploadImgWithMaskingParams.initImageList.length > 0) {
           const file = convertStringToFile(params.uploadImgWithMaskingParams.initImageList[0], 'image.png');
-          const generatedPrompts = await getClip([file]);
-          dispatch(setClipData(generatedPrompts));
+
+          const gpuNumber = gpuNum || 1; // GPU 번호 설정 간소화
+
+          const clipData = {
+            gpu_device: gpuNumber,
+            image_list: [file]
+          };
+          const newClipId = await getClip(clipData);
+          dispatch(setIsLoading({ tab: 'clip', value: true }));
+          dispatch(setTaskId({ tab: 'clip', value: newClipId }));
+          console.log('clip 갱신: ', newClipId);
         } else {
           console.error('No image available for clip generation');
         }
       } catch (error) {
-        console.error('Error generating clip data:', error);
+        message.error(`Error generating clip data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        dispatch(setIsLoading({ tab: 'clip', value: false }));
       }
     }
-  };
+  }, [
+    params.uploadImgWithMaskingParams.clipData.length,
+    params.uploadImgWithMaskingParams.initImageList,
+    gpuNum,
+    dispatch
+  ]);
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | undefined;
+
+    const fetchTaskStatus = async () => {
+      console.log(clipIsLoading, clipTaskId);
+      if (clipIsLoading && clipTaskId) {
+        try {
+          const response = await getTaskStatus(clipTaskId);
+          if (response.task_status === 'SUCCESS') {
+            clearInterval(intervalId); // 성공 시 상태 확인 중지
+            dispatch(setClipData(response.result_data));
+
+            dispatch(setIsLoading({ tab: 'clip', value: false }));
+            dispatch(setTaskId({ tab: 'clip', value: null }));
+          }
+        } catch (error) {
+          console.error('Failed to get task status:', error);
+          dispatch(setIsLoading({ tab: 'clip', value: false }));
+          clearInterval(intervalId);
+        }
+      }
+    };
+
+    if (clipTaskId) {
+      fetchTaskStatus();
+      intervalId = setInterval(fetchTaskStatus, 1000); // 1초마다 상태 확인
+    }
+
+    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 정리
+  }, [isLoading, dispatch, clipIsLoading, clipTaskId]);
 
   const handleNegativePromptChange = () => {
     dispatch(setIsNegativePrompt(!isNegativePrompt));

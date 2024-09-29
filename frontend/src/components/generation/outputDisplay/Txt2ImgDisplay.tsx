@@ -1,20 +1,12 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store/store';
+import { useDispatch } from 'react-redux';
 import { setSelectedImgs } from '../../../store/slices/generation/outputSlice';
+import { useTxt2ImgOutputs } from '../../../hooks/generation/outputs/useTxt2ImgOutputs';
 
 const Txt2ImgDisplay = () => {
   const dispatch = useDispatch();
-  // const { params } = useSelector((state: RootState) => state.txt2Img);
-  const { output, isLoading, allOutputs, selectedImgs } = useSelector(
-    (state: RootState) => state.generatedOutput.txt2Img
-  );
-
-  // 생성할 이미지 가로세로 비율 계산
-  // const aspectRatio = params.imgDimensionParams.width / params.imgDimensionParams.height;
-
+  const { output, isLoading, allOutputs, selectedImgs } = useTxt2ImgOutputs();
   const handleImageClick = (url: string) => {
     console.log('이미지수 체크: ', output.imgsCnt);
-    // 이미지 선택 로직
     const updatedImages = selectedImgs.includes(url)
       ? selectedImgs.filter((imageUrl: string) => imageUrl !== url)
       : [...selectedImgs, url];
@@ -28,10 +20,7 @@ const Txt2ImgDisplay = () => {
         <div
           className="grid gap-4 mr-[16px]"
           style={{
-            gridTemplateColumns:
-              allOutputs.outputsCnt + output.imgsCnt <= 4
-                ? 'repeat(4, 1fr)' // 이미지가 4개 이하일 때는 4열 고정
-                : 'repeat(auto-fit, minmax(200px, 1fr))' // 4개 이상일 때는 부모 요소 크기에 맞춰 조정
+            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))'
           }}
         >
           {Array.from({ length: output.imgsCnt }).map((_, index) => (
@@ -41,9 +30,6 @@ const Txt2ImgDisplay = () => {
               style={{
                 paddingBottom: '100%'
               }}
-              // style={{
-              //   paddingBottom: `${100 / aspectRatio}%`
-              // }}
             >
               <div className="absolute top-0 left-0 w-full h-full bg-gray-200 dark:bg-gray-700 animate-pulse rounded-xl border border-gray-300 dark:border-gray-700" />
             </div>
@@ -53,21 +39,21 @@ const Txt2ImgDisplay = () => {
               <div
                 key={imgIndex}
                 className="relative w-full h-0 cursor-pointer"
-                onClick={() => handleImageClick(url)} // 클릭 시 해당 이미지의 URL 전달
+                onClick={() => handleImageClick(url)}
                 style={{
                   paddingBottom: '100%'
                 }}
               >
                 <img
                   src={url}
-                  alt={`Generated image ${imgIndex}`} // 이미지 인덱스 반영
+                  alt={`Generated image ${imgIndex}`}
                   className={`absolute top-0 left-0 w-full h-full object-cover rounded-xl ${
                     selectedImgs.includes(url)
                       ? 'border-4 border-blue-500'
                       : 'border border-gray-300 dark:border-gray-700'
                   }`}
                   style={{
-                    boxSizing: 'border-box' // 이미지 안쪽에 테두리 적용
+                    boxSizing: 'border-box'
                   }}
                 />
               </div>
@@ -78,10 +64,7 @@ const Txt2ImgDisplay = () => {
         <div
           className="grid gap-4 mr-[16px]"
           style={{
-            gridTemplateColumns:
-              allOutputs.outputsCnt <= 4
-                ? 'repeat(4, 1fr)' // 이미지가 4개 이하일 때는 4열 고정
-                : 'repeat(auto-fit, minmax(200px, 1fr))' // 4개 이상일 때는 부모 요소 크기에 맞춰 조정
+            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))'
           }}
         >
           {allOutputs.outputsInfo.map((outputInfo) =>
@@ -89,21 +72,21 @@ const Txt2ImgDisplay = () => {
               <div
                 key={imgIndex}
                 className="relative w-full h-0 cursor-pointer"
-                onClick={() => handleImageClick(url)} // 클릭 시 해당 이미지의 URL 전달
+                onClick={() => handleImageClick(url)}
                 style={{
                   paddingBottom: '100%'
                 }}
               >
                 <img
                   src={url}
-                  alt={`Generated image ${imgIndex}`} // 이미지 인덱스 반영
+                  alt={`Generated image ${imgIndex}`}
                   className={`absolute top-0 left-0 w-full h-full object-cover rounded-xl ${
                     selectedImgs.includes(url)
                       ? 'border-4 border-blue-500'
                       : 'border border-gray-300 dark:border-gray-700'
                   }`}
                   style={{
-                    boxSizing: 'border-box' // 이미지 안쪽에 테두리 적용
+                    boxSizing: 'border-box'
                   }}
                 />
               </div>
