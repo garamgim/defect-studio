@@ -462,15 +462,15 @@ const MaskingModal = ({
       width="100%"
       className="max-w-screen-sm w-full md:max-w-screen-md lg:max-w-screen-lg"
     >
-      {/* <div>
+      <div>
         {mousePosition && (
           <p>
             Mouse Position: X: {mousePosition.x}, Y: {mousePosition.y}
           </p>
         )}
         {rgbColor && <p>RGB: {rgbColor}</p>}
-      </div> */}
-      {/* <div className="flex items-center space-x-4 mt-3">
+      </div> 
+      <div className="flex items-center space-x-4 mt-3">
         <Slider
           min={1} // 최소 확대 배율
           max={3} // 최대 확대 배율
@@ -487,7 +487,7 @@ const MaskingModal = ({
           onChange={(newScale) => setScale(newScale ?? 1)} // 숫자 입력으로도 확대/축소 가능
           className="w-[60px]"
         />
-      </div> */}
+      </div>
       <div className="flex flex-col h-full w-full justify-center">
         <div className="flex justify-center items-center w-full h-[80%]">
           <Stage

@@ -102,6 +102,24 @@ const InpaintingLayout = () => {
             clearInterval(intervalId); // 성공 시 상태 확인 중지
             dispatch(setOutputImgsUrl({ tab: 'inpainting', value: response.result_data }));
 
+            window.electron
+              .saveImgsWithZip(
+                response.result_data,
+                params.uploadImgWithMaskingParams.outputPath,
+                'png', // 파일 형식 (png로 고정)
+                params.uploadImgWithMaskingParams.isZipDownload
+              )
+              .then((result) => {
+                if (result.success) {
+                  console.log('이미지가 성공적으로 저장되었습니다:', result.success);
+                } else {
+                  console.error('이미지 저장 중 오류 발생:', result.error);
+                }
+              })
+              .catch((error) => {
+                console.error('이미지 저장 오류:', error);
+              });
+
             const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
             const outputsInfo = [
               {

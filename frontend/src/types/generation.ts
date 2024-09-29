@@ -165,6 +165,9 @@ export interface PresetDataType {
   sampling_steps?: number;
   sampling_method?: string;
   seed?: number;
+
+  _id?: string;
+  date?: string;
 }
 
 export interface ClipDataType {
