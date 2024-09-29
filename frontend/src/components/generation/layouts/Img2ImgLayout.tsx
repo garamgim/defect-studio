@@ -38,7 +38,7 @@ const Img2ImgLayout = () => {
   const handleGenerate = async () => {
     if (params.uploadImgParams.mode === 'manual') {
       files = params.uploadImgParams.imageList.map((base64Img, index) =>
-        convertStringToFile(base64Img, `image_${index}.png`)
+        convertStringToFile(base64Img, `image_${index}.png`, 'image/png')
       );
       dispatch(
         setOutputImgsCnt({ tab: 'img2Img', value: params.batchParams.batchCount * params.batchParams.batchSize })
@@ -52,18 +52,8 @@ const Img2ImgLayout = () => {
         })
       );
 
-      // base64 데이터를 Blob으로 변환하고 File 객체로 생성
       files = fileDataArray.map((fileData) => {
-        const byteString = atob(fileData.data);
-        const arrayBuffer = new ArrayBuffer(byteString.length);
-        const uintArray = new Uint8Array(arrayBuffer);
-
-        for (let i = 0; i < byteString.length; i++) {
-          uintArray[i] = byteString.charCodeAt(i);
-        }
-
-        const blob = new Blob([arrayBuffer], { type: fileData.type });
-        return new File([blob], fileData.name, { type: fileData.type });
+        return convertStringToFile(fileData.data, fileData.name, fileData.type);
       });
     }
 
@@ -169,7 +159,7 @@ const Img2ImgLayout = () => {
     if (params.uploadImgParams.clipData.length === 0) {
       try {
         if (params.uploadImgParams.imageList.length > 0) {
-          const file = convertStringToFile(params.uploadImgParams.imageList[0], 'image.png');
+          const file = convertStringToFile(params.uploadImgParams.imageList[0], 'image.png', 'image/png');
 
           const gpuNumber = gpuNum || 1; // GPU 번호 설정 간소화
 
