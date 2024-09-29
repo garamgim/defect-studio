@@ -36,10 +36,9 @@ const RemoveBackground = () => {
       dispatch(setOutputImgsCnt({ tab: 'removeBg', value: 1 }));
     } else {
       const fileDataArray = await window.electron.getFilesInFolder(params.uploadImgParams.inputPath);
-
       dispatch(
         setOutputImgsCnt({
-          tab: 'img2Img',
+          tab: 'removeBg',
           value: fileDataArray.length
         })
       );
@@ -127,7 +126,7 @@ const RemoveBackground = () => {
             dispatch(setIsLoading({ tab: 'removeBg', value: false }));
             dispatch(setIsCheckedOutput({ tab: 'removeBg', value: false }));
             dispatch(setTaskId({ tab: 'removeBg', value: null }));
-          } else if (response.detail.task_status === 'FAILURE') {
+          } else if (response.detail && response.detail.task_status === 'FAILURE') {
             clearInterval(intervalId);
             dispatch(setIsLoading({ tab: 'removeBg', value: false }));
             dispatch(setTaskId({ tab: 'removeBg', value: null }));

@@ -67,8 +67,18 @@ const Img2ImgLayout = () => {
         })
       );
 
+      // base64 데이터를 Blob으로 변환하고 File 객체로 생성
       files = fileDataArray.map((fileData) => {
-        return convertStringToFile(fileData.data, fileData.name);
+        const byteString = atob(fileData.data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uintArray = new Uint8Array(arrayBuffer);
+
+        for (let i = 0; i < byteString.length; i++) {
+          uintArray[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([arrayBuffer], { type: fileData.type });
+        return new File([blob], fileData.name, { type: fileData.type });
       });
     }
 
@@ -152,7 +162,7 @@ const Img2ImgLayout = () => {
             dispatch(setIsLoading({ tab: 'img2Img', value: false }));
             dispatch(setIsCheckedOutput({ tab: 'img2Img', value: false }));
             dispatch(setTaskId({ tab: 'img2Img', value: null }));
-          } else if (response.detail.task_status === 'FAILURE') {
+          } else if (response.detail && response.detail.task_status === 'FAILURE') {
             clearInterval(intervalId);
             dispatch(setIsLoading({ tab: 'img2Img', value: false }));
             dispatch(setTaskId({ tab: 'img2Img', value: null }));

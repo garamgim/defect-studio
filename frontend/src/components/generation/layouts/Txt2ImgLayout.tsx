@@ -106,7 +106,7 @@ const Txt2ImgLayout = () => {
               dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
               dispatch(setIsCheckedOutput({ tab: 'txt2Img', value: false }));
               dispatch(setTaskId({ tab: 'txt2Img', value: null }));
-            } else if (response.detail.task_status === 'FAILURE') {
+            } else if (response.detail && response.detail.task_status === 'FAILURE') {
               clearInterval(intervalId);
               dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
               dispatch(setTaskId({ tab: 'txt2Img', value: null }));
