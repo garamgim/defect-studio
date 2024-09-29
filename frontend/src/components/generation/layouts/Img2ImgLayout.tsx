@@ -2,22 +2,31 @@ import Sidebar from '../sidebar/Img2ImgSidebar';
 import PromptParams from '../params/PromptParams';
 import Img2ImgDisplay from '../outputDisplay/Img2ImgDisplay';
 import { setIsNegativePrompt, setClipData } from '../../../store/slices/generation/img2ImgSlice';
-import { setIsLoading, setTaskId, setOutputImgsCnt } from '../../../store/slices/generation/outputSlice';
+import {
+  setIsLoading,
+  setTaskId,
+  setOutputImgsCnt,
+  setOutputImgsUrl,
+  setAllOutputsInfo,
+  setIsCheckedOutput
+} from '../../../store/slices/generation/outputSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { postImg2ImgGeneration } from '../../../api/generation';
+import { postImg2ImgGeneration, getClip, getTaskStatus } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import GenerateButton from '../common/GenerateButton';
-import { getClip } from '../../../api/generation';
 import { useImg2ImgParams } from '../../../hooks/generation/params/useImg2ImgParams';
 import { RootState } from '../../../store/store';
 import { message } from 'antd';
 import OutputToolbar from '../outputTool/OutputToolbar';
 import { useImg2ImgOutputs } from '../../../hooks/generation/outputs/useImg2ImgOutputs';
+import { useEffect, useCallback } from 'react';
+import { useClipOutputs } from '@/hooks/generation/outputs/useClipOutputs';
 
 const Img2ImgLayout = () => {
   const dispatch = useDispatch();
   const { params, gpuNum } = useSelector((state: RootState) => state.img2Img);
   const { isLoading, taskId, output, allOutputs, isSidebarVisible } = useImg2ImgOutputs();
+  const { isLoading: clipIsLoading, taskId: clipTaskId } = useClipOutputs();
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useImg2ImgParams();
 
   const handleNegativePromptChange = () => {
@@ -34,7 +43,6 @@ const Img2ImgLayout = () => {
       dispatch(
         setOutputImgsCnt({ tab: 'img2Img', value: params.batchParams.batchCount * params.batchParams.batchSize })
       );
-      console.log('파일: ', files);
     } else {
       const fileDataArray = await window.electron.getFilesInFolder(params.uploadImgParams.inputPath);
       dispatch(
@@ -89,40 +97,112 @@ const Img2ImgLayout = () => {
       dispatch(setIsLoading({ tab: 'img2Img', value: true }));
       const newTaskId = await postImg2ImgGeneration('remote', data);
 
-      const imgsCnt = params.batchParams.batchCount * params.batchParams.batchSize;
-      dispatch(setOutputImgsCnt({ tab: 'img2Img', value: imgsCnt }));
-
-      dispatch(setTaskId(newTaskId));
+      dispatch(setTaskId({ tab: 'img2Img', value: newTaskId }));
     } catch (error) {
-      if (error instanceof Error) {
-        message.error(`Error generating image: ${error.message}`);
-      } else {
-        message.error('An unknown error occurred');
-      }
-
+      message.error(`Error generating image: ${error instanceof Error ? error.message : 'Unknown error'}`);
       dispatch(setIsLoading({ tab: 'img2Img', value: false }));
     }
   };
 
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | undefined;
+
+    const fetchTaskStatus = async () => {
+      if (isLoading && taskId) {
+        try {
+          const response = await getTaskStatus(taskId);
+          if (response.task_status === 'SUCCESS') {
+            clearInterval(intervalId); // 성공 시 상태 확인 중지
+            dispatch(setOutputImgsUrl({ tab: 'img2Img', value: response.result_data }));
+
+            const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
+            const outputsInfo = [
+              {
+                id: response.result_data_log.id,
+                imgsUrl: response.result_data,
+                prompt: response.result_data_log.prompt
+              },
+              ...allOutputs.outputsInfo
+            ];
+            dispatch(setAllOutputsInfo({ tab: 'img2Img', outputsCnt, outputsInfo }));
+
+            dispatch(setIsLoading({ tab: 'img2Img', value: false }));
+            dispatch(setIsCheckedOutput({ tab: 'img2Img', value: false }));
+            dispatch(setTaskId({ tab: 'img2Img', value: null }));
+          }
+        } catch (error) {
+          console.error('Failed to get task status:', error);
+          dispatch(setIsLoading({ tab: 'img2Img', value: false }));
+          clearInterval(intervalId);
+        }
+      }
+    };
+
+    if (taskId) {
+      fetchTaskStatus();
+      intervalId = setInterval(fetchTaskStatus, 1000); // 1초마다 상태 확인
+    }
+
+    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 정리
+  }, [taskId, isLoading, dispatch, allOutputs.outputsCnt, output.imgsCnt, allOutputs.outputsInfo]);
+
   // Clip아이콘 클릭
-  const handleClipClick = async () => {
-    // clipData가 빈 배열일 때만 getClip 실행
+  const handleClipClick = useCallback(async () => {
     if (params.uploadImgParams.clipData.length === 0) {
       try {
         if (params.uploadImgParams.imageList.length > 0) {
           const file = convertStringToFile(params.uploadImgParams.imageList[0], 'image.png');
 
-          const generatedPrompts = await getClip([file]);
-          dispatch(setClipData(generatedPrompts));
-          console.log('clip 갱신: ', params.uploadImgParams.clipData);
+          const gpuNumber = gpuNum || 1; // GPU 번호 설정 간소화
+
+          const clipData = {
+            gpu_device: gpuNumber,
+            image_list: [file]
+          };
+          const newClipId = await getClip(clipData);
+          dispatch(setIsLoading({ tab: 'clip', value: true }));
+          dispatch(setTaskId({ tab: 'clip', value: newClipId }));
+          console.log('clip 갱신: ', newClipId);
         } else {
           console.error('No image available for clip generation');
         }
       } catch (error) {
-        console.error('Error generating clip data:', error);
+        message.error(`Error generating clip data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        dispatch(setIsLoading({ tab: 'clip', value: false }));
       }
     }
-  };
+  }, [params.uploadImgParams.clipData.length, params.uploadImgParams.imageList, gpuNum, dispatch]);
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | undefined;
+
+    const fetchTaskStatus = async () => {
+      console.log(clipIsLoading, clipTaskId);
+      if (clipIsLoading && clipTaskId) {
+        try {
+          const response = await getTaskStatus(clipTaskId);
+          if (response.task_status === 'SUCCESS') {
+            clearInterval(intervalId); // 성공 시 상태 확인 중지
+            dispatch(setClipData(response.result_data));
+
+            dispatch(setIsLoading({ tab: 'clip', value: false }));
+            dispatch(setTaskId({ tab: 'clip', value: null }));
+          }
+        } catch (error) {
+          console.error('Failed to get task status:', error);
+          dispatch(setIsLoading({ tab: 'clip', value: false }));
+          clearInterval(intervalId);
+        }
+      }
+    };
+
+    if (clipTaskId) {
+      fetchTaskStatus();
+      intervalId = setInterval(fetchTaskStatus, 1000); // 1초마다 상태 확인
+    }
+
+    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 정리
+  }, [isLoading, dispatch, clipIsLoading, clipTaskId]);
 
   return (
     <div className="flex h-full pt-4 pb-6">

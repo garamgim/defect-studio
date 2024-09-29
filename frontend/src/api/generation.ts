@@ -5,7 +5,8 @@ import {
   InpaintingDataType,
   RemoveBgDataType,
   CleanupDataType,
-  PresetDataType
+  PresetDataType,
+  ClipDataType
 } from '../types/generation';
 
 // scheduler 리스트 가져오는 함수
@@ -120,12 +121,19 @@ export const postInpaintingGeneration = async (
 };
 
 // clip 함수 (image -> text 변환)
-export const getClip = async (imageFiles: File[]) => {
+export const getClip = async (data: ClipDataType) => {
   try {
     const formData = new FormData();
 
-    imageFiles.forEach((file) => {
-      formData.append('image_list', file);
+    Object.entries(data).forEach(([key, value]) => {
+      console.log(key, value);
+      if (Array.isArray(value)) {
+        value.forEach((file) => {
+          formData.append(key, file);
+        });
+      } else {
+        formData.append(key, typeof value === 'number' ? String(value) : value);
+      }
     });
 
     const response = await axiosInstance.post('/generation/clip', formData, {
@@ -134,9 +142,8 @@ export const getClip = async (imageFiles: File[]) => {
       }
     });
 
-    if (response.status === 201) {
-      console.log(response.data.generated_prompts);
-      return response.data.generated_prompts;
+    if (response.status === 200) {
+      return response.data.task_id;
     } else {
       throw new Error('Failed to get generated prompts');
     }
@@ -168,8 +175,8 @@ export const postRemoveBgGeneration = async (gpu_env: RemoveBgDataType['gpu_env'
       }
     });
 
-    if (response.status === 201) {
-      return response.data.image_list; // image_list 배열 반환
+    if (response.status === 200) {
+      return response.data.task_id;
     } else {
       throw new Error('Failed to generate remove-background image');
     }
@@ -198,8 +205,8 @@ export const postCleanupGeneration = async (gpu_env: CleanupDataType['gpu_env'],
       }
     });
 
-    if (response.status === 201) {
-      return response.data.image_list; // image_list 배열 반환
+    if (response.status === 200) {
+      return response.data.task_id;
     } else {
       throw new Error('Failed to generate cleanup image');
     }

@@ -7,6 +7,7 @@ export const useInpaintingOutputs = () => {
   const taskId = useSelector((state: RootState) => state.generatedOutput.inpainting.taskId);
   const output = useSelector((state: RootState) => state.generatedOutput.inpainting.output);
   const allOutputs = useSelector((state: RootState) => state.generatedOutput.inpainting.allOutputs);
+  const selectedImgs = useSelector((state: RootState) => state.generatedOutput.inpainting.selectedImgs);
   const isSidebarVisible = useSelector((state: RootState) => state.generatedOutput.inpainting.isSidebarVisible);
   const isCheckedOutput = useSelector((state: RootState) => state.generatedOutput.inpainting.isCheckedOutput);
 
@@ -14,6 +15,7 @@ export const useInpaintingOutputs = () => {
     isLoading,
     taskId,
     output,
+    selectedImgs,
     allOutputs,
     isSidebarVisible,
     isCheckedOutput

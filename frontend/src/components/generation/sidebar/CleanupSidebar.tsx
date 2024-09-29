@@ -15,6 +15,8 @@ const CleanupSidebar = () => {
     maskInputPath,
     initInputPath,
     outputPath,
+    isZipDownload,
+    updateIsZipDownload,
     updateInitImageList,
     updateMaskImageList,
     updateMaskInputPath,
@@ -60,6 +62,8 @@ const CleanupSidebar = () => {
           updateMaskInputPath={updateMaskInputPath}
           updateOutputPath={updateOutputPath}
           updateMode={updateMode}
+          isZipDownload={isZipDownload}
+          updateIsZipDownload={updateIsZipDownload}
         />
 
         {initImageList[0] && (

@@ -7,7 +7,8 @@ import {
   setMaskInputPath,
   setOutputPath,
   setMode,
-  setCombinedImg
+  setCombinedImg,
+  setIsZipDownload
 } from '../../../store/slices/generation/cleanupSlice';
 import { useCallback } from 'react';
 
@@ -16,7 +17,7 @@ export const useCleanupParams = () => {
 
   // uploadImgParams도 자주 변경될 수 있으므로 따로 개별 호출
   const mode = useSelector((state: RootState) => state.cleanup.params.uploadImgWithMaskingParams.mode);
-  const combinedImg = useSelector((state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.combinedImg);
+  const combinedImg = useSelector((state: RootState) => state.cleanup.params.uploadImgWithMaskingParams.combinedImg);
   const initImageList = useSelector(
     (state: RootState) => state.cleanup.params.uploadImgWithMaskingParams.initImageList
   );
@@ -30,6 +31,9 @@ export const useCleanupParams = () => {
     (state: RootState) => state.cleanup.params.uploadImgWithMaskingParams.initInputPath
   );
   const outputPath = useSelector((state: RootState) => state.cleanup.params.uploadImgWithMaskingParams.outputPath);
+  const isZipDownload = useSelector(
+    (state: RootState) => state.cleanup.params.uploadImgWithMaskingParams.isZipDownload
+  );
 
   const updateMode = useCallback(
     (mode: 'manual' | 'batch') => {
@@ -73,6 +77,12 @@ export const useCleanupParams = () => {
     },
     [dispatch]
   );
+  const updateIsZipDownload = useCallback(
+    (isZipDownload: boolean) => {
+      dispatch(setIsZipDownload(isZipDownload));
+    },
+    [dispatch]
+  );
 
   return {
     mode,
@@ -82,6 +92,8 @@ export const useCleanupParams = () => {
     maskInputPath,
     initInputPath,
     outputPath,
+    isZipDownload,
+    updateIsZipDownload,
     updateMode,
     updateInitImageList,
     updateMaskImageList,

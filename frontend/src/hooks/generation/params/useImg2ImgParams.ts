@@ -15,7 +15,8 @@ import {
   setClipData,
   setImageList,
   setInputPath,
-  setOutputPath
+  setOutputPath,
+  setIsZipDownload
 } from '../../../store/slices/generation/img2ImgSlice';
 import { useCallback } from 'react';
 
@@ -41,6 +42,7 @@ export const useImg2ImgParams = () => {
   const imageList = useSelector((state: RootState) => state.img2Img.params.uploadImgParams.imageList);
   const inputPath = useSelector((state: RootState) => state.img2Img.params.uploadImgParams.inputPath);
   const outputPath = useSelector((state: RootState) => state.img2Img.params.uploadImgParams.outputPath);
+  const isZipDownload = useSelector((state: RootState) => state.img2Img.params.uploadImgParams.isZipDownload);
 
   // params 업데이트 함수들
   const updateModelParams = useCallback(
@@ -135,6 +137,12 @@ export const useImg2ImgParams = () => {
     },
     [dispatch]
   );
+  const updateIsZipDownload = useCallback(
+    (isZipDownload: boolean) => {
+      dispatch(setIsZipDownload(isZipDownload));
+    },
+    [dispatch]
+  );
 
   return {
     modelParams,
@@ -152,6 +160,8 @@ export const useImg2ImgParams = () => {
     imageList,
     inputPath,
     outputPath,
+    isZipDownload,
+    updateIsZipDownload,
     updateModelParams,
     updateSamplingParams,
     updateSeedParams,

@@ -35,6 +35,8 @@ const Img2ImgSidebar = () => {
     imageList,
     inputPath,
     outputPath,
+    isZipDownload,
+    updateIsZipDownload,
     updateModelParams,
     updateSamplingParams,
     updateStrengthParams,
@@ -163,6 +165,8 @@ const Img2ImgSidebar = () => {
           updateInputPath={updateInputPath}
           updateOutputPath={updateOutputPath}
           updateMode={updateMode}
+          isZipDownload={isZipDownload}
+          updateIsZipDownload={updateIsZipDownload}
         />
 
         {level === 'Advanced' && (

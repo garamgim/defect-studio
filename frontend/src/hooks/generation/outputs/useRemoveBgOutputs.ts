@@ -6,6 +6,7 @@ export const useRemoveBgOutputs = () => {
   const isLoading = useSelector((state: RootState) => state.generatedOutput.removeBg.isLoading);
   const taskId = useSelector((state: RootState) => state.generatedOutput.removeBg.taskId);
   const output = useSelector((state: RootState) => state.generatedOutput.removeBg.output);
+  const selectedImgs = useSelector((state: RootState) => state.generatedOutput.removeBg.selectedImgs);
   const allOutputs = useSelector((state: RootState) => state.generatedOutput.removeBg.allOutputs);
   const isSidebarVisible = useSelector((state: RootState) => state.generatedOutput.removeBg.isSidebarVisible);
   const isCheckedOutput = useSelector((state: RootState) => state.generatedOutput.removeBg.isCheckedOutput);
@@ -14,6 +15,7 @@ export const useRemoveBgOutputs = () => {
     isLoading,
     taskId,
     output,
+    selectedImgs,
     allOutputs,
     isSidebarVisible,
     isCheckedOutput
