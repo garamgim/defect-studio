@@ -34,7 +34,7 @@ const RemoveBgDisplay = () => {
   // 엔터 키를 눌렀을 때 모달을 띄움 (마지막으로 선택된 이미지를 기준으로)
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' && selectedImgs.length > 0) {
+      if (event.ctrlKey && event.key === 'p' && selectedImgs.length > 0) {
         setIsModalOpen(true); // 모달 열기
       }
     };
