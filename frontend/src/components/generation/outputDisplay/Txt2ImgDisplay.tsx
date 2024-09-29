@@ -8,7 +8,7 @@ import styled from 'styled-components';
 
 const CustomModal = styled(Modal)`
   html.dark & .ant-modal-content {
-    background-color: #1f2937;
+    background-color: #434d59;
     color: #e5e7eb;
     margin: 20px;
   }
@@ -34,7 +34,7 @@ const Txt2ImgDisplay = () => {
   // 엔터 키를 눌렀을 때 모달을 띄움 (마지막으로 선택된 이미지를 기준으로)
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' && selectedImgs.length > 0) {
+      if (event.ctrlKey && event.key === 'p' && selectedImgs.length > 0) {
         setIsModalOpen(true); // 모달 열기
       }
     };
@@ -166,7 +166,7 @@ const Txt2ImgDisplay = () => {
                 <span>복사</span>
               </div>
             </div>
-            <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-[16px] leading-relaxed">
+            <div className="p-4 bg-gray-100 dark:bg-[#5a6472] rounded-lg text-[16px] leading-relaxed">
               {allOutputs.outputsInfo.find((output) => output.imgsUrl.includes(lastSelectedImage))?.prompt ||
                 'No prompt available'}
             </div>
