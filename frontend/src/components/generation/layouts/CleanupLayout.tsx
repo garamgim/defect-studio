@@ -111,7 +111,7 @@ const Cleanup = () => {
             dispatch(setIsLoading({ tab: 'cleanup', value: false }));
             dispatch(setIsCheckedOutput({ tab: 'cleanup', value: false }));
             dispatch(setTaskId({ tab: 'cleanup', value: null }));
-          } else if (response.detail.task_status === 'FAILURE') {
+          } else if (response.detail && response.detail.task_status === 'FAILURE') {
             clearInterval(intervalId);
             dispatch(setIsLoading({ tab: 'cleanup', value: false }));
             dispatch(setTaskId({ tab: 'cleanup', value: null }));

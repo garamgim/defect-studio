@@ -61,8 +61,33 @@ const InpaintingLayout = () => {
       const bgFileDataArray = await window.electron.getFilesInFolder(params.uploadImgWithMaskingParams.initInputPath);
       const maskFileDataArray = await window.electron.getFilesInFolder(params.uploadImgWithMaskingParams.maskInputPath);
 
-      bgFiles = bgFileDataArray.map(({ data, name }) => convertStringToFile(data, name));
-      canvasFiles = maskFileDataArray.map(({ data, name }) => convertStringToFile(data, name));
+      // base64 데이터를 Blob으로 변환하고 File 객체로 생성 (배경 이미지 파일)
+      bgFiles = bgFileDataArray.map((fileData) => {
+        const byteString = atob(fileData.data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uintArray = new Uint8Array(arrayBuffer);
+
+        for (let i = 0; i < byteString.length; i++) {
+          uintArray[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([arrayBuffer], { type: fileData.type });
+        return new File([blob], fileData.name, { type: fileData.type });
+      });
+
+      // base64 데이터를 Blob으로 변환하고 File 객체로 생성 (마스크 이미지 파일)
+      canvasFiles = maskFileDataArray.map((fileData) => {
+        const byteString = atob(fileData.data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uintArray = new Uint8Array(arrayBuffer);
+
+        for (let i = 0; i < byteString.length; i++) {
+          uintArray[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([arrayBuffer], { type: fileData.type });
+        return new File([blob], fileData.name, { type: fileData.type });
+      });
 
       dispatch(
         setOutputImgsCnt({
@@ -149,7 +174,7 @@ const InpaintingLayout = () => {
             dispatch(setIsLoading({ tab: 'inpainting', value: false }));
             dispatch(setIsCheckedOutput({ tab: 'inpainting', value: false }));
             dispatch(setTaskId({ tab: 'inpainting', value: null }));
-          } else if (response.detail.task_status === 'FAILURE') {
+          } else if (response.detail && response.detail.task_status === 'FAILURE') {
             clearInterval(intervalId);
             dispatch(setIsLoading({ tab: 'inpainting', value: false }));
             dispatch(setTaskId({ tab: 'inpainting', value: null }));
