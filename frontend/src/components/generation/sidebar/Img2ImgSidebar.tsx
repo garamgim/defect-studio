@@ -61,10 +61,22 @@ const Img2ImgSidebar = () => {
       const base64String = reader.result as string;
       const img = new Image();
       img.onload = () => {
+        // 이미지 크기 제한 (2024x2024 이하)
+        if (img.width > 2024 || img.height > 2024) {
+          alert('The image is too large. Please upload an image with a size less than or equal to 2024x2024.');
+          return;
+        }
         updateClipData([]);
         updateImageList([base64String]);
       };
+
+      img.onerror = () => {
+        alert('Failed to load the image. Please try again.');
+      };
       img.src = base64String;
+    };
+    reader.onerror = () => {
+      alert('Failed to read the file. Please try again.');
     };
     reader.readAsDataURL(file);
   };

@@ -111,6 +111,12 @@ const Cleanup = () => {
             dispatch(setIsLoading({ tab: 'cleanup', value: false }));
             dispatch(setIsCheckedOutput({ tab: 'cleanup', value: false }));
             dispatch(setTaskId({ tab: 'cleanup', value: null }));
+          } else if (response.detail.task_status === 'FAILURE') {
+            clearInterval(intervalId);
+            dispatch(setIsLoading({ tab: 'cleanup', value: false }));
+            dispatch(setTaskId({ tab: 'cleanup', value: null }));
+            console.error('Image generation failed:', response.detail.result_data || 'Unknown error');
+            alert(`Image generation failed: ${response.detail.result_data || 'Unknown error'}`);
           }
         } catch (error) {
           console.error('Failed to get task status:', error);
