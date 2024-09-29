@@ -1,13 +1,14 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { getImgsList } from '../api/history';
-import { FolderDataType } from '../types/history';
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getImgsList, deleteImgsFolder } from '../api/history';
+import { FolderListDataType } from '../types/history';
 import SearchFilter from '../components/history/SearchFilter';
 import ImageFolderList from '../components/history/ImageFolderList';
 import ImagesFolderDetail from '../components/history/ImageFolderDetail';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import { message } from 'antd';
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
@@ -15,24 +16,54 @@ dayjs.extend(isSameOrBefore);
 const History = () => {
   const [searchPrompt, setSearchPrompt] = useState('');
   const [searchId, setSearchId] = useState('');
-  const [searchDates, setSearchDates] = useState<[Dayjs | null, Dayjs | null] | null>(null); // Dayjs[]로 설정
-  const [selectedFolder, setSelectedFolder] = useState<FolderDataType | null>(null);
+  const [searchDates, setSearchDates] = useState<[Dayjs | null, Dayjs | null] | null>(null);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [folders, setFolders] = useState<FolderListDataType[]>([]);
 
-  const {
-    data: imageFolders,
-    isLoading,
-    error
-  } = useQuery({
+  const queryClient = useQueryClient(); // Query Client 사용
+
+  // 이미지 목록 조회
+  const { data, isLoading, error } = useQuery({
     queryKey: ['imageFolders'],
     queryFn: getImgsList
   });
 
-  const handleModalClose = () => setSelectedFolder(null);
+  // 폴더 삭제 mutation
+  const { mutate: deleteFolder } = useMutation({
+    mutationFn: deleteImgsFolder,
+    onSuccess: () => {
+      message.success('Folder deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['imageFolders'] }); // 쿼리 키를 객체로 전달
+    },
+    onError: () => {
+      message.error('Failed to delete folder');
+    }
+  });
+
+  // useEffect로 데이터를 상태로 업데이트
+  useEffect(() => {
+    if (data) {
+      setFolders(data.logs); // 가져온 데이터를 상태에 저장
+    }
+  }, [data]);
+
+  const handleModalClose = () => setSelectedFolderId(null);
+
+  // 폴더 세부 정보 핸들러
+  const handleDetailClick = (folder: FolderListDataType) => {
+    setSelectedFolderId(folder.id); // 선택된 폴더의 ID만 설정
+  };
+
+  // 삭제 핸들러
+  const handleDelete = (id: string) => {
+    deleteFolder(id); // 삭제 mutation 호출
+  };
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading data</div>;
 
-  const filteredFolders = imageFolders.logs.filter((folder: FolderDataType) => {
+  // 필터링된 폴더 목록
+  const filteredFolders = folders.filter((folder: FolderListDataType) => {
     const matchesPrompt = folder.prompt?.toLowerCase().includes(searchPrompt.toLowerCase());
     const matchesId = folder.id.toLowerCase().includes(searchId.toLowerCase());
     const matchesDate =
@@ -58,12 +89,12 @@ const History = () => {
 
       <ImageFolderList
         folders={filteredFolders}
-        handleDetailClick={setSelectedFolder}
-        handleDownload={(id) => console.log(`Downloading ${id}`)}
-        handleDelete={(id) => console.log(`Deleting ${id}`)}
+        handleDetailClick={handleDetailClick} // 세부 정보 핸들러 전달
+        handleDownload={(id) => console.log(`Downloading folder with ID: ${id}`)} // 다운로드 핸들러 전달
+        handleDelete={handleDelete} // 삭제 핸들러 전달
       />
 
-      <ImagesFolderDetail folder={selectedFolder} onClose={handleModalClose} />
+      <ImagesFolderDetail folderId={selectedFolderId} onClose={handleModalClose} />
     </div>
   );
 };

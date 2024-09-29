@@ -6,6 +6,7 @@ export const getImgsList = async () => {
     const response = await axiosInstance.get('/generation/log');
 
     if (response.status === 200) {
+      console.log(response.data);
       return response.data;
     } else {
       throw new Error('Failed to get imgs-list');
@@ -17,7 +18,7 @@ export const getImgsList = async () => {
 };
 
 // 생성된 이미지 세부 조회 함수
-export const getImgsDetail = async (logId: number) => {
+export const getImgsDetail = async (logId: string) => {
   try {
     const response = await axiosInstance.get(`/generation/log/${logId}`);
 
@@ -33,11 +34,11 @@ export const getImgsDetail = async (logId: number) => {
 };
 
 // 생성된 이미지 삭제 함수
-export const deleteImgsFolder = async (logId: number) => {
+export const deleteImgsFolder = async (logId: string) => {
   try {
     const response = await axiosInstance.delete(`/generation/log/${logId}`);
 
-    if (response.status === 200) {
+    if (response.status === 204) {
       return response.data;
     } else {
       throw new Error('Failed to delete imgs');
