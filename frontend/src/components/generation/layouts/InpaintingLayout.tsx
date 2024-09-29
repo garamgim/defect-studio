@@ -30,7 +30,9 @@ const InpaintingLayout = () => {
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useInpaintingParams();
 
   const convertBase64ToFileArray = (base64Array: string[], fileType: string) => {
-    return base64Array.map((base64Img, index) => convertStringToFile(base64Img, `${fileType}_${index}.png`));
+    return base64Array.map((base64Img, index) =>
+      convertStringToFile(base64Img, `${fileType}_${index}.png`, 'image/png')
+    );
   };
 
   const handleGenerate = async () => {
@@ -46,8 +48,8 @@ const InpaintingLayout = () => {
       const bgFileDataArray = await window.electron.getFilesInFolder(params.uploadImgWithMaskingParams.initInputPath);
       const maskFileDataArray = await window.electron.getFilesInFolder(params.uploadImgWithMaskingParams.maskInputPath);
 
-      bgFiles = bgFileDataArray.map(({ data, name }) => convertStringToFile(data, name));
-      canvasFiles = maskFileDataArray.map(({ data, name }) => convertStringToFile(data, name));
+      bgFiles = bgFileDataArray.map(({ data, name }) => convertStringToFile(data, name, 'image/png'));
+      canvasFiles = maskFileDataArray.map(({ data, name }) => convertStringToFile(data, name, 'image/png'));
 
       dispatch(
         setOutputImgsCnt({
@@ -156,7 +158,11 @@ const InpaintingLayout = () => {
     if (params.uploadImgWithMaskingParams.clipData.length === 0) {
       try {
         if (params.uploadImgWithMaskingParams.initImageList.length > 0) {
-          const file = convertStringToFile(params.uploadImgWithMaskingParams.initImageList[0], 'image.png');
+          const file = convertStringToFile(
+            params.uploadImgWithMaskingParams.initImageList[0],
+            'image.png',
+            'image/png'
+          );
 
           const gpuNumber = gpuNum || 1; // GPU 번호 설정 간소화
 

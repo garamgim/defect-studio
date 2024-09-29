@@ -31,7 +31,7 @@ const RemoveBackground = () => {
   const handleGenerate = async () => {
     if (params.uploadImgParams.mode === 'manual') {
       files = params.uploadImgParams.imageList.map((base64Img, index) =>
-        convertStringToFile(base64Img, `image_${index}.png`)
+        convertStringToFile(base64Img, `image_${index}.png`, 'image/png')
       );
       dispatch(setOutputImgsCnt({ tab: 'removeBg', value: 1 }));
     } else {

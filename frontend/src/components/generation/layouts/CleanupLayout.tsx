@@ -126,7 +126,16 @@ const Cleanup = () => {
     }
 
     return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 정리
-  }, [taskId, isLoading, dispatch, allOutputs.outputsCnt, output.imgsCnt, allOutputs.outputsInfo]);
+  }, [
+    taskId,
+    isLoading,
+    dispatch,
+    allOutputs.outputsCnt,
+    output.imgsCnt,
+    allOutputs.outputsInfo,
+    params.uploadImgWithMaskingParams.outputPath,
+    params.uploadImgWithMaskingParams.isZipDownload
+  ]);
 
   return (
     <div className="flex h-full pt-4 pb-6">
