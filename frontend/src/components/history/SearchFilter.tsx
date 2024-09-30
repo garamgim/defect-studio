@@ -36,7 +36,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       <div className="flex-grow w-full">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search by Prompt</label>
         <Input
-          placeholder="Enter prompt (e.g., 'cat', 'sunset')"
+          placeholder="Enter prompt"
           value={searchPrompt}
           onChange={(e) => setSearchPrompt(e.target.value)}
           className="w-full border border-gray-300 dark:border-gray-600 p-2 rounded-md"

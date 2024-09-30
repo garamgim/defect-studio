@@ -1,5 +1,5 @@
 import { Button } from 'antd';
-import { EyeOutlined, DownloadOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DownloadOutlined, DeleteOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { FolderListDataType } from '../../types/history';
 
@@ -21,9 +21,9 @@ const ImageFolderList: React.FC<ImageFolderListProps> = ({
       {folders.map((folder) => (
         <div
           key={folder.id}
-          className="relative bg-white rounded-lg shadow-lg p-2 flex flex-col justify-between dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-300 h-[140px]"
+          className="relative bg-white rounded-lg shadow-lg p-2 flex flex-col justify-between dark:bg-gray-700 border border-gray-300 dark:border-none hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-300 h-[140px]"
         >
-          <div>
+          <div className="cursor-pointer" onClick={() => handleDetailClick(folder)}>
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">ID: {folder.id}</h3>
               <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -40,23 +40,6 @@ const ImageFolderList: React.FC<ImageFolderListProps> = ({
 
           {/* Detail, Download, Delete 버튼 */}
           <div className="flex justify-end gap-2">
-            <Button
-              type="default"
-              size="small"
-              icon={<EyeOutlined />}
-              className="text-xs xl:flex hidden"
-              onClick={() => handleDetailClick(folder)}
-            >
-              Detail
-            </Button>
-            <Button
-              type="default"
-              size="small"
-              icon={<EyeOutlined />}
-              className="text-xs xl:hidden"
-              onClick={() => handleDetailClick(folder)}
-            />
-
             <Button
               type="primary"
               size="small"

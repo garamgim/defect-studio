@@ -4,6 +4,8 @@ import { FaRegCopy } from 'react-icons/fa6';
 import { getImgsDetail } from '../../api/history';
 import styled from 'styled-components';
 import { Carousel } from 'antd';
+import type { CarouselRef } from 'antd/lib/carousel';
+import { useState, useRef } from 'react';
 
 const CustomModal = styled(Modal)`
   html.dark & .ant-modal-content {
@@ -22,6 +24,9 @@ interface FolderDetailsModalProps {
 }
 
 const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClose }) => {
+  const carouselRef = useRef<CarouselRef>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
   const {
     data: folderDetails,
     isLoading,
@@ -46,6 +51,14 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
   if (isLoading) return <Spin />;
   if (isError) return <p>Error loading folder details</p>;
 
+  // 썸네일 클릭 시 해당 슬라이드로 이동하는 함수
+  const handleThumbnailClick = (index: number) => {
+    setSelectedImageIndex(index);
+    if (carouselRef.current) {
+      carouselRef.current.goTo(index);
+    }
+  };
+
   return (
     <CustomModal
       open={folderId !== null}
@@ -61,8 +74,9 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
       {folderDetails && (
         <div className="flex w-full h-full">
           {/* 좌측 이미지 영역 */}
-          <div className="w-[40%] flex flex-col h-full p-4">
-            <Carousel autoplay>
+          <div className="w-[40%] flex flex-col h-full p-4 overflow-hidden">
+            {/* 선택된 이미지를 표시하는 캐러셀 */}
+            <Carousel ref={carouselRef} autoplay={false} arrows={true} dots={false}>
               {folderDetails.image_url_list.map((url: string, index: number) => (
                 <div key={index}>
                   <img
@@ -74,13 +88,18 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
                 </div>
               ))}
             </Carousel>
+
+            {/* 썸네일 영역 */}
             <div className="flex justify-center gap-2">
               {folderDetails.image_url_list.map((url: string, index: number) => (
                 <img
                   key={index}
                   src={url}
                   alt={`generated img ${index}`}
-                  className="w-[60px] h-[60px] rounded-lg object-cover border dark:border-gray-600"
+                  className={`w-[60px] h-[60px] rounded-lg object-cover border cursor-pointer ${
+                    selectedImageIndex === index ? 'border-blue-500' : 'dark:border-gray-600'
+                  }`}
+                  onClick={() => handleThumbnailClick(index)} // 클릭 시 슬라이드 이동
                 />
               ))}
             </div>
@@ -93,7 +112,7 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
               <div className="flex justify-between items-center mb-2">
                 <span className="font-semibold text-[18px]">Prompt</span>
                 <div
-                  className="flex items-center cursor-pointer text-sm text-gray-400"
+                  className="flex items-center cursor-pointer text-sm text-gray-400 transition-transform transform hover:scale-110"
                   onClick={() => copyToClipboard(folderDetails.prompt || 'N/A')}
                 >
                   <FaRegCopy className="mr-2" />
@@ -110,7 +129,7 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
               <div className="flex justify-between items-center mb-2">
                 <span className="font-semibold text-[18px]">Negative Prompt</span>
                 <div
-                  className="flex items-center cursor-pointer text-[14px] text-gray-400"
+                  className="flex items-center cursor-pointer text-[14px] text-gray-400 transition-transform transform hover:scale-110"
                   onClick={() => copyToClipboard(folderDetails.negative_prompt || 'N/A')}
                 >
                   <FaRegCopy className="mr-2" />
@@ -143,7 +162,7 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
 
               <div className="flex flex-col">
                 <span className="text-gray-400 mb-1">Seed</span>
-                <span className="font-medium mb-2">{folderDetails.seed || 'N/A'}</span>
+                <span className="font-medium mb-2">{folderDetails.seed}</span>
               </div>
 
               <div className="flex flex-col">
@@ -169,11 +188,6 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
               <div className="flex flex-col">
                 <span className="text-gray-400 mb-1">Strength</span>
                 <span className="font-medium mb-2">{folderDetails.strength || 'N/A'}</span>
-              </div>
-
-              <div className="flex flex-col">
-                <span className="text-gray-400 mb-1">Number of Images</span>
-                <span className="font-medium mb-2">{folderDetails.num_of_generated_images}</span>
               </div>
             </div>
           </div>

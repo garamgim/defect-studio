@@ -95,13 +95,6 @@ const Navbar = () => {
           <Button
             type="link"
             className="text-base text-black dark:text-gray-300 cursor-pointer"
-            onClick={() => navigateTo('/history')}
-          >
-            History
-          </Button>
-          <Button
-            type="link"
-            className="text-base text-black dark:text-gray-300 cursor-pointer"
             onClick={() => navigateTo('/training')}
           >
             Training
@@ -112,6 +105,13 @@ const Navbar = () => {
             onClick={() => navigateTo('/model')}
           >
             Model
+          </Button>
+          <Button
+            type="link"
+            className="text-base text-black dark:text-gray-300 cursor-pointer"
+            onClick={() => navigateTo('/history')}
+          >
+            History
           </Button>
           <Button
             type="link"

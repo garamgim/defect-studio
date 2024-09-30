@@ -1,27 +1,19 @@
 import GenerateButton from '../common/GenerateButton';
 import Sidebar from '../sidebar/CleanupSidebar';
-import { postCleanupGeneration, getTaskStatus } from '../../../api/generation';
+import { postCleanupGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import CleanupDisplay from '../outputDisplay/CleanupDisplay';
-import {
-  setIsLoading,
-  setTaskId,
-  setOutputImgsUrl,
-  setOutputImgsCnt,
-  setAllOutputsInfo,
-  setIsCheckedOutput
-} from '../../../store/slices/generation/outputSlice';
+import { setIsLoading, setTaskId, setOutputImgsCnt } from '../../../store/slices/generation/outputSlice';
 import { RootState } from '../../../store/store';
 import { useSelector, useDispatch } from 'react-redux';
-import { useCleanupOutputs } from '@/hooks/generation/outputs/useCleanupOutputs';
-import { useEffect } from 'react';
+import { useCleanupOutputs } from '../../../hooks/generation/outputs/useCleanupOutputs';
 import OutputToolbar from '../outputTool/OutputToolbar';
 import { message } from 'antd';
 
 const Cleanup = () => {
   const dispatch = useDispatch();
   const { params, gpuNum } = useSelector((state: RootState) => state.cleanup);
-  const { isLoading, taskId, output, allOutputs, isSidebarVisible } = useCleanupOutputs();
+  const { isLoading, isSidebarVisible } = useCleanupOutputs();
 
   const convertBase64ToFileArray = (base64Array: string[], fileType: string) => {
     return base64Array.map((base64Img, index) => convertStringToFile(base64Img, `${fileType}_${index}.png`));
@@ -67,81 +59,6 @@ const Cleanup = () => {
       dispatch(setIsLoading({ tab: 'cleanup', value: false }));
     }
   };
-
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout | undefined;
-
-    const fetchTaskStatus = async () => {
-      if (isLoading && taskId) {
-        try {
-          const response = await getTaskStatus(taskId);
-          if (response.task_status === 'SUCCESS') {
-            clearInterval(intervalId); // 성공 시 상태 확인 중지
-            dispatch(setOutputImgsUrl({ tab: 'cleanup', value: response.result_data }));
-
-            window.electron
-              .saveImgsWithZip(
-                response.result_data,
-                params.uploadImgWithMaskingParams.outputPath,
-                'png', // 파일 형식 (png로 고정)
-                params.uploadImgWithMaskingParams.isZipDownload
-              )
-              .then((result) => {
-                if (result.success) {
-                  console.log('이미지가 성공적으로 저장되었습니다:', result.success);
-                } else {
-                  console.error('이미지 저장 중 오류 발생:', result.error);
-                }
-              })
-              .catch((error) => {
-                console.error('이미지 저장 오류:', error);
-              });
-
-            const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
-            const outputsInfo = [
-              {
-                id: response.result_data_log.id,
-                imgsUrl: response.result_data,
-                prompt: response.result_data_log.prompt
-              },
-              ...allOutputs.outputsInfo
-            ];
-            dispatch(setAllOutputsInfo({ tab: 'cleanup', outputsCnt, outputsInfo }));
-
-            dispatch(setIsLoading({ tab: 'cleanup', value: false }));
-            dispatch(setIsCheckedOutput({ tab: 'cleanup', value: false }));
-            dispatch(setTaskId({ tab: 'cleanup', value: null }));
-          } else if (response.detail && response.detail.task_status === 'FAILURE') {
-            clearInterval(intervalId);
-            dispatch(setIsLoading({ tab: 'cleanup', value: false }));
-            dispatch(setTaskId({ tab: 'cleanup', value: null }));
-            console.error('Image generation failed:', response.detail.result_data || 'Unknown error');
-            alert(`Image generation failed: ${response.detail.result_data || 'Unknown error'}`);
-          }
-        } catch (error) {
-          console.error('Failed to get task status:', error);
-          dispatch(setIsLoading({ tab: 'cleanup', value: false }));
-          clearInterval(intervalId);
-        }
-      }
-    };
-
-    if (taskId) {
-      fetchTaskStatus();
-      intervalId = setInterval(fetchTaskStatus, 1000); // 1초마다 상태 확인
-    }
-
-    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 정리
-  }, [
-    taskId,
-    isLoading,
-    dispatch,
-    allOutputs.outputsCnt,
-    output.imgsCnt,
-    allOutputs.outputsInfo,
-    params.uploadImgWithMaskingParams.outputPath,
-    params.uploadImgWithMaskingParams.isZipDownload
-  ]);
 
   return (
     <div className="flex h-full pt-4 pb-6">
