@@ -1,95 +1,112 @@
-import { useQuery } from '@tanstack/react-query';
 import axios, { AxiosResponse } from 'axios';
-import axiosInstance from './token/axiosInstance';
+import axiosInstance from '@api/token/axiosInstance';
+import {
+  MemberImageCount,
+  ToolFrequency,
+  durationSearchProps,
+  TokenDistribution,
+  DepartmentMemberTokenUsage
+} from '@/types/statistics';
 
-type logType = 'distribute' | 'issue' | 'use';
-// ------------- 부서 단위 별 토큰 기록 요청 -------------------
-
-// Request Type
-export interface DepartmentTokenStatisticRequestType {
-  start_date: string;
-  end_date: string;
-  department_id: number;
-  log_type: logType;
-}
-
-// Response Type
-export type DepartmentTokenStatisticResponseType = {
-  create_date: string;
-  quantity: number;
-  log_type: logType;
-};
-
-// 요청 함수
-export const getDepartmentTokenStatistic = async (
-  requestData: DepartmentTokenStatisticRequestType
-): Promise<AxiosResponse<DepartmentTokenStatisticResponseType[]>> => {
-  const params: { [key: string]: string | number } = {};
-  params.start_date = requestData.start_date;
-  params.end_date = requestData.end_date;
-  params.department_id = requestData.department_id;
-
+// 부서 내 사용자별 생성 이미지 수
+export const getDepartmentMemberImageCount = async (
+  department_id: number
+): Promise<AxiosResponse<MemberImageCount[]>> => {
   try {
-    const response = await axiosInstance.get<DepartmentTokenStatisticResponseType[]>(
-      `/admin/token-logs/${requestData.log_type}`,
-      {
-        params
-      }
+    const response = await axiosInstance.get<MemberImageCount[]>(
+      `/departments/${department_id}/members/statistics/images`
     );
     return response;
   } catch (error) {
-    if (axios.isAxiosError<DepartmentTokenStatisticResponseType[]>(error)) {
-      if (error.response?.status === 401) {
-        throw new Error('Unauthorized'); // 권한 없음
-      } else if (error.response?.status === 404) {
-        throw new Error('Not Found'); // 없음
-      } else if (error.response?.status === 422) {
-        throw new Error('Unprocessable Entity'); // 누락
-      } else {
-        throw new Error('Unknown Error'); // 알수 없는 에러
+    if (axios.isAxiosError(error)) {
+      switch (error.response?.status) {
+        case 404:
+          throw new Error('Not Found');
+        case 401:
+          throw new Error('Unauthorized');
+        default:
+          throw new Error('Unknown Error');
       }
     } else {
-      throw new Error('Unknown Error'); // 알수 없는 에러
+      throw new Error('Unknown Error');
     }
   }
 };
 
-// Custom Hook - 요청
-interface UseDepartmentTokenStatisticProps {
-  departmentId: number;
-  start_date: string;
-  end_date: string;
-  log_type: 'distribute' | 'issue';
-}
-export const useDepartmentTokenStatistic = ({
-  departmentId,
-  start_date,
-  end_date,
-  log_type
-}: UseDepartmentTokenStatisticProps) => {
-  const { data, error, isPending, isLoading, isError } = useQuery<
-    DepartmentTokenStatisticResponseType[],
-    Error,
-    DepartmentTokenStatisticResponseType[],
-    (string | number)[]
-  >({
-    queryKey: ['departmentTokenStatistic', departmentId, start_date as string, end_date as string],
-    queryFn: async () => {
-      const response = await getDepartmentTokenStatistic({
-        department_id: departmentId,
-        start_date,
-        end_date,
-        log_type
-      });
-      console.log(response.data);
-      return response.data;
+// 부서 내 도구별 사용 빈도
+export const getDepartmentToolFrequency = async (department_id: number): Promise<AxiosResponse<ToolFrequency[]>> => {
+  try {
+    const response = await axiosInstance.get<ToolFrequency[]>(`/departments/${department_id}/statistics/tools`);
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      switch (error.response?.status) {
+        case 404:
+          throw new Error('Not Found');
+        case 401:
+          throw new Error('Unauthorized');
+        default:
+          throw new Error('Unknown Error');
+      }
+    } else {
+      throw new Error('Unknown Error');
     }
-  });
-  return {
-    data,
-    error,
-    isLoading,
-    isPending,
-    isError
-  };
+  }
+};
+
+// 부서 내 토큰 배분 현황
+export const getDepartmentTokenDistributionState = async (
+  department_id: number,
+  durationSearchProps?: durationSearchProps
+): Promise<AxiosResponse<TokenDistribution[]>> => {
+  const queryParams: durationSearchProps = {};
+  if (queryParams?.start_date) queryParams.start_date = durationSearchProps?.start_date;
+  if (queryParams?.end_date) queryParams.end_date = durationSearchProps?.end_date;
+  try {
+    const response = await axiosInstance.get<TokenDistribution[]>(
+      `/departments/${department_id}/statistics/tokens/distributions`,
+      {
+        params: queryParams
+      }
+    );
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      switch (error.response?.status) {
+        case 404:
+          throw new Error('Not Found');
+        case 401:
+          throw new Error('Unauthorized');
+        default:
+          throw new Error('Unknown Error');
+      }
+    } else {
+      throw new Error('Unknown Error');
+    }
+  }
+};
+
+// 부서 내 사용자별 토큰 사용 현황
+export const getDepartmentMembersTokenUsage = async (
+  department_id: number
+): Promise<AxiosResponse<DepartmentMemberTokenUsage[]>> => {
+  try {
+    const response = await axiosInstance.get<DepartmentMemberTokenUsage[]>(
+      `/departments/${department_id}/members/statistics/tokens/usage`
+    );
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      switch (error.response?.status) {
+        case 404:
+          throw new Error('Not Found');
+        case 401:
+          throw new Error('Unauthorized');
+        default:
+          throw new Error('Unknown Error');
+      }
+    } else {
+      throw new Error('Unknown Error');
+    }
+  }
 };

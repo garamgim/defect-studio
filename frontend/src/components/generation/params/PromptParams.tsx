@@ -8,9 +8,9 @@ import { RootState } from '../../../store/store';
 
 interface PromptParamsProps {
   prompt: string;
-  setPrompt: (value: string) => void;
+  updatePrompt: (prompt: string) => void;
   negativePrompt: string;
-  setNegativePrompt: (value: string) => void;
+  updateNegativePrompt: (negativePrompt: string) => void;
   isNegativePrompt: boolean;
   handleNegativePromptChange: (event: CheckboxChangeEvent) => void;
   clipData?: string[];
@@ -19,9 +19,9 @@ interface PromptParamsProps {
 
 const PromptParams = ({
   prompt,
-  setPrompt,
+  updatePrompt,
   negativePrompt,
-  setNegativePrompt,
+  updateNegativePrompt,
   isNegativePrompt,
   handleNegativePromptChange,
   clipData = [],
@@ -45,13 +45,13 @@ const PromptParams = ({
   // Basic일 경우에는 Negative Prompt를 비활성화
   useEffect(() => {
     if (level === 'Basic') {
-      setNegativePrompt('');
+      updateNegativePrompt('');
     }
-  }, [level, setNegativePrompt]);
+  }, [level, updateNegativePrompt]);
 
   const handlePromptUpdate = (phrase: string) => {
     const newPrompt = prompt ? `${prompt}, ${phrase}` : phrase;
-    setPrompt(newPrompt);
+    updatePrompt(newPrompt);
   };
 
   // 모달이 열릴 때 clipData를 최신 상태로 반영
@@ -92,14 +92,12 @@ const PromptParams = ({
           className="pr-10"
           placeholder="Enter your prompt here..."
           value={prompt}
-          onChange={(event) => setPrompt(event.target.value)}
+          onChange={(event) => updatePrompt(event.target.value)}
         />
         {location.pathname !== '/generation/text-to-image' && handleClipClick && (
           <Tooltip title="Uploaded image is converted to a text description to assist in prompt creation.">
-            <Button
-              type="link"
-              className="absolute bottom-2 right-2 dark:text-gray-300"
-              icon={<MdImageSearch className="text-xl" />}
+            <MdImageSearch
+              className="text-[24px] cursor-pointer absolute bottom-4 right-4 text-[#222] hover:text-[#1677FF] text-[#1677FF] dark:text-gray-300 dark:hover:text-white transition-transform transform hover:scale-110"
               onClick={handleIconClick}
             />
           </Tooltip>
@@ -114,7 +112,7 @@ const PromptParams = ({
             className="mb-4"
             placeholder="Enter your negative prompt here..."
             value={negativePrompt}
-            onChange={(event) => setNegativePrompt(event.target.value)}
+            onChange={(event) => updateNegativePrompt(event.target.value)}
           />
         </>
       )}

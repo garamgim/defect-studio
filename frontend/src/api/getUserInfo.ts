@@ -2,7 +2,7 @@ import axiosInstance from './token/axiosInstance';
 import { AxiosError, AxiosResponse } from 'axios';
 
 export type userInfo = {
-  member_pk: number;
+  member_id: number;
   login_id: string;
   nickname: string;
   email: string;

@@ -1,18 +1,21 @@
-import { Tabs, Upload, Input, Button } from 'antd';
+import { Tabs, Upload, Input, Button, Checkbox } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { FiFolderPlus } from 'react-icons/fi';
 import React from 'react';
+import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 interface UploadImgWithMaskingParamsProps {
   handleImageUpload: (file: File) => void;
   imagePreview: string | null;
   initInputPath: string;
-  setInitInputPath: (value: string) => void;
+  updateInitInputPath: (initInputPath: string) => void;
   maskInputPath: string;
-  setMaskInputPath: (value: string) => void;
+  updateMaskInputPath: (maskInputPath: string) => void;
   outputPath: string;
-  setOutputPath: (value: string) => void;
-  setMode: (value: 'manual' | 'batch') => void;
+  updateOutputPath: (outputPath: string) => void;
+  updateMode: (value: 'manual' | 'batch') => void;
+  isZipDownload: boolean;
+  updateIsZipDownload: (value: boolean) => void;
 }
 
 const UploadImgWithMasking = ({
@@ -21,10 +24,12 @@ const UploadImgWithMasking = ({
   initInputPath,
   maskInputPath,
   outputPath,
-  setInitInputPath,
-  setMaskInputPath,
-  setOutputPath,
-  setMode
+  isZipDownload,
+  updateInitInputPath,
+  updateMaskInputPath,
+  updateOutputPath,
+  updateMode,
+  updateIsZipDownload
 }: UploadImgWithMaskingParamsProps) => {
   const uploadProps = {
     accept: 'image/*',
@@ -39,7 +44,7 @@ const UploadImgWithMasking = ({
     try {
       const selectedFolderPath = await window.electron.selectFolder();
       if (selectedFolderPath) {
-        setInitInputPath(selectedFolderPath); // 인풋 이미지 폴더
+        updateInitInputPath(selectedFolderPath);
       }
     } catch (error) {
       console.error('Error selecting folder:', error);
@@ -50,7 +55,7 @@ const UploadImgWithMasking = ({
     try {
       const selectedFolderPath = await window.electron.selectFolder();
       if (selectedFolderPath) {
-        setMaskInputPath(selectedFolderPath); // 인풋 이미지 폴더
+        updateMaskInputPath(selectedFolderPath);
       }
     } catch (error) {
       console.error('Error selecting folder:', error);
@@ -61,16 +66,20 @@ const UploadImgWithMasking = ({
     try {
       const selectedFolderPath = await window.electron.selectFolder();
       if (selectedFolderPath) {
-        setOutputPath(selectedFolderPath); // 아웃풋 폴더(생성된 이미지 저장할 곳)
+        updateOutputPath(selectedFolderPath);
       }
     } catch (error) {
       console.error('Error selecting folder:', error);
     }
   };
 
+  const onCheckboxChange = (e: CheckboxChangeEvent) => {
+    updateIsZipDownload(e.target.checked);
+  };
+
   // 탭 변경될 때
   const handleTabChange = (key: string) => {
-    setMode(key as 'manual' | 'batch');
+    updateMode(key as 'manual' | 'batch');
   };
 
   const items = [
@@ -107,7 +116,7 @@ const UploadImgWithMasking = ({
               <Input
                 value={initInputPath || ''}
                 onChange={(event) => {
-                  setInitInputPath(event.target.value);
+                  updateInitInputPath(event.target.value);
                 }}
                 type="text"
                 id="imagePath"
@@ -128,7 +137,7 @@ const UploadImgWithMasking = ({
               <Input
                 value={maskInputPath || ''}
                 onChange={(event) => {
-                  setInitInputPath(event.target.value);
+                  updateInitInputPath(event.target.value);
                 }}
                 type="text"
                 id="imagePath"
@@ -149,7 +158,7 @@ const UploadImgWithMasking = ({
               <Input
                 value={outputPath || ''}
                 onChange={(event) => {
-                  setOutputPath(event.target.value);
+                  updateOutputPath(event.target.value);
                 }}
                 type="text"
                 id="outputPath"
@@ -160,6 +169,9 @@ const UploadImgWithMasking = ({
                 <FiFolderPlus className="w-[18px] h-[18px] text-[#222]" />
               </Button>
             </div>
+            <Checkbox checked={isZipDownload} onChange={onCheckboxChange} className="mt-2">
+              Zip
+            </Checkbox>
           </div>
         </div>
       )

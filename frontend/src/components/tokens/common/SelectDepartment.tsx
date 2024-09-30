@@ -12,8 +12,7 @@ interface SelectOptionType {
 }
 
 interface SelectDepartmentProps {
-  selectedDepartment: number | undefined;
-  setSelectedDepartment: React.Dispatch<React.SetStateAction<number | undefined>>;
+  setSelectedDepartment: (departmentsId: number | undefined) => void;
 }
 
 const SelectDepartment = ({ setSelectedDepartment }: SelectDepartmentProps) => {
