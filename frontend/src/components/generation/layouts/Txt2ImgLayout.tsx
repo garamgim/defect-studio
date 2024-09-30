@@ -1,51 +1,56 @@
-import { useState, useCallback } from 'react';
-import { Modal, Button, Select, message } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect } from 'react';
+import { message } from 'antd';
 import Sidebar from '../sidebar/Txt2ImgSidebar';
 import PromptParams from '../params/PromptParams';
 import Txt2ImgDisplay from '../outputDisplay/Txt2ImgDisplay';
 import { useDispatch, useSelector } from 'react-redux';
-import { setIsNegativePrompt, setIsLoading } from '../../../store/slices/generation/txt2ImgSlice';
-import { setImageList as setImg2ImgImages } from '../../../store/slices/generation/img2ImgSlice';
-import { setInitImageList as setInpaintingImages } from '../../../store/slices/generation/inpaintingSlice';
-import { setImageList as setRemoveBgImages } from '../../../store/slices/generation/removeBgSlice';
-import { setInitImageList as setCleanupImages } from '../../../store/slices/generation/cleanupSlice';
-import { useTxt2ImgParams } from '../../../hooks/generation/useTxt2ImgParams';
-import GenerateButton from '../../common/GenerateButton';
-import { RiFolderDownloadLine } from 'react-icons/ri';
-import { MdMoveUp } from 'react-icons/md';
-import { RiCheckboxMultipleBlankFill, RiCheckboxMultipleBlankLine } from 'react-icons/ri';
-import { AiOutlineEyeInvisible, AiOutlineEye } from 'react-icons/ai';
-import { postTxt2ImgGeneration } from '../../../api/generation';
+import { setIsNegativePrompt } from '../../../store/slices/generation/txt2ImgSlice';
+import { useTxt2ImgParams } from '../../../hooks/generation/params/useTxt2ImgParams';
+import { useTxt2ImgOutputs } from '../../../hooks/generation/outputs/useTxt2ImgOutputs';
+import GenerateButton from '../common/GenerateButton';
+import { postTxt2ImgGeneration, getTaskStatus } from '../../../api/generation';
 import { RootState } from '../../../store/store';
+import OutputToolbar from '../outputTool/OutputToolbar';
+import {
+  setIsLoading,
+  setOutputImgsCnt,
+  setTaskId,
+  setOutputImgsUrl,
+  setAllOutputsInfo,
+  setIsCheckedOutput
+} from '../../../store/slices/generation/outputSlice';
 
 const Txt2ImgLayout = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { params, isLoading, output } = useSelector((state: RootState) => state.txt2Img);
+  const { params, gpuNum } = useSelector((state: RootState) => state.txt2Img);
+  const { isLoading, taskId, output, allOutputs, isSidebarVisible, isCheckedOutput } = useTxt2ImgOutputs();
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useTxt2ImgParams();
-
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
-  const [selectedImages, setSelectedImages] = useState<string[]>([]);
-  const [allSelected, setAllSelected] = useState(false);
-  const [isIconFilled, setIsIconFilled] = useState(true);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isFormatModalVisible, setIsFormatModalVisible] = useState(false);
-  const [selectedImageFormat, setSelectedImageFormat] = useState<string>('png');
-
-  const imageFormats = [
-    { value: 'png', label: 'PNG' },
-    { value: 'jpg', label: 'JPG' },
-    { value: 'jpeg', label: 'JPEG' },
-    { value: 'bmp', label: 'BMP' }
-  ];
 
   const handleNegativePromptChange = useCallback(() => {
     dispatch(setIsNegativePrompt(!isNegativePrompt));
   }, [isNegativePrompt, dispatch]);
 
+  // Ctrl + Enter 키를 감지하여 handleGenerate 실행
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === 'Enter') {
+        handleGenerate();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [prompt]);
+
   const handleGenerate = async () => {
+    const gpuNumber = gpuNum || 1; // gpuNum이 없으면 기본값 1 사용
+    console.log('pp', params.promptParams.prompt);
+
     const data = {
+      gpu_device: gpuNumber,
       model: params.modelParams.model,
       scheduler: params.samplingParams.scheduler,
       prompt: params.promptParams.prompt,
@@ -61,90 +66,67 @@ const Txt2ImgLayout = () => {
     };
 
     try {
-      dispatch(setIsLoading(true));
-      await postTxt2ImgGeneration('remote', data);
-      dispatch(setIsLoading(false));
+      dispatch(setIsLoading({ tab: 'txt2Img', value: true }));
+      const newTaskId = await postTxt2ImgGeneration('remote', data);
+
+      const imgsCnt = params.batchParams.batchCount * params.batchParams.batchSize;
+      dispatch(setOutputImgsCnt({ tab: 'txt2Img', value: imgsCnt }));
+
+      dispatch(setTaskId({ tab: 'txt2Img', value: newTaskId }));
     } catch (error) {
-      if (error instanceof Error) {
-        message.error(`Error generating image: ${error.message}`);
-      } else {
-        message.error('An unknown error occurred');
+      message.error(`Error generating image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
+    }
+  };
+
+  useEffect(() => {
+    const fetchTaskStatus = async () => {
+      try {
+        // taskId가 있을 경우에만 상태를 확인
+        if (taskId) {
+          console.log(isLoading, taskId, 'check', isCheckedOutput);
+          if (isLoading && taskId) {
+            const response = await getTaskStatus(taskId);
+
+            if (response.task_status === 'SUCCESS') {
+              clearInterval(intervalId); // 성공 시 상태 확인 중지
+              dispatch(setOutputImgsUrl({ tab: 'txt2Img', value: response.result_data }));
+
+              const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
+              const outputsInfo = [
+                {
+                  id: response.result_data_log.id,
+                  imgsUrl: response.result_data,
+                  prompt: response.result_data_log.prompt
+                },
+                ...allOutputs.outputsInfo
+              ];
+              dispatch(setAllOutputsInfo({ tab: 'txt2Img', outputsCnt, outputsInfo }));
+
+              dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
+              dispatch(setIsCheckedOutput({ tab: 'txt2Img', value: false }));
+              dispatch(setTaskId({ tab: 'txt2Img', value: null }));
+            } else if (response.detail && response.detail.task_status === 'FAILURE') {
+              clearInterval(intervalId);
+              dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
+              dispatch(setTaskId({ tab: 'txt2Img', value: null }));
+              console.error('Image generation failed:', response.detail.result_data || 'Unknown error');
+              alert(`Image generation failed: ${response.detail.result_data || 'Unknown error'}`);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to get task status:', error);
+        dispatch(setIsLoading({ tab: 'txt2Img', value: false }));
+        clearInterval(intervalId);
       }
-      dispatch(setIsLoading(false));
-    }
-  };
+    };
 
-  const handleSelectAllImages = useCallback(() => {
-    if (allSelected) {
-      setSelectedImages([]);
-    } else {
-      setSelectedImages(output.outputImgs);
-    }
-    setAllSelected(!allSelected);
-    setIsIconFilled(!isIconFilled);
-  }, [allSelected, output.outputImgs]);
+    const intervalId = setInterval(fetchTaskStatus, 1000); // const로 선언하고 바로 초기화
 
-  const handleDownloadImages = async () => {
-    if (selectedImages.length === 0) {
-      message.warning('Please select at least one image to save.');
-      return;
-    }
-    const folderPath = await window.electron.selectFolder();
-    if (!folderPath) {
-      message.info('Folder selection was canceled.');
-      return;
-    }
-    const response = await window.electron.saveImages(selectedImages, folderPath, selectedImageFormat);
-    if (response.success) {
-      message.success('Image saved successfully!');
-    } else {
-      message.error(`Failed to save images: ${response.error}`);
-    }
-  };
-
-  const toggleSidebarAndPrompt = useCallback(() => {
-    setIsSidebarVisible(!isSidebarVisible);
-  }, [isSidebarVisible]);
-
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
-  const showFormatModal = () => {
-    setIsFormatModalVisible(true);
-  };
-
-  const handleFormatModalOk = () => {
-    setIsFormatModalVisible(false);
-    handleDownloadImages(); // 형식 선택 후 다운로드 함수 호출
-  };
-
-  const handleFormatModalCancel = () => {
-    setIsFormatModalVisible(false);
-  };
-
-  const routeToActionMap: { [key: string]: (images: string[]) => void } = {
-    '/generation/image-to-image': (images) => dispatch(setImg2ImgImages(images)),
-    '/generation/inpainting': (images) => dispatch(setInpaintingImages(images)),
-    '/generation/remove-background': (images) => dispatch(setRemoveBgImages(images)),
-    '/generation/cleanup': (images) => dispatch(setCleanupImages(images))
-  };
-
-  const goToPage = useCallback(
-    (path: string) => {
-      const action = routeToActionMap[path];
-      if (action) {
-        action(selectedImages);
-      }
-      navigate(path);
-      setIsModalVisible(false);
-    },
-    [navigate, selectedImages]
-  );
+    // 컴포넌트가 언마운트될 때 setInterval 정리
+    return () => clearInterval(intervalId);
+  }, [taskId, isLoading, allOutputs.outputsCnt, allOutputs.outputsInfo, output.imgsCnt, dispatch, isCheckedOutput]);
 
   return (
     <div className="flex h-full pt-4 pb-6">
@@ -160,43 +142,9 @@ const Txt2ImgLayout = () => {
         <div className="flex-1 overflow-y-auto custom-scrollbar py-4 pl-4 flex">
           {/* 이미지 디스플레이 */}
           <div className="flex-1">
-            <Txt2ImgDisplay selectedImages={selectedImages} setSelectedImages={setSelectedImages} />
+            <Txt2ImgDisplay />
           </div>
-
-          {/* 생성된 이미지 도구모음 */}
-          <div className="flex flex-col items-center gap-6 w-[46px] text-[#222] py-10 bg-white rounded-[20px] shadow-md border border-gray-300 dark:bg-gray-600 dark:border-none ml-8 overflow-y-auto custom-scrollbar">
-            <RiFolderDownloadLine
-              className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 hover:text-blue-500 dark:hover:text-white"
-              onClick={showFormatModal}
-            />
-            <MdMoveUp
-              className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white"
-              onClick={showModal}
-            />
-            {isIconFilled ? (
-              <RiCheckboxMultipleBlankLine
-                className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white ${allSelected ? 'text-blue-500' : ''}`}
-                onClick={handleSelectAllImages}
-              />
-            ) : (
-              <RiCheckboxMultipleBlankFill
-                className={`flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer  hover:text-blue-500 dark:hover:text-white ${allSelected ? 'text-blue-500' : ''}`}
-                onClick={handleSelectAllImages}
-              />
-            )}
-
-            {isSidebarVisible ? (
-              <AiOutlineEye
-                className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white"
-                onClick={toggleSidebarAndPrompt}
-              />
-            ) : (
-              <AiOutlineEyeInvisible
-                className="flex-shrink-0 w-[22px] h-[22px] dark:text-gray-300 cursor-pointer hover:text-blue-500 dark:hover:text-white"
-                onClick={toggleSidebarAndPrompt}
-              />
-            )}
-          </div>
+          <OutputToolbar type="txt2Img" />
         </div>
 
         {/* 프롬프트 영역 */}
@@ -220,33 +168,6 @@ const Txt2ImgLayout = () => {
           <GenerateButton onClick={handleGenerate} disabled={isLoading} />
         </div>
       )}
-
-      {/* 이미지 형식 선택 모달 */}
-      <Modal open={isFormatModalVisible} closable={false} onOk={handleFormatModalOk} onCancel={handleFormatModalCancel}>
-        <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">
-          Select the format for saving images
-        </div>
-        <Select value={selectedImageFormat} onChange={setSelectedImageFormat} className="w-full mt-4 mb-10">
-          {imageFormats.map((format) => (
-            <Select.Option key={format.value} value={format.value}>
-              {format.label}
-            </Select.Option>
-          ))}
-        </Select>
-      </Modal>
-
-      {/* 액션 선택 모달 */}
-      <Modal open={isModalVisible} onCancel={handleCancel} footer={null}>
-        <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Select a tab to navigate</div>
-        <div className="flex flex-col gap-4 my-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
-            <Button onClick={() => goToPage('/generation/image-to-image')}>Img2Img</Button>
-            <Button onClick={() => goToPage('/generation/inpainting')}>Inpainting</Button>
-            <Button onClick={() => goToPage('/generation/remove-background')}>Remove Background</Button>
-            <Button onClick={() => goToPage('/generation/cleanup')}>Cleanup</Button>
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 };

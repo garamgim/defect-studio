@@ -12,6 +12,7 @@ import {
 } from '../../../types/generation';
 
 interface InpaintingState {
+  gpuNum: number | null; // 지정안하면 settings의 기본 default number 사용
   params: {
     modelParams: ModelParamsType;
     batchParams: BatchParamsType;
@@ -23,15 +24,10 @@ interface InpaintingState {
     uploadImgWithMaskingParams: UploadImgWithMaskingParamsType;
     strengthParams: StrengthParamsType;
   };
-  isLoading: boolean;
-  output: {
-    processedImgsCnt: number;
-    outputImgs: string[];
-    firstProcessedImg: string | null;
-  };
 }
 
 const initialState: InpaintingState = {
+  gpuNum: null,
   params: {
     modelParams: {
       model: 'stable-diffusion-2-inpainting'
@@ -68,17 +64,12 @@ const initialState: InpaintingState = {
       combinedImg: null,
       initInputPath: '',
       maskInputPath: '',
-      outputPath: ''
+      outputPath: '',
+      isZipDownload: false
     },
     strengthParams: {
       strength: 0.75
     }
-  },
-  isLoading: false,
-  output: {
-    processedImgsCnt: 0,
-    outputImgs: [],
-    firstProcessedImg: null
   }
 };
 
@@ -86,6 +77,10 @@ const inpaintingSlice = createSlice({
   name: 'inpainting',
   initialState,
   reducers: {
+    setGpuNum: (state, action: PayloadAction<number | null>) => {
+      state.gpuNum = action.payload;
+    },
+
     // promptParams는 자주 업데이트 될 수 있으므로 개별 처리
     setPrompt: (state, action: PayloadAction<string>) => {
       state.params.promptParams.prompt = action.payload;
@@ -125,6 +120,9 @@ const inpaintingSlice = createSlice({
     setOutputPath: (state, action: PayloadAction<string>) => {
       state.params.uploadImgWithMaskingParams.outputPath = action.payload;
     },
+    setIsZipDownload: (state, action: PayloadAction<boolean>) => {
+      state.params.uploadImgWithMaskingParams.isZipDownload = action.payload;
+    },
 
     setModelParams: (state, action: PayloadAction<string>) => {
       state.params.modelParams.model = action.payload;
@@ -148,29 +146,15 @@ const inpaintingSlice = createSlice({
       state.params.batchParams = action.payload;
     },
 
-    // 이미지 생성 체크를 위한 로딩
-    setIsLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
-    },
-    // output
-    setProcessedImgsCnt: (state, action: PayloadAction<number>) => {
-      state.output.processedImgsCnt = action.payload;
-    },
-    setFirstProcessedImg: (state, action: PayloadAction<string | null>) => {
-      state.output.firstProcessedImg = action.payload;
-    },
-    setOutputImgs: (state, action: PayloadAction<string[]>) => {
-      state.output.outputImgs = action.payload;
-    },
-
     // params 초기화
-    resetState: (state) => {
+    resetParams: (state) => {
       Object.assign(state.params, initialState.params);
     }
   }
 });
 
 export const {
+  setGpuNum,
   setPrompt,
   setNegativePrompt,
   setIsNegativePrompt,
@@ -180,10 +164,6 @@ export const {
   setImgDimensionParams,
   setSeedParams,
   setBatchParams,
-  setIsLoading,
-  setProcessedImgsCnt,
-  setFirstProcessedImg,
-  setOutputImgs,
   setStrengthParams,
   setMode,
   setClipData,
@@ -193,7 +173,8 @@ export const {
   setInitInputPath,
   setOutputPath,
   setCombinedImg,
-  resetState
+  resetParams,
+  setIsZipDownload
 } = inpaintingSlice.actions;
 
 export default inpaintingSlice.reducer;

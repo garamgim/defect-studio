@@ -1,7 +1,8 @@
-import { Tabs, Upload, Input, Button } from 'antd';
+import { Tabs, Upload, Input, Button, Checkbox } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { FiFolderPlus } from 'react-icons/fi';
 import React from 'react';
+import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 interface UploadImgWithMaskingParamsProps {
   handleImageUpload: (file: File) => void;
@@ -13,6 +14,8 @@ interface UploadImgWithMaskingParamsProps {
   outputPath: string;
   updateOutputPath: (outputPath: string) => void;
   updateMode: (value: 'manual' | 'batch') => void;
+  isZipDownload: boolean;
+  updateIsZipDownload: (value: boolean) => void;
 }
 
 const UploadImgWithMasking = ({
@@ -21,10 +24,12 @@ const UploadImgWithMasking = ({
   initInputPath,
   maskInputPath,
   outputPath,
+  isZipDownload,
   updateInitInputPath,
   updateMaskInputPath,
   updateOutputPath,
-  updateMode
+  updateMode,
+  updateIsZipDownload
 }: UploadImgWithMaskingParamsProps) => {
   const uploadProps = {
     accept: 'image/*',
@@ -66,6 +71,10 @@ const UploadImgWithMasking = ({
     } catch (error) {
       console.error('Error selecting folder:', error);
     }
+  };
+
+  const onCheckboxChange = (e: CheckboxChangeEvent) => {
+    updateIsZipDownload(e.target.checked);
   };
 
   // 탭 변경될 때
@@ -160,6 +169,9 @@ const UploadImgWithMasking = ({
                 <FiFolderPlus className="w-[18px] h-[18px] text-[#222]" />
               </Button>
             </div>
+            <Checkbox checked={isZipDownload} onChange={onCheckboxChange} className="mt-2">
+              Zip
+            </Checkbox>
           </div>
         </div>
       )

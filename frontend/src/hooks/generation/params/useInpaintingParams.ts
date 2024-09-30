@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store/store';
+import { RootState } from '../../../store/store';
 import {
   setModelParams,
   setSamplingParams,
@@ -18,8 +18,9 @@ import {
   setMaskInputPath,
   setInitInputPath,
   setOutputPath,
-  setCombinedImg
-} from '../../store/slices/generation/inpaintingSlice';
+  setCombinedImg,
+  setIsZipDownload
+} from '../../../store/slices/generation/inpaintingSlice';
 import { useCallback } from 'react';
 
 export const useInpaintingParams = () => {
@@ -42,6 +43,9 @@ export const useInpaintingParams = () => {
   const mode = useSelector((state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.mode);
   const clipData = useSelector((state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.clipData);
   const combinedImg = useSelector((state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.combinedImg);
+  const isZipDownload = useSelector(
+    (state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.isZipDownload
+  );
   const initImageList = useSelector(
     (state: RootState) => state.inpainting.params.uploadImgWithMaskingParams.initImageList
   );
@@ -167,6 +171,12 @@ export const useInpaintingParams = () => {
     },
     [dispatch]
   );
+  const updateIsZipDownload = useCallback(
+    (isZipDownload: boolean) => {
+      dispatch(setIsZipDownload(isZipDownload));
+    },
+    [dispatch]
+  );
 
   return {
     modelParams,
@@ -187,6 +197,8 @@ export const useInpaintingParams = () => {
     maskInputPath,
     initInputPath,
     outputPath,
+    isZipDownload,
+    updateIsZipDownload,
     updateModelParams,
     updateSamplingParams,
     updateSeedParams,

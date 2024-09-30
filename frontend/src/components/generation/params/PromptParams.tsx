@@ -96,10 +96,8 @@ const PromptParams = ({
         />
         {location.pathname !== '/generation/text-to-image' && handleClipClick && (
           <Tooltip title="Uploaded image is converted to a text description to assist in prompt creation.">
-            <Button
-              type="link"
-              className="absolute bottom-2 right-2 dark:text-gray-300"
-              icon={<MdImageSearch className="text-xl" />}
+            <MdImageSearch
+              className="text-[24px] cursor-pointer absolute bottom-4 right-4 text-[#222] hover:text-[#1677FF] text-[#1677FF] dark:text-gray-300 dark:hover:text-white transition-transform transform hover:scale-110"
               onClick={handleIconClick}
             />
           </Tooltip>

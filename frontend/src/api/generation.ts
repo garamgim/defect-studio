@@ -5,7 +5,8 @@ import {
   InpaintingDataType,
   RemoveBgDataType,
   CleanupDataType,
-  PresetDataType
+  PresetDataType,
+  ClipDataType
 } from '../types/generation';
 
 // scheduler 리스트 가져오는 함수
@@ -39,8 +40,8 @@ export const postTxt2ImgGeneration = async (gpu_env: Txt2ImgDataType['gpu_env'],
       }
     });
 
-    if (response.status === 201) {
-      return response.data.image_list;
+    if (response.status === 200) {
+      return response.data.task_id;
     } else {
       throw new Error('Failed to generate text-to-image');
     }
@@ -72,8 +73,8 @@ export const postImg2ImgGeneration = async (gpu_env: Img2ImgDataType['gpu_env'],
       }
     });
 
-    if (response.status === 201) {
-      return response.data.image_list; // image_list 배열 반환
+    if (response.status === 200) {
+      return response.data.task_id;
     } else {
       throw new Error('Failed to generate image-to-image');
     }
@@ -108,8 +109,8 @@ export const postInpaintingGeneration = async (
       }
     });
 
-    if (response.status === 201) {
-      return response.data.image_list; // image_list 배열 반환
+    if (response.status === 200) {
+      return response.data.task_id;
     } else {
       throw new Error('Failed to generate image-to-image');
     }
@@ -120,12 +121,19 @@ export const postInpaintingGeneration = async (
 };
 
 // clip 함수 (image -> text 변환)
-export const getClip = async (imageFiles: File[]) => {
+export const getClip = async (data: ClipDataType) => {
   try {
     const formData = new FormData();
 
-    imageFiles.forEach((file) => {
-      formData.append('images', file);
+    Object.entries(data).forEach(([key, value]) => {
+      console.log(key, value);
+      if (Array.isArray(value)) {
+        value.forEach((file) => {
+          formData.append(key, file);
+        });
+      } else {
+        formData.append(key, typeof value === 'number' ? String(value) : value);
+      }
     });
 
     const response = await axiosInstance.post('/generation/clip', formData, {
@@ -134,9 +142,8 @@ export const getClip = async (imageFiles: File[]) => {
       }
     });
 
-    if (response.status === 201) {
-      console.log(response.data.generated_prompts);
-      return response.data.generated_prompts;
+    if (response.status === 200) {
+      return response.data.task_id;
     } else {
       throw new Error('Failed to get generated prompts');
     }
@@ -168,8 +175,8 @@ export const postRemoveBgGeneration = async (gpu_env: RemoveBgDataType['gpu_env'
       }
     });
 
-    if (response.status === 201) {
-      return response.data.image_list; // image_list 배열 반환
+    if (response.status === 200) {
+      return response.data.task_id;
     } else {
       throw new Error('Failed to generate remove-background image');
     }
@@ -198,8 +205,8 @@ export const postCleanupGeneration = async (gpu_env: CleanupDataType['gpu_env'],
       }
     });
 
-    if (response.status === 201) {
-      return response.data.image_list; // image_list 배열 반환
+    if (response.status === 200) {
+      return response.data.task_id;
     } else {
       throw new Error('Failed to generate cleanup image');
     }
@@ -248,6 +255,7 @@ export const getPresetDetail = async (preset_id: string) => {
     const response = await axiosInstance.get(`/generation/presets/${preset_id}`);
 
     if (response.status === 200) {
+      console.log('preset: ', response.data);
       return response.data;
     } else {
       throw new Error('Failed to get preset-detail');
@@ -287,5 +295,22 @@ export const getModelList = async (member_id: number) => {
   } catch (error) {
     console.error(error);
     throw new Error('Failed to get model-list');
+  }
+};
+
+// ai 동작 진행 상황 확인
+export const getTaskStatus = async (task_id: string) => {
+  try {
+    const response = await axiosInstance.get(`/generation/tasks/${task_id}`);
+
+    if (response.status === 200) {
+      console.log('respone.data', response.data);
+      return response.data;
+    } else {
+      throw new Error('Failed to get task-status');
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to get task-status');
   }
 };

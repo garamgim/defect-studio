@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import { RootState } from '../../../store/store';
 import { useCallback } from 'react';
 import {
   setModelParams,
@@ -11,7 +11,7 @@ import {
   setIsNegativePrompt,
   setNegativePrompt,
   setSeedParams
-} from '../../store/slices/generation/txt2ImgSlice';
+} from '../../../store/slices/generation/txt2ImgSlice';
 
 export const useTxt2ImgParams = () => {
   const dispatch = useDispatch();

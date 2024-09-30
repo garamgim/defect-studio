@@ -15,11 +15,13 @@
     "@tanstack/react-query-devtools": "^5.53.1",
     "@types/react-highlight-words": "^0.20.0",
     "@types/react-loading-indicator": "^1.0.3",
+    "adm-zip": "^0.5.16",
     "antd": "^5.20.3",
     "axios": "^1.7.7",
     "chart.js": "^4.4.4",
     "chartjs-adapter-date-fns": "^3.0.0",
     "date-fns": "^4.1.0",
+    "fs": "^0.0.1-security",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
@@ -37,6 +39,7 @@
     "use-image": "^1.1.1"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.5",
     "@types/electron": "^1.6.10",
     "@types/node": "^22.6.1",
     "@types/react": "^18.2.64",

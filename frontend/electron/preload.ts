@@ -24,6 +24,12 @@ contextBridge.exposeInMainWorld('electron', {
   // 파일 선택과 같은 사용자 정의 API
   selectFolder: () => ipcRenderer.invoke('select-folder'),
   getFilesInFolder: (folderPath: string) => ipcRenderer.invoke('get-files-in-folder', folderPath),
-  saveImages: (images: string[], folderPath: string, format: string) =>
-    ipcRenderer.invoke('save-images', { images, folderPath, format })
+
+  // 이미지 저장 API (일반 저장)
+  saveImgs: (images: string[], folderPath: string, format: string) =>
+    ipcRenderer.invoke('save-images', { images, folderPath, format }),
+
+  // 이미지 저장 API (ZIP 파일로 압축해서 저장)
+  saveImgsWithZip: (images: string[], folderPath: string, format: string, isZipDownload: boolean) =>
+    ipcRenderer.invoke('save-images-with-zip', { images, folderPath, format, isZipDownload })
 });

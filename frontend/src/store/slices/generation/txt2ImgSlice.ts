@@ -10,6 +10,7 @@ import {
 } from '../../../types/generation';
 
 export interface Txt2ImgState {
+  gpuNum: number | null; // 지정안하면 settings의 기본 default number 사용
   params: {
     modelParams: ModelParamsType;
     batchParams: BatchParamsType;
@@ -19,15 +20,10 @@ export interface Txt2ImgState {
     samplingParams: SamplingParamsType;
     seedParams: SeedParamsType;
   };
-  isLoading: boolean;
-  output: {
-    processedImgsCnt: number;
-    outputImgs: string[]; // api 수정되면 제거할 예정
-    firstProcessedImg: string | null;
-  };
 }
 
 const initialState: Txt2ImgState = {
+  gpuNum: null,
   params: {
     modelParams: {
       model: 'stable-diffusion-2'
@@ -56,12 +52,6 @@ const initialState: Txt2ImgState = {
       batchCount: 1,
       batchSize: 1
     }
-  },
-  isLoading: false,
-  output: {
-    processedImgsCnt: 0,
-    outputImgs: [],
-    firstProcessedImg: null
   }
 };
 
@@ -69,6 +59,10 @@ const txt2ImgSlice = createSlice({
   name: 'txt2Img',
   initialState,
   reducers: {
+    setGpuNum: (state, action: PayloadAction<number | null>) => {
+      state.gpuNum = action.payload;
+    },
+
     // promptParams는 자주 업데이트 될 수 있으므로 개별 처리
     setPrompt: (state, action: PayloadAction<string>) => {
       state.params.promptParams.prompt = action.payload;
@@ -102,29 +96,15 @@ const txt2ImgSlice = createSlice({
       state.params.batchParams = action.payload;
     },
 
-    // 이미지 생성 체크를 위한 로딩
-    setIsLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
-    },
-    // output
-    setProcessedImgsCnt: (state, action: PayloadAction<number>) => {
-      state.output.processedImgsCnt = action.payload;
-    },
-    setFirstProcessedImg: (state, action: PayloadAction<string | null>) => {
-      state.output.firstProcessedImg = action.payload;
-    },
-    setOutputImgs: (state, action: PayloadAction<string[]>) => {
-      state.output.outputImgs = action.payload;
-    },
-
     // params 초기화
-    resetState: (state) => {
+    resetParams: (state) => {
       Object.assign(state.params, initialState.params);
     }
   }
 });
 
 export const {
+  setGpuNum,
   setPrompt,
   setNegativePrompt,
   setIsNegativePrompt,
@@ -134,11 +114,7 @@ export const {
   setImgDimensionParams,
   setSeedParams,
   setBatchParams,
-  setIsLoading,
-  setProcessedImgsCnt,
-  setFirstProcessedImg,
-  setOutputImgs,
-  resetState
+  resetParams
 } = txt2ImgSlice.actions;
 
 export default txt2ImgSlice.reducer;

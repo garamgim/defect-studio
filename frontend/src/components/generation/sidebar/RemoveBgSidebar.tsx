@@ -1,9 +1,18 @@
 import UploadImage from '../params/UploadImgParams';
-import { useRemoveBgParams } from '../../../hooks/generation/useRemoveBgParams';
+import { useRemoveBgParams } from '../../../hooks/generation/params/useRemoveBgParams';
 
 const RemoveBgSidebar = () => {
-  const { inputPath, outputPath, imageList, updateInputPath, updateOutputPath, updateImageList, updateMode } =
-    useRemoveBgParams();
+  const {
+    inputPath,
+    outputPath,
+    imageList,
+    isZipDownload,
+    updateIsZipDownload,
+    updateInputPath,
+    updateOutputPath,
+    updateImageList,
+    updateMode
+  } = useRemoveBgParams();
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
@@ -11,9 +20,21 @@ const RemoveBgSidebar = () => {
       const base64String = reader.result as string;
       const img = new Image();
       img.onload = () => {
+        // 이미지 크기 제한 (2024x2024 이하)
+        if (img.width > 2024 || img.height > 2024) {
+          alert('The image is too large. Please upload an image with a size less than or equal to 2024x2024.');
+          return;
+        }
         updateImageList([base64String]);
       };
-      img.src = reader.result as string;
+
+      img.onerror = () => {
+        alert('Failed to load the image. Please try again.');
+      };
+      img.src = base64String;
+    };
+    reader.onerror = () => {
+      alert('Failed to read the file. Please try again.');
     };
     reader.readAsDataURL(file);
   };
@@ -30,6 +51,8 @@ const RemoveBgSidebar = () => {
           updateInputPath={updateInputPath}
           updateOutputPath={updateOutputPath}
           updateMode={updateMode}
+          isZipDownload={isZipDownload}
+          updateIsZipDownload={updateIsZipDownload}
         />
       </div>
     </div>

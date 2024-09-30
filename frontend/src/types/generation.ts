@@ -1,4 +1,14 @@
-// 상태 관리
+// 상태 관리 타입
+export interface OutputInfo {
+  id: string;
+  imgsUrl: string[];
+  prompt: string;
+}
+export interface OutputsInfoType {
+  outputsCnt: number;
+  outputsInfo: OutputInfo[];
+}
+
 export interface ModelParamsType {
   model: string;
 }
@@ -35,6 +45,7 @@ export interface UploadImgParamsType {
   imageList: string[];
   inputPath: string;
   outputPath: string;
+  isZipDownload: boolean;
 }
 export interface UploadImgWithMaskingParamsType extends Omit<UploadImgParamsType, 'imageList' | 'inputPath'> {
   initInputPath: string;
@@ -44,13 +55,14 @@ export interface UploadImgWithMaskingParamsType extends Omit<UploadImgParamsType
   combinedImg: string | null;
 }
 
-// API 통신
+// API 통신 타입
 export interface Txt2ImgDataType {
   gpu_env: 'local' | 'remote';
   data: Txt2ImgParams;
 }
 
 export interface Txt2ImgParams {
+  gpu_device: number;
   model: string;
   scheduler: string;
   prompt: string;
@@ -71,6 +83,7 @@ export interface Img2ImgDataType {
 }
 
 export interface Img2ImgParams {
+  gpu_device: number;
   model: string;
   scheduler: string;
   prompt: string;
@@ -94,6 +107,7 @@ export interface InpaintingDataType {
 }
 
 export interface InpaintingParams {
+  gpu_device: number;
   model: string;
   scheduler: string;
   prompt: string;
@@ -119,6 +133,7 @@ export interface RemoveBgDataType {
 }
 
 export interface RemoveBgParams {
+  gpu_device: number;
   image_list: File[];
   input_path: string;
   output_path: string;
@@ -130,6 +145,7 @@ export interface CleanupDataType {
 }
 
 export interface CleanupParams {
+  gpu_device: number;
   init_image_list: File[];
   mask_image_list: File[];
 }
@@ -150,7 +166,15 @@ export interface PresetDataType {
   sampling_method?: string;
   seed?: number;
 
-  _id?: string; // 필요없는 정보
-  member_id?: number; // 필요없는 정보
-  date?: string; // 필요없는 정보
+  _id?: string;
+  date?: string;
+}
+
+export interface ClipDataType {
+  gpu_device: number;
+  model?: string;
+  image_list: File[];
+  mode?: 'fast' | 'classic' | 'negative';
+  caption?: string;
+  batch_size?: number;
 }
