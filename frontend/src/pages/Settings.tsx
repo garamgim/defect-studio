@@ -1,65 +1,37 @@
 import { useState } from 'react';
-import { Input, Button, Form, message } from 'antd';
+import { Input, Button, Form } from 'antd';
 import { showToastSuccess, showToastError } from '../components/common/ToastNotification';
 import ToastNotification from '../components/common/ToastNotification';
-import { getDeviceHealth, getDeviceCudaAvailable } from '../api/settings';
+import { useGetDeviceCudaAvailable, useGetDeviceHealth } from '@/hooks/settings/useGetStatus';
+// import { queryClient } from '@/main';
+import CudaUsageTable from '@/components/settings/CudaUsageTable';
+
+// type queryKeyType = 'deviceHealth' | 'deviceCudaAvailable' | 'deviceCudaUsage';
+// const refreshData = (updateQueryKey: queryKeyType) => {
+//   console.log('refreshing data', updateQueryKey);
+//   queryClient.invalidateQueries({
+//     queryKey: [updateQueryKey]
+//   });
+// };
 
 const Settings = () => {
-  const [health, setHealth] = useState<boolean>(false);
-  const [isHealthLoading, setHealthIsLoading] = useState<boolean>(false);
-  const [cudaAvailability, setCudaAvailability] = useState<boolean>(false);
-  const [isCudaAvailabilityLoading, setCudaAvailabilityIsLoading] = useState<boolean>(false);
-  // const [cudaUsage, setCudaUsage] = useState<boolean>(false);
-  // const [isCudaUsageLoading, setIsCudaUsageLoading] = useState<boolean>(false);
+  // GPU 서버 연결 상태 확인
+  const {
+    data: healthStatus,
+    isPending: isHealthPending,
+    isError: isHealthError,
+    error: healthError
+  } = useGetDeviceHealth();
+
+  // CUDA 사용 가능 여부 확인
+  const {
+    data: cudaAvailability,
+    isPending: isCudaAvailabilityPending,
+    isError: isCudaAvailabilityError,
+    error: cudaAvailabilityError
+  } = useGetDeviceCudaAvailable();
   const [imagePath, setImagePath] = useState<string>('');
   const [modelPath, setModelPath] = useState<string>('');
-
-  // Health Check
-  const checkHealthStatus = async () => {
-    setHealthIsLoading(true);
-    try {
-      await getDeviceHealth();
-      setHealth(true);
-    } catch (error) {
-      setHealth(false);
-    } finally {
-      setHealthIsLoading(false);
-    }
-  };
-
-  // CUDA Availability
-  const checkCudaAvailability = async () => {
-    if (!health) {
-      message.error('Check health status first');
-    } else {
-      setCudaAvailabilityIsLoading(true);
-      try {
-        await getDeviceCudaAvailable();
-        setCudaAvailability(true);
-      } catch (error) {
-        setCudaAvailability(false);
-      } finally {
-        setCudaAvailabilityIsLoading(false);
-      }
-    }
-  };
-
-  // CUDA Usage Monitoring
-  // const checkCudaUsage = async () => {
-  //   if (!health && !cudaAvailability) {
-  //     message.error('Check health status first');
-  //   } else {
-  //     setIsCudaUsageLoading(true);
-  //     try {
-  //       const response = await getDeviceCudaUsage();
-  //       setCudaUsage(true);
-  //     } catch (error) {
-  //       setCudaUsage(false);
-  //     } finally {
-  //       setIsCudaUsageLoading(false);
-  //     }
-  //   }
-  // };
 
   // 설정 저장
   const handleSave = () => {
@@ -77,27 +49,45 @@ const Settings = () => {
           Device Monitoring and Management
         </h1>
 
-        <div className="mb-4">
-          <Button type="primary" onClick={checkHealthStatus} loading={isHealthLoading}>
-            Health Status Check
-          </Button>
-          <span className="ml-3">
-            {health ? 'Connectable status to GPU server' : 'Unable to connect to GPU server'}
-          </span>
-        </div>
+        <section className="flex flex-row justify-evenly">
+          <div className="mb-4 flex flex-col justify-center align-middle items-center">
+            <span className="font-bold text-black dark:text-white">Server Health Status</span>
+            <span className={`ml-3 ${isHealthError ? 'text-red-400' : 'text-dark dark:text-white'}`}>
+              {isHealthPending
+                ? 'Checking health status...'
+                : healthStatus
+                  ? 'Available'
+                  : healthError?.message || 'Unhealthy'}
+            </span>
+          </div>
 
-        <div className="mb-4">
-          <Button type="primary" onClick={checkCudaAvailability} loading={isCudaAvailabilityLoading}>
-            CUDA Availability Check
-          </Button>
-          <span className="ml-3">{cudaAvailability ? 'Status of gpu enabled' : 'gpu unavailable status'}</span>
-        </div>
+          <div className="mb-4 flex flex-col justify-center align-middle items-center">
+            <span className="font-bold text-black dark:text-white">Cuda Status</span>
+            <span className={`ml-3 ${isCudaAvailabilityError ? 'text-red-400' : 'text-dark dark:text-white'}`}>
+              {isCudaAvailabilityPending
+                ? 'Checking CUDA availability...'
+                : cudaAvailability
+                  ? 'Available'
+                  : cudaAvailabilityError?.message || 'Unavailable'}
+            </span>
+          </div>
+        </section>
 
         {/* <div className="mb-4">
           <Button type="primary" onClick={checkCudaUsage} loading={isCudaUsageLoading}>
             CUDA Usage Monitoring
           </Button>
         </div> */}
+
+        <hr />
+
+        <section>
+          <CudaUsageTable />
+        </section>
+
+        <section className="mt-3 flex flex-col">
+          <h4 className="text-[20px] text-dark dark:text-white font-bold">GPU Server Status</h4>
+        </section>
 
         <Form layout="vertical" onFinish={handleSave}>
           <Form.Item
