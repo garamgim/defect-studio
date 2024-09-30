@@ -7,14 +7,7 @@ import { postInpaintingGeneration, getClip, getTaskStatus } from '../../../api/g
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import GenerateButton from '../common/GenerateButton';
 import { setIsNegativePrompt, setClipData } from '../../../store/slices/generation/inpaintingSlice';
-import {
-  setIsLoading,
-  setTaskId,
-  setOutputImgsUrl,
-  setOutputImgsCnt,
-  setAllOutputsInfo,
-  setIsCheckedOutput
-} from '../../../store/slices/generation/outputSlice';
+import { setIsLoading, setTaskId, setOutputImgsCnt } from '../../../store/slices/generation/outputSlice';
 import { RootState } from '../../../store/store';
 import { message } from 'antd';
 import { useEffect, useCallback } from 'react';
@@ -25,7 +18,7 @@ import { useClipOutputs } from '../../../hooks/generation/outputs/useClipOutputs
 const InpaintingLayout = () => {
   const dispatch = useDispatch();
   const { params, gpuNum } = useSelector((state: RootState) => state.inpainting);
-  const { isLoading, taskId, output, allOutputs, isSidebarVisible } = useInpaintingOutputs();
+  const { isLoading, isSidebarVisible } = useInpaintingOutputs();
   const { isLoading: clipIsLoading, taskId: clipTaskId } = useClipOutputs();
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useInpaintingParams();
 

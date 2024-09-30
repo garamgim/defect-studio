@@ -8,19 +8,91 @@ import Cleanup from '../components/generation/layouts/CleanupLayout';
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from 'react-icons/ai';
 import { FaImage, FaMagic, FaPaintBrush, FaEraser, FaTrash, FaSpinner, FaCircle } from 'react-icons/fa';
 
-import { useDispatch } from 'react-redux';
-import { setIsCheckedOutput } from '../store/slices/generation/outputSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  setIsCheckedOutput,
+  setOutputImgsUrl,
+  setAllOutputsInfo,
+  setIsLoading,
+  setTaskId
+} from '../store/slices/generation/outputSlice';
 
 import { useTxt2ImgOutputs } from '../hooks/generation/outputs/useTxt2ImgOutputs';
 import { useImg2ImgOutputs } from '../hooks/generation/outputs/useImg2ImgOutputs';
 import { useInpaintingOutputs } from '../hooks/generation/outputs/useInpaintingOutputs';
 import { useRemoveBgOutputs } from '../hooks/generation/outputs/useRemoveBgOutputs';
 import { useCleanupOutputs } from '../hooks/generation/outputs/useCleanupOutputs';
+import { getTaskStatus } from '../api/generation';
+import { RootState } from '@/store/store';
 
 const Generation = () => {
+  const dispatch = useDispatch();
+
+  // 'cleanup' 탭을 제외한 나머지 탭들
+  const tabs: Array<keyof Omit<RootState['generatedOutput'], 'clip'>> = [
+    'txt2Img',
+    'img2Img',
+    'inpainting',
+    'removeBg',
+    'cleanup'
+  ];
+
+  // generatedOutput에서 각 탭의 상태 가져오기
+  const tabsState = useSelector((state: RootState) => tabs.map((tab) => state.generatedOutput[tab]));
+
+  useEffect(() => {
+    const fetchTaskStatusForTabs = async () => {
+      for (let index = 0; index < tabsState.length; index++) {
+        const tabState = tabsState[index];
+        const tabName = tabs[index];
+
+        if (!tabState) continue;
+
+        const { taskId, isLoading, allOutputs, output } = tabState;
+
+        if (taskId && isLoading) {
+          try {
+            dispatch(setIsCheckedOutput({ tab: tabName, value: false }));
+            const response = await getTaskStatus(taskId);
+
+            if (response.task_status === 'SUCCESS') {
+              dispatch(setOutputImgsUrl({ tab: tabName, value: response.result_data }));
+
+              const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
+              const outputsInfo = [
+                {
+                  id: response.result_data_log.id,
+                  imgsUrl: response.result_data,
+                  prompt: response.result_data_log.prompt
+                },
+                ...allOutputs.outputsInfo
+              ];
+
+              dispatch(setAllOutputsInfo({ tab: tabName, outputsCnt, outputsInfo }));
+              dispatch(setIsLoading({ tab: tabName, value: false }));
+              dispatch(setTaskId({ tab: tabName, value: null }));
+            } else if (response.detail && response.detail.task_status === 'FAILURE') {
+              dispatch(setIsLoading({ tab: tabName, value: false }));
+              dispatch(setTaskId({ tab: tabName, value: null }));
+              console.error('Image generation failed:', response.detail.result_data || 'Unknown error');
+              alert(`Image generation failed: ${response.detail.result_data || 'Unknown error'}`);
+            }
+          } catch (error) {
+            console.error(`Failed to get task status for ${tabName}:`, error);
+            dispatch(setIsLoading({ tab: tabName, value: false }));
+          }
+        }
+      }
+    };
+
+    const intervalId = setInterval(fetchTaskStatusForTabs, 1000); // 주기적으로 각 탭의 상태 확인
+
+    // 컴포넌트 언마운트 시 clearInterval 호출
+    return () => clearInterval(intervalId);
+  }, [dispatch, tabsState]); // 모든 탭 상태를 의존성으로 추가
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation(); // 현재 경로 감지
-  const dispatch = useDispatch();
 
   // 각 탭의 로딩 상태와 체크 상태를 가져옴
   const { isLoading: txt2imgLoading, isCheckedOutput: txt2imgChecked } = useTxt2ImgOutputs();
@@ -74,7 +146,7 @@ const Generation = () => {
     } else if (!isCheckedOutput) {
       return <FaCircle className="absolute w-[6px] top-0 left-[14px] text-red-500" />;
     }
-    return null; // 체크된 상태면 아무것도 표시하지 않음
+    return null;
   };
 
   return (

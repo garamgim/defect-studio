@@ -1,29 +1,20 @@
 import Sidebar from '../sidebar/RemoveBgSidebar';
 import GenerateButton from '../common/GenerateButton';
-import { postRemoveBgGeneration, getTaskStatus } from '../../../api/generation';
+import { postRemoveBgGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import RemoveBgDisplay from '../outputDisplay/RemoveBgDisplay';
 import { useRemoveBgParams } from '../../../hooks/generation/params/useRemoveBgParams';
 import { RootState } from '../../../store/store';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  setIsLoading,
-  setTaskId,
-  setOutputImgsCnt,
-  setOutputImgsUrl,
-  setAllOutputsInfo,
-  setIsCheckedOutput
-} from '../../../store/slices/generation/outputSlice';
-import { useEffect } from 'react';
+import { setIsLoading, setTaskId, setOutputImgsCnt } from '../../../store/slices/generation/outputSlice';
+
 import { message } from 'antd';
 import OutputToolbar from '../outputTool/OutputToolbar';
 
 const RemoveBackground = () => {
   const dispatch = useDispatch();
   const { params, gpuNum } = useSelector((state: RootState) => state.removeBg);
-  const { isLoading, taskId, output, allOutputs, isSidebarVisible } = useSelector(
-    (state: RootState) => state.generatedOutput.removeBg
-  );
+  const { isLoading, isSidebarVisible } = useSelector((state: RootState) => state.generatedOutput.removeBg);
   useRemoveBgParams();
 
   let files;

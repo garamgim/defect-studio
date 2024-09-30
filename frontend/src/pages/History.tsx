@@ -1,218 +1,100 @@
-import { useEffect, useState } from 'react';
-import { Button, Input, DatePicker, message, Modal } from 'antd';
-import { DownloadOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import moment from 'moment';
-import 'tailwindcss/tailwind.css';
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getImgsList, deleteImgsFolder } from '../api/history';
+import { FolderListDataType } from '../types/history';
+import SearchFilter from '../components/history/SearchFilter';
+import ImageFolderList from '../components/history/ImageFolderList';
+import ImagesFolderDetail from '../components/history/ImageFolderDetail';
+import dayjs, { Dayjs } from 'dayjs';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import { message } from 'antd';
 
-const { RangePicker } = DatePicker;
-
-const dummyFolders = [
-  {
-    id: 'folder1',
-    type: 'text_to_image',
-    date: '2024-09-26',
-    prompt: 'A beautiful sunset over the mountains',
-    firstImageUrl: 'https://via.placeholder.com/150',
-    count: 10
-  },
-  {
-    id: 'folder2',
-    type: 'image_to_image',
-    date: '2024-09-25',
-    prompt:
-      'A futuristic city skyline that stretches endlessly towards the horizon with tall buildings and bright neon lights illuminating the night sky.',
-    firstImageUrl: 'https://via.placeholder.com/150',
-    count: 8
-  },
-  {
-    id: 'folder3',
-    type: 'inpainting',
-    date: '2024-09-24',
-    prompt:
-      'A portrait of a person with abstract background and intricate details in the clothing and facial expressions, showing a range of emotions.',
-    firstImageUrl: 'https://via.placeholder.com/150',
-    count: 5
-  },
-  {
-    id: 'folder4',
-    type: 'text_to_image',
-    date: '2024-09-23',
-    prompt:
-      'A really long prompt that describes an incredibly detailed and complex scene with various elements interacting together, including people, buildings, and the environment. This scene could depict a bustling city street with pedestrians, cars, tall skyscrapers, and trees lining the sidewalks. The sky is bright blue with clouds scattered across, and the atmosphere is lively with various activities going on.',
-    firstImageUrl: 'https://via.placeholder.com/150',
-    count: 15
-  }
-];
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 const History = () => {
-  const [imageFolders, setImageFolders] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchPrompt, setSearchPrompt] = useState('');
   const [searchId, setSearchId] = useState('');
-  const [searchDates, setSearchDates] = useState([]);
-  const [selectedFolder, setSelectedFolder] = useState(null); // 모달에서 선택된 폴더
+  const [searchDates, setSearchDates] = useState<[Dayjs | null, Dayjs | null] | null>(null);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [folders, setFolders] = useState<FolderListDataType[]>([]);
 
-  // 더미 데이터 로드
-  const fetchImageFolders = async () => {
-    try {
-      setTimeout(() => {
-        setImageFolders(dummyFolders);
-        setIsLoading(false);
-      }, 1000);
-    } catch (error) {
-      message.error('Failed to load image folders.');
-      setIsLoading(false);
+  const queryClient = useQueryClient(); // Query Client 사용
+
+  // 이미지 목록 조회
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['imageFolders'],
+    queryFn: getImgsList
+  });
+
+  // 폴더 삭제 mutation
+  const { mutate: deleteFolder } = useMutation({
+    mutationFn: deleteImgsFolder,
+    onSuccess: () => {
+      message.success('Folder deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['imageFolders'] }); // 쿼리 키를 객체로 전달
+    },
+    onError: () => {
+      message.error('Failed to delete folder');
     }
-  };
+  });
 
+  // useEffect로 데이터를 상태로 업데이트
   useEffect(() => {
-    fetchImageFolders();
-  }, []);
+    if (data) {
+      setFolders(data.logs); // 가져온 데이터를 상태에 저장
+    }
+  }, [data]);
 
-  const handleDownload = (id) => {
-    console.log(`Download folder with ID: ${id}`);
+  const handleModalClose = () => setSelectedFolderId(null);
+
+  // 폴더 세부 정보 핸들러
+  const handleDetailClick = (folder: FolderListDataType) => {
+    setSelectedFolderId(folder.id); // 선택된 폴더의 ID만 설정
   };
 
-  const handleDelete = (id) => {
-    console.log(`Delete folder with ID: ${id}`);
+  // 삭제 핸들러
+  const handleDelete = (id: string) => {
+    deleteFolder(id); // 삭제 mutation 호출
   };
 
-  const handleDetailClick = (folder) => {
-    setSelectedFolder(folder); // 모달에 선택된 폴더 정보 설정
-  };
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading data</div>;
 
-  const handleModalClose = () => {
-    setSelectedFolder(null); // 모달 닫기
-  };
-
-  // 검색어와 날짜로 필터링
-  const filteredFolders = imageFolders.filter((folder) => {
-    const matchesPrompt = folder.prompt.toLowerCase().includes(searchPrompt.toLowerCase());
+  // 필터링된 폴더 목록
+  const filteredFolders = folders.filter((folder: FolderListDataType) => {
+    const matchesPrompt = folder.prompt?.toLowerCase().includes(searchPrompt.toLowerCase());
     const matchesId = folder.id.toLowerCase().includes(searchId.toLowerCase());
-
     const matchesDate =
-      searchDates.length === 0 ||
-      (moment(folder.date).isSameOrAfter(searchDates[0], 'day') &&
-        moment(folder.date).isSameOrBefore(searchDates[1], 'day'));
+      searchDates === null ||
+      (searchDates[0] &&
+        dayjs(folder.date).isSameOrAfter(searchDates[0], 'day') &&
+        searchDates[1] &&
+        dayjs(folder.date).isSameOrBefore(searchDates[1], 'day'));
 
     return matchesPrompt && matchesId && matchesDate;
   });
 
-  if (isLoading) {
-    return <div>로딩중</div>;
-  }
-
   return (
     <div className="flex flex-col items-start h-[calc(100vh-60px)] bg-gray-100 p-8 overflow-auto dark:bg-gray-800">
-      {/* 검색 필터 */}
-      <div className="flex flex-col w-full mb-6 space-y-4">
-        <div className="flex flex-col md:flex-row items-center justify-between w-full">
-          <div className="flex space-x-4 w-full md:w-2/3">
-            <Input
-              placeholder="Search by ID"
-              value={searchId}
-              onChange={(e) => setSearchId(e.target.value)}
-              className="w-full"
-            />
-            <Input
-              placeholder="Search by prompt"
-              value={searchPrompt}
-              onChange={(e) => setSearchPrompt(e.target.value)}
-              className="w-full"
-            />
-          </div>
-          <div className="flex w-full md:w-1/3 justify-end">
-            <RangePicker
-              value={searchDates}
-              onChange={(dates) => setSearchDates(dates)}
-              className="w-full"
-              placeholder={['Start Date', 'End Date']}
-            />
-          </div>
-        </div>
-      </div>
+      <SearchFilter
+        searchId={searchId}
+        setSearchId={setSearchId}
+        searchPrompt={searchPrompt}
+        setSearchPrompt={setSearchPrompt}
+        searchDates={searchDates}
+        setSearchDates={setSearchDates}
+      />
 
-      {/* 이미지 폴더 리스트 */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 w-full">
-        {filteredFolders.map((folder) => (
-          <div
-            key={folder.id}
-            className="relative bg-white rounded-lg shadow-lg p-2 flex flex-col justify-between dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-300 h-[140px]"
-          >
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">ID: {folder.id}</h3>
-                <span className="text-xs text-gray-500 dark:text-gray-400">{folder.date}</span>
-              </div>
+      <ImageFolderList
+        folders={filteredFolders}
+        handleDetailClick={handleDetailClick} // 세부 정보 핸들러 전달
+        handleDownload={(id) => console.log(`Downloading folder with ID: ${id}`)} // 다운로드 핸들러 전달
+        handleDelete={handleDelete} // 삭제 핸들러 전달
+      />
 
-              {/* 이미지 장수 */}
-              <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">Images: {folder.count}</div>
-
-              {/* 최대 2줄까지 프롬프트 표시 */}
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">Prompt: {folder.prompt}</p>
-            </div>
-
-            {/* Detail, Download, Delete 버튼 */}
-            <div className="flex justify-end gap-2">
-              <Button
-                type="default"
-                size="small"
-                icon={<EyeOutlined />}
-                className="text-xs xl:flex hidden"
-                onClick={() => handleDetailClick(folder)}
-              >
-                Detail
-              </Button>
-              <Button
-                type="default"
-                size="small"
-                icon={<EyeOutlined />}
-                className="text-xs xl:hidden"
-                onClick={() => handleDetailClick(folder)}
-              />
-
-              <Button
-                type="primary"
-                size="small"
-                icon={<DownloadOutlined />}
-                className="text-xs xl:flex hidden"
-                onClick={() => handleDownload(folder.id)}
-              >
-                Download
-              </Button>
-              <Button
-                type="primary"
-                size="small"
-                icon={<DownloadOutlined />}
-                className="text-xs xl:hidden"
-                onClick={() => handleDownload(folder.id)}
-              />
-
-              <Button
-                danger
-                size="small"
-                icon={<DeleteOutlined />}
-                className="text-xs xl:flex hidden"
-                onClick={() => handleDelete(folder.id)}
-              >
-                Delete
-              </Button>
-              <Button
-                danger
-                size="small"
-                icon={<DeleteOutlined />}
-                className="text-xs xl:hidden"
-                onClick={() => handleDelete(folder.id)}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Detail 모달 */}
-      <Modal title="Folder Details" open={selectedFolder !== null} onCancel={handleModalClose} footer={null}>
-        {selectedFolder && <div></div>}
-      </Modal>
+      <ImagesFolderDetail folderId={selectedFolderId} onClose={handleModalClose} />
     </div>
   );
 };

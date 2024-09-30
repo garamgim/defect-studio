@@ -2,14 +2,7 @@ import Sidebar from '../sidebar/Img2ImgSidebar';
 import PromptParams from '../params/PromptParams';
 import Img2ImgDisplay from '../outputDisplay/Img2ImgDisplay';
 import { setIsNegativePrompt, setClipData } from '../../../store/slices/generation/img2ImgSlice';
-import {
-  setIsLoading,
-  setTaskId,
-  setOutputImgsCnt,
-  setOutputImgsUrl,
-  setAllOutputsInfo,
-  setIsCheckedOutput
-} from '../../../store/slices/generation/outputSlice';
+import { setIsLoading, setTaskId, setOutputImgsCnt } from '../../../store/slices/generation/outputSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { postImg2ImgGeneration, getClip, getTaskStatus } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
@@ -25,7 +18,7 @@ import { useClipOutputs } from '@/hooks/generation/outputs/useClipOutputs';
 const Img2ImgLayout = () => {
   const dispatch = useDispatch();
   const { params, gpuNum } = useSelector((state: RootState) => state.img2Img);
-  const { isLoading, taskId, output, allOutputs, isSidebarVisible } = useImg2ImgOutputs();
+  const { isLoading, isSidebarVisible } = useImg2ImgOutputs();
   const { isLoading: clipIsLoading, taskId: clipTaskId } = useClipOutputs();
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useImg2ImgParams();
 

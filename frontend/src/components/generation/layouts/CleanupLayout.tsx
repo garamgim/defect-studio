@@ -3,25 +3,17 @@ import Sidebar from '../sidebar/CleanupSidebar';
 import { postCleanupGeneration, getTaskStatus } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import CleanupDisplay from '../outputDisplay/CleanupDisplay';
-import {
-  setIsLoading,
-  setTaskId,
-  setOutputImgsUrl,
-  setOutputImgsCnt,
-  setAllOutputsInfo,
-  setIsCheckedOutput
-} from '../../../store/slices/generation/outputSlice';
+import { setIsLoading, setTaskId, setOutputImgsCnt } from '../../../store/slices/generation/outputSlice';
 import { RootState } from '../../../store/store';
 import { useSelector, useDispatch } from 'react-redux';
-import { useCleanupOutputs } from '@/hooks/generation/outputs/useCleanupOutputs';
-import { useEffect } from 'react';
+import { useCleanupOutputs } from '../../../hooks/generation/outputs/useCleanupOutputs';
 import OutputToolbar from '../outputTool/OutputToolbar';
 import { message } from 'antd';
 
 const Cleanup = () => {
   const dispatch = useDispatch();
   const { params, gpuNum } = useSelector((state: RootState) => state.cleanup);
-  const { isLoading, taskId, output, allOutputs, isSidebarVisible } = useCleanupOutputs();
+  const { isLoading, isSidebarVisible } = useCleanupOutputs();
 
   const convertBase64ToFileArray = (base64Array: string[], fileType: string) => {
     return base64Array.map((base64Img, index) => convertStringToFile(base64Img, `${fileType}_${index}.png`));
