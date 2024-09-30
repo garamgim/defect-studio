@@ -6,13 +6,13 @@ import { useGetDeviceCudaAvailable, useGetDeviceHealth } from '@/hooks/settings/
 // import { queryClient } from '@/main';
 import CudaUsageTable from '@/components/settings/CudaUsageTable';
 
-// type queryKeyType = 'deviceHealth' | 'deviceCudaAvailable' | 'deviceCudaUsage';
-// const refreshData = (updateQueryKey: queryKeyType) => {
-//   console.log('refreshing data', updateQueryKey);
-//   queryClient.invalidateQueries({
-//     queryKey: [updateQueryKey]
-//   });
-// };
+type queryKeyType = 'deviceHealth' | 'deviceCudaAvailable' | 'deviceCudaUsage';
+const refreshData = (updateQueryKey: queryKeyType) => {
+  console.log('refreshing data', updateQueryKey);
+  queryClient.invalidateQueries({
+    queryKey: [updateQueryKey]
+  });
+};
 
 const Settings = () => {
   // GPU 서버 연결 상태 확인
