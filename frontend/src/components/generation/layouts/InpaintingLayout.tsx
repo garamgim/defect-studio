@@ -11,7 +11,7 @@ import { setIsLoading, setTaskId, setOutputImgsCnt } from '../../../store/slices
 import { RootState } from '../../../store/store';
 import { message } from 'antd';
 import { useEffect, useCallback } from 'react';
-import OutputToolbar from '../outputTool/outputToolbar';
+import OutputToolbar from '../outputTool/OutputToolbar';
 import { useInpaintingOutputs } from '../../../hooks/generation/outputs/useInpaintingOutputs';
 import { useClipOutputs } from '../../../hooks/generation/outputs/useClipOutputs';
 

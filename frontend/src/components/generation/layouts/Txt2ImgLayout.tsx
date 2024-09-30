@@ -10,7 +10,7 @@ import { useTxt2ImgOutputs } from '../../../hooks/generation/outputs/useTxt2ImgO
 import GenerateButton from '../common/GenerateButton';
 import { postTxt2ImgGeneration } from '../../../api/generation';
 import { RootState } from '../../../store/store';
-import OutputToolbar from '../outputTool/outputToolbar';
+import OutputToolbar from '../outputTool/OutputToolbar';
 import { setIsLoading, setOutputImgsCnt, setTaskId } from '../../../store/slices/generation/outputSlice';
 
 const Txt2ImgLayout = () => {
