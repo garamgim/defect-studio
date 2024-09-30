@@ -9,6 +9,7 @@ from fastapi import HTTPException, Response, status, Request
 from fastapi.params import Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from starlette.responses import JSONResponse
 
 from crud import members as members_crud
 from core.config import settings
@@ -86,7 +87,7 @@ def create_response_with_tokens(login_id: str):
 
     headers = {"Authorization": f"Bearer {access_token}"}
 
-    response = Response(status_code=status.HTTP_200_OK, headers=headers)
+    response = JSONResponse(status_code=status.HTTP_200_OK, headers=headers, content={"access_token": access_token, "token_type": "bearer"})
 
     expiration_time = datetime.now(timezone.utc) + timedelta(minutes=settings.JWT_REFRESH_TOKEN_EXPIRE_MINUTES)
     response.set_cookie(

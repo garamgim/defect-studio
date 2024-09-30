@@ -11,7 +11,7 @@ from core.db import Session
 from core.config import settings
 
 # Access 토큰만을 리턴
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='api/auth/login')
 
 
 def get_db():

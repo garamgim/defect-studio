@@ -1,16 +1,17 @@
-import base64
 from datetime import datetime
 from io import BytesIO
 from typing import List
 
 import boto3
+from PIL import Image
 from botocore.exceptions import BotoCoreError, ClientError
+from fastapi import HTTPException
 
 from core.config import settings
 
 
 # TODO : 비동기로 변경
-def upload_files(image_list: List[str], key: str) -> List[str]:
+def upload_files(image_list: List[BytesIO], key: str) -> List[str]:
     s3_urls = []
     s3_client = boto3.client(
         's3',
@@ -22,11 +23,8 @@ def upload_files(image_list: List[str], key: str) -> List[str]:
     formatted_date = now.strftime("%Y%m%d")
     formatted_time = now.strftime("%H%M%S%f")
 
-    for index, encoded_image in enumerate(image_list):
-        image_key = f"{key}/{formatted_date}/{formatted_time}/{index + 1}.jpeg"
-
-        image_bytes = base64.b64decode(encoded_image)
-        image_stream = BytesIO(image_bytes)
+    for index, image_stream in enumerate(image_list):
+        image_key = f"{key}/{formatted_date}/{formatted_time}/{index + 1}"
         image_stream.seek(0)
 
         url = upload_file(s3_client, image_stream, image_key)
@@ -35,7 +33,7 @@ def upload_files(image_list: List[str], key: str) -> List[str]:
 
     return s3_urls
 
-
+# TODO : key 변경
 def delete_files(num_of_images: int, key: str):
     s3_client = boto3.client(
         's3',
@@ -48,29 +46,30 @@ def delete_files(num_of_images: int, key: str):
         delete_file(s3_client, key_url)
 
 
-def upload_file(s3_client, image_io: BytesIO, key: str) -> str:
-    image_io.seek(0)
+def upload_file(s3_client, image_stream: BytesIO, key: str) -> str:
+    image_stream.seek(0)
+    image = Image.open(image_stream)
+    format = image.format.lower()
+
     try:
+        image_stream.seek(0)
         s3_client.upload_fileobj(
-            image_io,
+            image_stream,
             settings.AWS_S3_BUCKET,
-            key,
-            # JPEG로 변환해서 업로드
+            f"{key}.{format}",
             ExtraArgs={
-                'ContentType': 'image/jpeg',
+                'ContentType': f'image/{format}',
                 'ContentDisposition': 'inline'
             }
         )
-        s3_url = f"https://{settings.AWS_S3_BUCKET}.s3.{settings.AWS_S3_REGION_STATIC}.amazonaws.com/{key}"
+        s3_url = f"https://{settings.AWS_S3_BUCKET}.s3.{settings.AWS_S3_REGION_STATIC}.amazonaws.com/{key}.{format}"
         return s3_url
     except (BotoCoreError, ClientError) as e:
-        print(f"업로드 실패: {e}")
-        return None
+        raise HTTPException(status_code=500, detail=f"업로드 실패: {e}")
 
 
 def delete_file(s3_client, key: str):
     try:
         s3_client.delete_object(Bucket=settings.AWS_S3_BUCKET, Key=key)
-        print(f"파일 삭제 성공: {key}")
     except (BotoCoreError, ClientError) as e:
-        print(f"삭제 실패: {e}")
+        raise HTTPException(status_code=500, detail=f"삭제 실패: {e}")

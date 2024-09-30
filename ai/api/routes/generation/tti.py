@@ -1,13 +1,11 @@
-import base64
-import random
-from io import BytesIO
-
 import torch
 from diffusers import StableDiffusionPipeline
 from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse
+from core.config import settings
+from pathlib import Path
+from starlette.responses import StreamingResponse
 
-from utils import get_scheduler
+from utils import get_scheduler, generate_zip_from_images
 
 router = APIRouter(
     prefix="/txt-to-img",
@@ -16,7 +14,6 @@ router = APIRouter(
 @router.post("")
 async def text_to_image(request: Request):
     form = await request.form()
-    print(form)
 
     model = form.get("model")
     scheduler = form.get("scheduler")
@@ -31,19 +28,18 @@ async def text_to_image(request: Request):
     batch_size = int(form.get("batch_size"))
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    t2i_pipe = StableDiffusionPipeline.from_pretrained(model, torch_dtype=torch.float16).to(device)
+    model_dir = settings.OUTPUT_DIR
+    model_path = Path(model_dir) / model
+    
+    t2i_pipe = StableDiffusionPipeline.from_pretrained(model_path, torch_dtype=torch.float16).to(device)
 
     if scheduler:
         t2i_pipe.scheduler = get_scheduler(scheduler, t2i_pipe.scheduler.config)
 
-    if seed == -1:
-        seed = random.randint(0, 2 ** 32 - 1)
-
-    image_list = []
-    metadata = []
-
     total_images = batch_size * batch_count
-    seeds = [seed + i for i in range(total_images)]
+    seeds = [(seed + i) % (2 ** 32) for i in range(total_images)]
+
+    generated_image_list = []
 
     for i in range(batch_count):
         current_seeds = seeds[i * batch_size: (i + 1) * batch_size]
@@ -60,24 +56,10 @@ async def text_to_image(request: Request):
             num_images_per_prompt=len(generators),
         ).images
 
-        image_list.extend(images)
+        generated_image_list.extend(images)
 
-        for j in range(batch_size):
-            metadata.append({
-                'batch': i,
-                'image_index': j,
-                'seed': current_seeds[j],
-                'num_inference_steps': num_inference_steps,
-                'guidance_scale': guidance_scale,
-                'prompt': prompt
-            })
+    zip_buffer = generate_zip_from_images(generated_image_list)
 
-    encoded_images = []
-
-    for image in image_list:
-        buffered = BytesIO()
-        image.save(buffered, format="PNG")
-        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-        encoded_images.append(img_str)
-
-    return JSONResponse(content={"image_list": encoded_images, "metadata": metadata})
+    return StreamingResponse(zip_buffer, media_type="application/zip", headers={
+        "Content-Disposition": "attachment; filename=images.zip"
+    })

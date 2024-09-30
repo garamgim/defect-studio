@@ -7,8 +7,9 @@ import torch
 from diffusers import AutoPipelineForInpainting
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
+from starlette.responses import StreamingResponse
 
-from utils import get_scheduler
+from utils import get_scheduler, generate_zip_from_images
 
 router = APIRouter(
     prefix="/inpainting",
@@ -39,11 +40,8 @@ async def inpainting(
     init_image_list = [PIL.Image.open(BytesIO(await file.read())).convert("RGB") for file in init_image_files]
     mask_image_list = [PIL.Image.open(BytesIO(await file.read())).convert("RGB") for file in mask_image_files]
 
-    if seed == -1:
-        seed = random.randint(0, 2 ** 32 - 1)
-
     total_images = batch_size * batch_count
-    seeds = [seed + i for i in range(total_images)]
+    seeds = [(seed + i) % (2 ** 32) for i in range(total_images)]
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     inpaint_pipe = AutoPipelineForInpainting.from_pretrained(model, torch_dtype=torch.float16).to(device)
@@ -74,12 +72,9 @@ async def inpainting(
 
             generated_image_list.extend(images)
 
-    encoded_images = []
+    zip_buffer = generate_zip_from_images(generated_image_list)
 
-    for image in generated_image_list:
-        buffered = BytesIO()
-        image.save(buffered, format="PNG")
-        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-        encoded_images.append(img_str)
+    return StreamingResponse(zip_buffer, media_type="application/zip", headers={
+        "Content-Disposition": "attachment; filename=images.zip"
+    })
 
-    return JSONResponse(content={"image_list": encoded_images})

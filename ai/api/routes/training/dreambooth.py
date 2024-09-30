@@ -19,8 +19,8 @@ log_file_path = None
 
 @router.post("")
 async def train_dreambooth(request: Request, background_tasks: BackgroundTasks):
-    # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    # os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 
     # global training_process, log_file_path
@@ -36,7 +36,7 @@ async def train_dreambooth(request: Request, background_tasks: BackgroundTasks):
 
         # 모델 학습 파라미터
         # 모델 및 토크나이저 설정
-        pretrained_model_name_or_path = form.get("model_name", settings.BASE_MODEL_NAME)
+        pretrained_model_name_or_path = form.get("model_name")
         revision = form.get("revision", None)
         variant = form.get("variant", None)
         tokenizer_name = form.get("tokenizer_name", None)
@@ -134,12 +134,12 @@ async def train_dreambooth(request: Request, background_tasks: BackgroundTasks):
         output_dir = os.path.join(base_output_dir, f"{member_id}", f"{train_model_name}")
         os.makedirs(output_dir, exist_ok=True)
 
-        instance_dir = os.path.join(base_output_dir, f"{member_id}", "instance_image")
-        class_dir = os.path.join(base_output_dir, f"{member_id}", "class_image")
+        instance_dir = os.path.join(base_output_dir, f"{member_id}", f"{train_model_name}", "instance_image")
+        class_dir = os.path.join(base_output_dir, f"{member_id}", f"{train_model_name}", "class_image")
         os.makedirs(instance_dir, exist_ok=True)
         os.makedirs(class_dir, exist_ok=True)
 
-        if settings.BASE_MODEL_NAME == pretrained_model_name_or_path:
+        if pretrained_model_name_or_path in settings.BASE_MODEL_NAME.split("|"):
             pretrained_model_name_or_path = os.path.join(base_output_dir, pretrained_model_name_or_path)
         else:
             pretrained_model_name_or_path = os.path.join(base_output_dir, f"{member_id}", pretrained_model_name_or_path)

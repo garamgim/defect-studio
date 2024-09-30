@@ -1,9 +1,13 @@
-from fastapi import APIRouter, Request, HTTPException, status
-from PIL import Image
-from io import BytesIO
-from starlette.responses import JSONResponse
+import os
+import subprocess
+import torch
 from tempfile import TemporaryDirectory
-import subprocess, os, base64, torch
+
+from PIL import Image
+from fastapi import APIRouter, Request, HTTPException, status
+from starlette.responses import StreamingResponse
+
+from utils import generate_zip_from_images
 
 router = APIRouter(
     prefix="/cleanup",
@@ -52,22 +56,20 @@ async def cleanup(request: Request):
             f"--output={temp_output_dir}"
         ]
 
-        result = subprocess.run(cmd, shell=True)
+        result = subprocess.run(cmd, check=True)
 
         if result.returncode == 0:
             output_images = []
+
             for filename in os.listdir(temp_output_dir):
                 output_image_path = os.path.join(temp_output_dir, filename)
                 output_image = Image.open(output_image_path)
+                output_images.append(output_image)
 
-                buffered = BytesIO()
-                output_image.save(buffered, format="PNG")
-                buffered.seek(0)
+            zip_buffer = generate_zip_from_images(output_images)
 
-                img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-                output_images.append(img_str)
-
-            return JSONResponse(content={"image_list": output_images})
-
+            return StreamingResponse(zip_buffer, media_type="application/zip", headers={
+                "Content-Disposition": "attachment; filename=images.zip"
+            })
         else:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"cleanup 중 오류가 발생했습니다. : {result.returncode}")
