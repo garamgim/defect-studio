@@ -79,11 +79,11 @@ const ImgModal = ({ onClose }: ImgModalProps) => {
             <div className="flex justify-between items-center mb-2">
               <span className="font-semibold text-[18px]">Prompt</span>
               <div
-                className="flex items-center cursor-pointer text-sm text-gray-400"
+                className="flex items-center cursor-pointer text-sm text-gray-400 transition-transform transform hover:scale-110"
                 onClick={() => copyToClipboard(promptText)}
               >
                 <FaRegCopy className="mr-2" />
-                <span>복사</span>
+                <span>Copy</span>
               </div>
             </div>
             <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-sm leading-relaxed">{promptText}</div>
@@ -94,11 +94,11 @@ const ImgModal = ({ onClose }: ImgModalProps) => {
             <div className="flex justify-between items-center mb-2">
               <span className="font-semibold text-[18px]">Negative Prompt</span>
               <div
-                className="flex items-center cursor-pointer text-[14px] text-gray-400"
+                className="flex items-center cursor-pointer text-[14px] text-gray-400 transition-transform transform hover:scale-110"
                 onClick={() => copyToClipboard(negativePromptText)}
               >
                 <FaRegCopy className="mr-2" />
-                <span>복사</span>
+                <span>Copy</span>
               </div>
             </div>
             <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-[14px] leading-relaxed">

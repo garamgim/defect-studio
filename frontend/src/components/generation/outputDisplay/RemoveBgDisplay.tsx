@@ -163,7 +163,7 @@ const RemoveBgDisplay = () => {
                 }
               >
                 <FaRegCopy className="mr-1" />
-                <span>복사</span>
+                <span>Copy</span>
               </div>
             </div>
             <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-[16px] leading-relaxed">

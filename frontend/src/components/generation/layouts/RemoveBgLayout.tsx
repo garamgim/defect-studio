@@ -1,29 +1,20 @@
 import Sidebar from '../sidebar/RemoveBgSidebar';
 import GenerateButton from '../common/GenerateButton';
-import { postRemoveBgGeneration, getTaskStatus } from '../../../api/generation';
+import { postRemoveBgGeneration } from '../../../api/generation';
 import { convertStringToFile } from '../../../utils/convertStringToFile';
 import RemoveBgDisplay from '../outputDisplay/RemoveBgDisplay';
 import { useRemoveBgParams } from '../../../hooks/generation/params/useRemoveBgParams';
 import { RootState } from '../../../store/store';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  setIsLoading,
-  setTaskId,
-  setOutputImgsCnt,
-  setOutputImgsUrl,
-  setAllOutputsInfo,
-  setIsCheckedOutput
-} from '../../../store/slices/generation/outputSlice';
-import { useEffect } from 'react';
+import { setIsLoading, setTaskId, setOutputImgsCnt } from '../../../store/slices/generation/outputSlice';
+
 import { message } from 'antd';
 import OutputToolbar from '../outputTool/OutputToolbar';
 
 const RemoveBackground = () => {
   const dispatch = useDispatch();
   const { params, gpuNum } = useSelector((state: RootState) => state.removeBg);
-  const { isLoading, taskId, output, allOutputs, isSidebarVisible } = useSelector(
-    (state: RootState) => state.generatedOutput.removeBg
-  );
+  const { isLoading, isSidebarVisible } = useSelector((state: RootState) => state.generatedOutput.removeBg);
   useRemoveBgParams();
 
   let files;
@@ -82,72 +73,6 @@ const RemoveBackground = () => {
       dispatch(setIsLoading({ tab: 'removeBg', value: false }));
     }
   };
-
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout | undefined;
-
-    const fetchTaskStatus = async () => {
-      if (isLoading && taskId) {
-        try {
-          const response = await getTaskStatus(taskId);
-          if (response.task_status === 'SUCCESS') {
-            clearInterval(intervalId); // 성공 시 상태 확인 중지
-            dispatch(setOutputImgsUrl({ tab: 'removeBg', value: response.result_data }));
-
-            window.electron
-              .saveImgsWithZip(
-                response.result_data,
-                params.uploadImgParams.outputPath,
-                'png', // 파일 형식 (png로 고정)
-                params.uploadImgParams.isZipDownload
-              )
-              .then((result) => {
-                if (result.success) {
-                  console.log('이미지가 성공적으로 저장되었습니다:', result.success);
-                } else {
-                  console.error('이미지 저장 중 오류 발생:', result.error);
-                }
-              })
-              .catch((error) => {
-                console.error('이미지 저장 오류:', error);
-              });
-
-            const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
-            const outputsInfo = [
-              {
-                id: response.result_data_log.id,
-                imgsUrl: response.result_data,
-                prompt: response.result_data_log.prompt
-              },
-              ...allOutputs.outputsInfo
-            ];
-            dispatch(setAllOutputsInfo({ tab: 'removeBg', outputsCnt, outputsInfo }));
-
-            dispatch(setIsLoading({ tab: 'removeBg', value: false }));
-            dispatch(setIsCheckedOutput({ tab: 'removeBg', value: false }));
-            dispatch(setTaskId({ tab: 'removeBg', value: null }));
-          } else if (response.detail && response.detail.task_status === 'FAILURE') {
-            clearInterval(intervalId);
-            dispatch(setIsLoading({ tab: 'removeBg', value: false }));
-            dispatch(setTaskId({ tab: 'removeBg', value: null }));
-            console.error('Image generation failed:', response.detail.result_data || 'Unknown error');
-            alert(`Image generation failed: ${response.detail.result_data || 'Unknown error'}`);
-          }
-        } catch (error) {
-          console.error('Failed to get task status:', error);
-          dispatch(setIsLoading({ tab: 'removeBg', value: false }));
-          clearInterval(intervalId);
-        }
-      }
-    };
-
-    if (taskId) {
-      fetchTaskStatus();
-      intervalId = setInterval(fetchTaskStatus, 1000); // 1초마다 상태 확인
-    }
-
-    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 정리
-  }, [isLoading, dispatch, taskId, allOutputs.outputsCnt, allOutputs.outputsInfo, output.imgsCnt]);
 
   return (
     <div className="flex h-full pt-4 pb-6">
