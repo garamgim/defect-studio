@@ -1,16 +1,19 @@
-import { Tabs, Upload, Input, Button } from 'antd';
+import { Tabs, Upload, Input, Button, Checkbox } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { FiFolderPlus } from 'react-icons/fi';
 import React from 'react';
+import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 interface UploadImgParamsProps {
   handleImageUpload: (file: File) => void;
-  imagePreview: string | ArrayBuffer | null;
+  imagePreview: string | null;
   inputPath: string;
-  setInputPath: (value: string) => void;
+  updateInputPath: (inputPath: string) => void;
   outputPath: string;
-  setOutputPath: (value: string) => void;
-  setMode: (value: 'manual' | 'batch') => void;
+  updateOutputPath: (outputPath: string) => void;
+  updateMode: (mode: 'manual' | 'batch') => void;
+  isZipDownload: boolean;
+  updateIsZipDownload: (value: boolean) => void;
 }
 
 const UploadImgParams = ({
@@ -18,9 +21,11 @@ const UploadImgParams = ({
   imagePreview,
   inputPath,
   outputPath,
-  setInputPath,
-  setOutputPath,
-  setMode
+  updateInputPath,
+  updateOutputPath,
+  updateMode,
+  isZipDownload,
+  updateIsZipDownload
 }: UploadImgParamsProps) => {
   const uploadProps = {
     accept: 'image/*',
@@ -35,7 +40,7 @@ const UploadImgParams = ({
     try {
       const selectedFolderPath = await window.electron.selectFolder();
       if (selectedFolderPath) {
-        setInputPath(selectedFolderPath); // 인풋 이미지 폴더
+        updateInputPath(selectedFolderPath); // 인풋 이미지 폴더
       }
     } catch (error) {
       console.error('Error selecting folder:', error);
@@ -46,16 +51,20 @@ const UploadImgParams = ({
     try {
       const selectedFolderPath = await window.electron.selectFolder();
       if (selectedFolderPath) {
-        setOutputPath(selectedFolderPath); // 아웃풋 폴더(생성된 이미지 저장할 곳)
+        updateOutputPath(selectedFolderPath); // 아웃풋 폴더(생성된 이미지 저장할 곳)
       }
     } catch (error) {
       console.error('Error selecting folder:', error);
     }
   };
 
+  const onCheckboxChange = (e: CheckboxChangeEvent) => {
+    updateIsZipDownload(e.target.checked);
+  };
+
   // 탭 변경될 때
   const handleTabChange = (key: string) => {
-    setMode(key as 'manual' | 'batch');
+    updateMode(key as 'manual' | 'batch');
   };
 
   const items = [
@@ -66,11 +75,7 @@ const UploadImgParams = ({
         <div>
           <Upload.Dragger {...uploadProps} className="mb-4">
             {imagePreview ? (
-              <img
-                src={imagePreview as string}
-                alt="Uploaded preview"
-                className="w-full h-full object-cover rounded-md"
-              />
+              <img src={imagePreview} alt="Uploaded preview" className="w-full h-full object-cover rounded-md" />
             ) : (
               <div>
                 <p className="ant-upload-drag-icon">
@@ -96,7 +101,7 @@ const UploadImgParams = ({
               <Input
                 value={inputPath || ''}
                 onChange={(event) => {
-                  setInputPath(event.target.value);
+                  updateInputPath(event.target.value);
                 }}
                 type="text"
                 id="imagePath"
@@ -117,7 +122,7 @@ const UploadImgParams = ({
               <Input
                 value={outputPath || ''}
                 onChange={(event) => {
-                  setOutputPath(event.target.value);
+                  updateOutputPath(event.target.value);
                 }}
                 type="text"
                 id="outputPath"
@@ -128,6 +133,9 @@ const UploadImgParams = ({
                 <FiFolderPlus className="w-[18px] h-[18px] text-[#222]" />
               </Button>
             </div>
+            <Checkbox checked={isZipDownload} onChange={onCheckboxChange} className="mt-2">
+              Zip
+            </Checkbox>
           </div>
         </div>
       )

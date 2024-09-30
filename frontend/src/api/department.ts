@@ -22,9 +22,9 @@ export type DepartmentPersonType = {
   member_id: number;
 };
 
-export const getDepartmentPeople = async (departmentId: number) => {
+export const getDepartmentPeople = async (department_id: number) => {
   try {
-    const response = await axiosInstance.get(`/departments/${departmentId}/members`);
+    const response = await axiosInstance.get(`/departments/${department_id}/members`);
     return response;
   } catch (error) {
     throw new Error('Unexpected error occurred');

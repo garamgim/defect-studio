@@ -2,7 +2,8 @@ import noAuthAxios from './token/noAuthAxios';
 import { loginData } from '../types/user';
 import axiosInstance from './token/axiosInstance';
 import { AxiosError, AxiosResponse } from 'axios';
-import { useQuery, QueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+import { queryClient } from '../main';
 
 // 로그인 함수
 export async function login(user: loginData) {
@@ -36,7 +37,7 @@ export async function login(user: loginData) {
 
 // 유저 정보 가져올 떄 쓰는 정보
 export type userInfoType = {
-  member_pk: number;
+  member_id: number;
   login_id: string;
   nickname: string;
   email: string;
@@ -86,7 +87,6 @@ export const useGetMyInfo = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 
 // 내 정보 업데이트 요청하기
 export const upDateMyInfo = async () => {
-  const queryClient = new QueryClient();
   queryClient.invalidateQueries({
     queryKey: ['myInfo']
   });
@@ -97,7 +97,6 @@ export async function logout() {
   try {
     localStorage.removeItem('accessToken');
     await axiosInstance.post('/auth/logout');
-    const queryClient = new QueryClient();
     queryClient.removeQueries({
       queryKey: ['myInfo']
     });
@@ -109,3 +108,43 @@ export async function logout() {
     return false;
   }
 }
+
+// 유저 정보 수정 --------
+interface EditProfileInputs {
+  email?: string;
+  nickname?: string;
+  password?: string;
+}
+
+export const editProfile = async (data: EditProfileInputs) => {
+  const submitData: { [key: string]: string } = {};
+  if (data.email) submitData.email = data.email;
+  if (data.nickname) submitData.nickname = data.nickname;
+  if (data.password) submitData.password = data.password;
+  try {
+    const response = await axiosInstance.patch('/members', submitData);
+    return response;
+  } catch (error) {
+    console.error('Error editing profile:', error);
+    throw error;
+  }
+};
+
+// 회원탈퇴
+export const deleteProfile = async () => {
+  try {
+    const response = await axiosInstance.delete('/members');
+    localStorage.removeItem('accessToken');
+    queryClient.invalidateQueries({
+      queryKey: ['myInfo'],
+      refetchType: 'none'
+    });
+    queryClient.removeQueries({
+      queryKey: ['myInfo']
+    });
+    return response;
+  } catch (error) {
+    console.error('Error deleting profile:', error);
+    throw error;
+  }
+};

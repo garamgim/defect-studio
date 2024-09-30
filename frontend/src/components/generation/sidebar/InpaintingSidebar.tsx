@@ -1,75 +1,68 @@
 import { useState } from 'react';
-import { Button } from 'antd';
+import { Button, Modal, InputNumber, Tooltip } from 'antd';
 import { FormatPainterOutlined, FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
-import Model from '../params/InpaintingModelParam';
+import ModelParam from '../params/InpaintingModelParam';
 import MaskingModal from '../masking/MaskingModal';
 import SamplingParams from '../params/SamplingParams';
 import ImgDimensionParams from '../params/ImgDimensionParams';
 import SeedParam from '../params/SeedParam';
 import BatchParams from '../params/BatchParams';
 import StrengthParam from '../params/StrengthParam';
-import GuidanceScaleParms from '../params/GuidanceScaleParam';
+import GuidanceScaleParam from '../params/GuidanceScaleParam';
 import UploadImgWithMaskingParams from '../params/UploadImgWithMaskingParams';
-import { useInpaintingParams } from '../../../hooks/generation/useInpaintingParams';
+import { useInpaintingParams } from '../../../hooks/generation/params/useInpaintingParams';
 import CreatePreset from '../presets/CreatePreset';
 import LoadPreset from '../presets/LoadPreset';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import { setCombinedImg, resetState } from '../../../store/slices/generation/inpaintingSlice';
+import { MdMemory } from 'react-icons/md';
+import { setCombinedImg, resetParams, setGpuNum } from '../../../store/slices/generation/inpaintingSlice';
 import { useDispatch } from 'react-redux';
 
 const InpaintingSidebar = () => {
+  const dispatch = useDispatch();
+
+  // useSelector와 useCallback으로 처리하는 부분을 커스텀 훅으로 분리
   const {
-    model,
-    scheduler,
-    width,
-    height,
-    numInferenceSteps,
-    seed,
-    isRandomSeed,
-    guidanceScale,
-    strength,
-    batchCount,
-    batchSize,
-    initInputPath,
-    maskInputPath,
-    outputPath,
-    mode,
-    initImageList,
-    combinedImg,
+    modelParams,
+    samplingParams,
+    strengthParams,
+    guidanceParams,
+    imgDimensionParams,
+    seedParams,
+    batchParams,
     prompt,
     negativePrompt,
-    handleSetModel,
-    handleSetScheduler,
-    handleSetWidth,
-    handleSetHeight,
-    handleSetNumInferenceSteps,
-    handleSetGuidanceScale,
-    handleSetSeed,
-    handleSetStrength,
-    handleSetIsRandomSeed,
-    handleSetBatchCount,
-    handleSetBatchSize,
-    handleSetInitImageList,
-    handleSetMaskImageList,
-    handleSetClipData,
-    handleSetInitInputPath,
-    handleSetMaskInputPath,
-    handleSetOutputPath,
-    handleSetMode,
-    handleSetPrompt,
-    handleSetNegativePrompt,
-    handleSetCombinedImg
+    mode,
+    combinedImg,
+    initImageList,
+    maskInputPath,
+    initInputPath,
+    outputPath,
+    isZipDownload,
+    updateIsZipDownload,
+    updateModelParams,
+    updateSamplingParams,
+    updateStrengthParams,
+    updateSeedParams,
+    updateGuidanceParams,
+    updateImgDimensionParams,
+    updateBatchParams,
+    updateInitImageList,
+    updateMaskImageList,
+    updateInitInputPath,
+    updateOutputPath,
+    updateMode,
+    updatePrompt,
+    updateNegativePrompt,
+    updateClipData,
+    updateMaskInputPath,
+    updateCombinedImg
   } = useInpaintingParams();
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
   const [showModal, setShowModal] = useState(false);
-
-  const handleRandomSeedChange = () => {
-    handleSetIsRandomSeed(!isRandomSeed);
-    handleSetSeed(!isRandomSeed ? -1 : seed);
-  };
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
@@ -77,12 +70,23 @@ const InpaintingSidebar = () => {
       const base64String = reader.result as string;
       const img = new Image();
       img.onload = async () => {
-        handleSetClipData([]);
-        handleSetInitImageList([base64String]);
-
+        // 이미지 크기 제한 (2024x2024 이하)
+        if (img.width > 2024 || img.height > 2024) {
+          alert('The image is too large. Please upload an image with a size less than or equal to 2024x2024.');
+          return;
+        }
+        updateClipData([]);
+        updateInitImageList([base64String]);
         setCombinedImg(null);
       };
+
+      img.onerror = () => {
+        alert('Failed to load the image. Please try again.');
+      };
       img.src = base64String;
+    };
+    reader.onerror = () => {
+      alert('Failed to read the file. Please try again.');
     };
     reader.readAsDataURL(file);
   };
@@ -107,34 +111,74 @@ const InpaintingSidebar = () => {
     setIsLoadPresetOpen(false);
   };
 
-  const dispatch = useDispatch();
   const handleReset = () => {
-    dispatch(resetState());
+    dispatch(resetParams());
+  };
+
+  // GPU 선택
+  const [gpuNumer, setGpuNumer] = useState(0);
+  const [isGpuModalVisible, setIsGpuModalVisible] = useState(false);
+
+  const showGpuModal = () => {
+    setIsGpuModalVisible(true);
+  };
+
+  const handleGpuInputChange = (gpuNumer: number | null) => {
+    if (gpuNumer) {
+      setGpuNumer(gpuNumer);
+    }
+  };
+
+  const handleGpuModalOk = () => {
+    if (gpuNumer !== null) {
+      dispatch(setGpuNum(gpuNumer));
+    }
+    setIsGpuModalVisible(false);
+  };
+
+  const handleGpuModalCancel = () => {
+    setIsGpuModalVisible(false);
   };
 
   return (
     <div className="w-full h-full mr-6">
       <div className="relative w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
-        {/* reset parameters & preset */}
         {level === 'Advanced' && (
-          <div className="absolute top-6 right-0 mx-6">
-            <UndoOutlined
-              onClick={handleReset}
-              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
-            />
-            <FileAddOutlined
-              onClick={showCreatePreset}
-              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
-            />
-            <FileSearchOutlined
-              onClick={showLoadPreset}
-              className="text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
-            />
+          <div className="absolute top-6 right-0 mr-6">
+            <div className="flex">
+              <Tooltip title="Reset Parameters">
+                <UndoOutlined
+                  onClick={handleReset}
+                  className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                />
+              </Tooltip>
+
+              <Tooltip title="Create Preset">
+                <FileAddOutlined
+                  onClick={showCreatePreset}
+                  className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                />
+              </Tooltip>
+
+              <Tooltip title="Load Preset">
+                <FileSearchOutlined
+                  onClick={showLoadPreset}
+                  className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                />
+              </Tooltip>
+
+              <Tooltip title="Enter GPU Number">
+                <MdMemory
+                  className="text-[22px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                  onClick={showGpuModal}
+                />
+              </Tooltip>
+            </div>
           </div>
         )}
 
-        {/* 모델 선택 */}
-        <Model model={model} setModel={handleSetModel} />
+        {/* 모델 */}
+        <ModelParam modelParams={modelParams} updateModelParams={updateModelParams} />
 
         <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
@@ -145,10 +189,12 @@ const InpaintingSidebar = () => {
           initInputPath={initInputPath}
           maskInputPath={maskInputPath}
           outputPath={outputPath}
-          setInitInputPath={handleSetInitInputPath}
-          setMaskInputPath={handleSetMaskInputPath}
-          setOutputPath={handleSetOutputPath}
-          setMode={handleSetMode}
+          updateInitInputPath={updateInitInputPath}
+          updateMaskInputPath={updateMaskInputPath}
+          updateOutputPath={updateOutputPath}
+          updateMode={updateMode}
+          isZipDownload={isZipDownload}
+          updateIsZipDownload={updateIsZipDownload}
         />
 
         {initImageList[0] && (
@@ -178,44 +224,30 @@ const InpaintingSidebar = () => {
           <>
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
-            {/* 샘플링 설정 */}
-            <SamplingParams
-              scheduler={scheduler}
-              numInferenceSteps={numInferenceSteps}
-              setNumInferenceSteps={handleSetNumInferenceSteps}
-              setScheduler={handleSetScheduler}
+            {/* 이미지 크기 */}
+            <ImgDimensionParams
+              imgDimensionParams={imgDimensionParams}
+              updateImgDimensionParams={updateImgDimensionParams}
             />
+
+            {/* 샘플링 세팅 */}
+            <SamplingParams samplingParams={samplingParams} updateSamplingParams={updateSamplingParams} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
-            {/* 이미지 크기 설정 */}
-            <ImgDimensionParams width={width} height={height} setWidth={handleSetWidth} setHeight={handleSetHeight} />
+            {/* 초기 이미지 변화 제어 */}
+            <GuidanceScaleParam guidanceParams={guidanceParams} updateGuidanceParams={updateGuidanceParams} />
+
+            {/* 초기 이미지 변화 제어 */}
+            <StrengthParam strengthParams={strengthParams} updateStrengthParams={updateStrengthParams} />
+
+            {/* 이미지 재현 & 다양성 세팅 */}
+            <SeedParam seedParams={seedParams} updateSeedParams={updateSeedParams} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
-            {/* guidance scale 설정 */}
-            <GuidanceScaleParms guidanceScale={guidanceScale} setGuidanceScale={handleSetGuidanceScale} />
-
-            {/* strength 설정 */}
-            <StrengthParam strength={strength} setStrength={handleSetStrength} />
-
-            {/* seed 설정 */}
-            <SeedParam
-              seed={seed}
-              setSeed={handleSetSeed}
-              isRandomSeed={isRandomSeed}
-              handleRandomSeedChange={handleRandomSeedChange}
-            />
-
-            <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
-
-            {/* 배치 설정 */}
-            <BatchParams
-              batchCount={batchCount}
-              batchSize={batchSize}
-              setBatchCount={handleSetBatchCount}
-              setBatchSize={handleSetBatchSize}
-            />
+            {/* 배치 세팅 */}
+            <BatchParams batchParams={batchParams} updateBatchParams={updateBatchParams} />
           </>
         )}
       </div>
@@ -225,29 +257,32 @@ const InpaintingSidebar = () => {
         <MaskingModal
           imageSrc={initImageList[0]}
           onClose={handleCloseModal}
-          setInitImageList={handleSetInitImageList}
-          setMaskImageList={handleSetMaskImageList}
-          setCombinedImg={handleSetCombinedImg}
+          updateInitImageList={updateInitImageList}
+          updateMaskImageList={updateMaskImageList}
+          updateCombinedImg={updateCombinedImg}
         />
       )}
 
+      {/* gpu 선택 모달 */}
+      <Modal open={isGpuModalVisible} closable={false} onOk={handleGpuModalOk} onCancel={handleGpuModalCancel}>
+        <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Input the GPU number you want</div>
+        <InputNumber min={0} onChange={handleGpuInputChange} />
+      </Modal>
+
       {/* 프리셋 생성 */}
       <CreatePreset
-        model={model}
-        width={width}
-        height={height}
-        guidanceScale={guidanceScale}
-        numInferenceSteps={numInferenceSteps}
-        seed={seed}
+        modelParams={modelParams}
+        batchParams={batchParams}
+        imgDimensionParams={imgDimensionParams}
+        guidanceParams={guidanceParams}
+        samplingParams={samplingParams}
+        seedParams={seedParams}
+        strengthParams={strengthParams}
         prompt={prompt}
         negativePrompt={negativePrompt}
-        batchCount={batchCount}
-        batchSize={batchSize}
-        scheduler={scheduler}
         type="inpainting"
         isModalOpen={isCreatePresetOpen}
         closeModal={closeCreatePreset}
-        strength={strength}
       />
 
       {/* 프리셋 다운로드 */}
@@ -255,18 +290,15 @@ const InpaintingSidebar = () => {
         isModalOpen={isLoadPresetOpen}
         closeModal={closeLoadPreset}
         type="inpainting"
-        setModel={handleSetModel}
-        setWidth={handleSetWidth}
-        setHeight={handleSetHeight}
-        setGuidanceScale={handleSetGuidanceScale}
-        setNumInferenceSteps={handleSetNumInferenceSteps}
-        setSeed={handleSetSeed}
-        setPrompt={handleSetPrompt}
-        setNegativePrompt={handleSetNegativePrompt}
-        setBatchCount={handleSetBatchCount}
-        setBatchSize={handleSetBatchSize}
-        setScheduler={handleSetScheduler}
-        setStrength={handleSetStrength}
+        updateModelParams={updateModelParams}
+        updateSamplingParams={updateSamplingParams}
+        updateSeedParams={updateSeedParams}
+        updateGuidanceParams={updateGuidanceParams}
+        updateImgDimensionParams={updateImgDimensionParams}
+        updateBatchParams={updateBatchParams}
+        updatePrompt={updatePrompt}
+        updateNegativePrompt={updateNegativePrompt}
+        updateStrengthParams={updateStrengthParams}
       />
     </div>
   );

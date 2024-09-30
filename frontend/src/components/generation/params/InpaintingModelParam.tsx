@@ -1,15 +1,50 @@
-import { Select, Form } from 'antd';
-import React from 'react';
+import { Select, Form, message } from 'antd';
+import React, { useEffect } from 'react';
+import { getModelList } from '../../../api/generation';
+import { useQuery } from '@tanstack/react-query';
+import { ModelParamsType } from '../../../types/generation';
 
 interface InpaintingModelParamsProps {
-  model: string;
-  setModel: (model: string) => void;
+  modelParams: ModelParamsType;
+  updateModelParams: (model: string) => void;
 }
 
-const InpaintingModelParam = ({ model, setModel }: InpaintingModelParamsProps) => {
-  const handleChange = (value: string) => {
-    setModel(value);
+const InpaintingModelParam = ({ modelParams, updateModelParams }: InpaintingModelParamsProps) => {
+  const handleChange = (model: string) => {
+    updateModelParams(model);
   };
+
+  const member_id = 1;
+
+  const {
+    data: modelList,
+    isLoading,
+    error
+  } = useQuery<string[], Error>({
+    queryKey: ['models', member_id],
+    queryFn: () => getModelList(member_id)
+  });
+
+  // 기본 모델 리스트
+  const defaultModels = [{ value: 'stable-diffusion-2-inpainting', label: 'stable-diffusion-2-inpainting' }];
+
+  // 기본 모델 리스트와 API로 받은 모델 리스트를 합침
+  let combinedModelOptions = [
+    ...defaultModels,
+    ...(modelList?.map((model: string) => ({ value: model, label: model })) || [])
+  ];
+
+  // 로딩 중이나 에러나면 default 모델 보여줌
+  if (isLoading || error) {
+    combinedModelOptions = defaultModels;
+  }
+
+  // model리스트 조회 api 오류 발생 시 알림 표시
+  useEffect(() => {
+    if (error) {
+      message.error('Error loading models. Please try again later.');
+    }
+  }, [error]);
 
   return (
     <div className="mt-[32px] px-6 pb-2">
@@ -17,19 +52,9 @@ const InpaintingModelParam = ({ model, setModel }: InpaintingModelParamsProps) =
       <Form layout="vertical">
         <Form.Item>
           <Select
-            value={model}
+            value={modelParams.model}
             onChange={handleChange}
-            options={[
-              {
-                value: 'diffusers/stable-diffusion-xl-1.0-inpainting-0.1',
-                label: 'diffusers/stable-diffusion-xl-1.0-inpainting-0.1'
-              },
-              {
-                value: 'stabilityai/stable-diffusion-2-inpainting',
-                label: 'stabilityai/stable-diffusion-2-inpainting'
-              },
-              { value: 'stable-diffusion-2-inpainting', label: 'stable-diffusion-2-inpainting' }
-            ]}
+            options={combinedModelOptions}
             placeholder="Select a model"
           />
         </Form.Item>

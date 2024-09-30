@@ -1,7 +1,7 @@
 import { signUpFormType } from '../types/user';
 import noAuthAxios from './token/axiosInstance';
 
-export const signupHTTP = async (data: signUpFormType) => {
+export const signupRequest = async (data: signUpFormType) => {
   try {
     const response = noAuthAxios.post('/members/signup', data);
     return response;

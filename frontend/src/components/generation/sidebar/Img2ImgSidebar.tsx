@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
-import ModelParams from '../params/ModelParam';
+import ModelParam from '../params/ModelParam';
 import UploadImgParams from '../params/UploadImgParams';
 import StrengthParam from '../params/StrengthParam';
 import ImgDimensionParams from '../params/ImgDimensionParams';
@@ -10,56 +10,50 @@ import BatchParams from '../params/BatchParams';
 import GuidanceScaleParam from '../params/GuidanceScaleParam';
 import CreatePreset from '../presets/CreatePreset';
 import LoadPreset from '../presets/LoadPreset';
-import { useImg2ImgParams } from '../../../hooks/generation/useImg2ImgParams';
+import { useImg2ImgParams } from '../../../hooks/generation/params/useImg2ImgParams';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import { useDispatch } from 'react-redux';
-import { resetState } from '../../../store/slices/generation/img2ImgSlice';
+import { MdMemory } from 'react-icons/md';
+import { resetParams, setGpuNum } from '../../../store/slices/generation/img2ImgSlice';
+import { Modal, InputNumber, Tooltip } from 'antd';
 
 const Img2ImgSidebar = () => {
+  const dispatch = useDispatch();
+
+  // useSelector와 useCallback으로 처리하는 부분을 커스텀 훅으로 분리
   const {
-    model,
-    scheduler,
-    width,
-    height,
-    numInferenceSteps,
-    seed,
-    isRandomSeed,
-    guidanceScale,
-    strength,
-    batchCount,
-    batchSize,
-    inputPath,
-    outputPath,
-    imageList,
+    modelParams,
+    samplingParams,
+    strengthParams,
+    guidanceParams,
+    imgDimensionParams,
+    seedParams,
+    batchParams,
     prompt,
     negativePrompt,
-    handleSetModel,
-    handleSetScheduler,
-    handleSetWidth,
-    handleSetHeight,
-    handleSetNumInferenceSteps,
-    handleSetGuidanceScale,
-    handleSetSeed,
-    handleSetStrength,
-    handleSetIsRandomSeed,
-    handleSetBatchCount,
-    handleSetBatchSize,
-    handleSetImageList,
-    handleSetInputPath,
-    handleSetOutputPath,
-    handleSetMode,
-    handleSetClipData,
-    handleSetPrompt,
-    handleSetNegativePrompt
+    imageList,
+    inputPath,
+    outputPath,
+    isZipDownload,
+    updateIsZipDownload,
+    updateModelParams,
+    updateSamplingParams,
+    updateStrengthParams,
+    updateSeedParams,
+    updateGuidanceParams,
+    updateImgDimensionParams,
+    updateBatchParams,
+    updateInputPath,
+    updateOutputPath,
+    updateMode,
+    updatePrompt,
+    updateNegativePrompt,
+    updateClipData,
+    updateImageList
   } = useImg2ImgParams();
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
-
-  const handleRandomSeedChange = () => {
-    handleSetIsRandomSeed(!isRandomSeed);
-    handleSetSeed(!isRandomSeed ? -1 : seed);
-  };
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
@@ -67,12 +61,24 @@ const Img2ImgSidebar = () => {
       const base64String = reader.result as string;
       const img = new Image();
       img.onload = () => {
-        handleSetClipData([]);
-        handleSetImageList([base64String]);
+        // 이미지 크기 제한 (2024x2024 이하)
+        if (img.width > 2024 || img.height > 2024) {
+          alert('The image is too large. Please upload an image with a size less than or equal to 2024x2024.');
+          return;
+        }
+        updateClipData([]);
+        updateImageList([base64String]);
+      };
+
+      img.onerror = () => {
+        alert('Failed to load the image. Please try again.');
       };
       img.src = base64String;
     };
-    reader.readAsDataURL(file); // 파일을 Base64로 변환
+    reader.onerror = () => {
+      alert('Failed to read the file. Please try again.');
+    };
+    reader.readAsDataURL(file);
   };
 
   const [isCreatePresetOpen, setIsCreatePresetOpen] = useState(false);
@@ -91,34 +97,74 @@ const Img2ImgSidebar = () => {
     setIsLoadPresetOpen(false);
   };
 
-  const dispatch = useDispatch();
   const handleReset = () => {
-    dispatch(resetState());
+    dispatch(resetParams());
+  };
+
+  // GPU 선택
+  const [gpuNumer, setGpuNumer] = useState(0);
+  const [isGpuModalVisible, setIsGpuModalVisible] = useState(false);
+
+  const showGpuModal = () => {
+    setIsGpuModalVisible(true);
+  };
+
+  const handleGpuInputChange = (gpuNumer: number | null) => {
+    if (gpuNumer) {
+      setGpuNumer(gpuNumer);
+    }
+  };
+
+  const handleGpuModalOk = () => {
+    if (gpuNumer !== null) {
+      dispatch(setGpuNum(gpuNumer));
+    }
+    setIsGpuModalVisible(false);
+  };
+
+  const handleGpuModalCancel = () => {
+    setIsGpuModalVisible(false);
   };
 
   return (
     <div className="w-full h-full mr-6">
       <div className="relative w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
-        {/* reset parameters & preset */}
         {level === 'Advanced' && (
-          <div className="absolute top-6 right-0 mx-6">
-            <UndoOutlined
-              onClick={handleReset}
-              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
-            />
-            <FileAddOutlined
-              onClick={showCreatePreset}
-              className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
-            />
-            <FileSearchOutlined
-              onClick={showLoadPreset}
-              className="text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer"
-            />
+          <div className="absolute top-6 right-0 mr-6">
+            <div className="flex">
+              <Tooltip title="Reset Parameters">
+                <UndoOutlined
+                  onClick={handleReset}
+                  className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                />
+              </Tooltip>
+
+              <Tooltip title="Create Preset">
+                <FileAddOutlined
+                  onClick={showCreatePreset}
+                  className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                />
+              </Tooltip>
+
+              <Tooltip title="Load Preset">
+                <FileSearchOutlined
+                  onClick={showLoadPreset}
+                  className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                />
+              </Tooltip>
+
+              <Tooltip title="Enter GPU Number">
+                <MdMemory
+                  className="text-[22px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+                  onClick={showGpuModal}
+                />
+              </Tooltip>
+            </div>
           </div>
         )}
 
-        {/* 모델 선택 */}
-        <ModelParams model={model} setModel={handleSetModel} />
+        {/* 모델 */}
+        <ModelParam modelParams={modelParams} updateModelParams={updateModelParams} />
 
         <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
@@ -128,9 +174,11 @@ const Img2ImgSidebar = () => {
           imagePreview={imageList[0]}
           inputPath={inputPath}
           outputPath={outputPath}
-          setInputPath={handleSetInputPath}
-          setOutputPath={handleSetOutputPath}
-          setMode={handleSetMode}
+          updateInputPath={updateInputPath}
+          updateOutputPath={updateOutputPath}
+          updateMode={updateMode}
+          isZipDownload={isZipDownload}
+          updateIsZipDownload={updateIsZipDownload}
         />
 
         {level === 'Advanced' && (
@@ -138,60 +186,51 @@ const Img2ImgSidebar = () => {
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 이미지 크기 */}
-            <ImgDimensionParams width={width} height={height} setWidth={handleSetWidth} setHeight={handleSetHeight} />
-
+            <ImgDimensionParams
+              imgDimensionParams={imgDimensionParams}
+              updateImgDimensionParams={updateImgDimensionParams}
+            />
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 샘플링 세팅 */}
-            <SamplingParams
-              scheduler={scheduler}
-              numInferenceSteps={numInferenceSteps}
-              setNumInferenceSteps={handleSetNumInferenceSteps}
-              setScheduler={handleSetScheduler}
-            />
+            <SamplingParams samplingParams={samplingParams} updateSamplingParams={updateSamplingParams} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 초기 이미지 변화 제어 */}
-            <GuidanceScaleParam guidanceScale={guidanceScale} setGuidanceScale={handleSetGuidanceScale} />
+            <GuidanceScaleParam guidanceParams={guidanceParams} updateGuidanceParams={updateGuidanceParams} />
 
             {/* 초기 이미지 변화 제어 */}
-            <StrengthParam strength={strength} setStrength={handleSetStrength} />
+            <StrengthParam strengthParams={strengthParams} updateStrengthParams={updateStrengthParams} />
 
-            {/* 이미지 재현/다양성 제어 */}
-            <SeedParam
-              seed={seed}
-              isRandomSeed={isRandomSeed}
-              setSeed={handleSetSeed}
-              handleRandomSeedChange={handleRandomSeedChange}
-            />
+            {/* 이미지 재현 & 다양성 세팅 */}
+            <SeedParam seedParams={seedParams} updateSeedParams={updateSeedParams} />
 
             <hr className="border-t-[2px] border-[#E6E6E6] w-full dark:border-gray-800" />
 
             {/* 배치 세팅 */}
-            <BatchParams
-              batchCount={batchCount}
-              batchSize={batchSize}
-              setBatchCount={handleSetBatchCount}
-              setBatchSize={handleSetBatchSize}
-            />
+            <BatchParams batchParams={batchParams} updateBatchParams={updateBatchParams} />
           </>
         )}
       </div>
 
+      {/* gpu 선택 모달 */}
+      <Modal open={isGpuModalVisible} closable={false} onOk={handleGpuModalOk} onCancel={handleGpuModalCancel}>
+        <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Input the GPU number you want</div>
+        <InputNumber min={0} onChange={handleGpuInputChange} />
+      </Modal>
+
       {/* 프리셋 생성 */}
       <CreatePreset
-        model={model}
-        width={width}
-        height={height}
-        guidanceScale={guidanceScale}
-        numInferenceSteps={numInferenceSteps}
-        seed={seed}
+        modelParams={modelParams}
+        batchParams={batchParams}
+        imgDimensionParams={imgDimensionParams}
+        guidanceParams={guidanceParams}
+        samplingParams={samplingParams}
+        seedParams={seedParams}
+        strengthParams={strengthParams}
         prompt={prompt}
         negativePrompt={negativePrompt}
-        batchCount={batchCount}
-        batchSize={batchSize}
-        scheduler={scheduler}
         type="image_to_image"
         isModalOpen={isCreatePresetOpen}
         closeModal={closeCreatePreset}
@@ -202,18 +241,15 @@ const Img2ImgSidebar = () => {
         isModalOpen={isLoadPresetOpen}
         closeModal={closeLoadPreset}
         type="image_to_image"
-        setModel={handleSetModel}
-        setWidth={handleSetWidth}
-        setHeight={handleSetHeight}
-        setGuidanceScale={handleSetGuidanceScale}
-        setNumInferenceSteps={handleSetNumInferenceSteps}
-        setSeed={handleSetSeed}
-        setPrompt={handleSetPrompt}
-        setNegativePrompt={handleSetNegativePrompt}
-        setBatchCount={handleSetBatchCount}
-        setBatchSize={handleSetBatchSize}
-        setScheduler={handleSetScheduler}
-        setStrength={handleSetStrength}
+        updateModelParams={updateModelParams}
+        updateSamplingParams={updateSamplingParams}
+        updateSeedParams={updateSeedParams}
+        updateGuidanceParams={updateGuidanceParams}
+        updateImgDimensionParams={updateImgDimensionParams}
+        updateBatchParams={updateBatchParams}
+        updatePrompt={updatePrompt}
+        updateNegativePrompt={updateNegativePrompt}
+        updateStrengthParams={updateStrengthParams}
       />
     </div>
   );

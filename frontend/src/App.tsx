@@ -12,7 +12,9 @@ import Signup from './pages/Signup';
 import PrivateRoute from './components/routing/PrivateRoute';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
-import GuestUserUpdate from './pages/GuestUserUpdate';
+import UserUpdate from './pages/UserUpdate';
+import EditProfile from './pages/EditProfile';
+import History from './pages/History';
 
 function AppContent() {
   return (
@@ -37,6 +39,14 @@ function AppContent() {
             element={
               <PrivateRoute>
                 <Generation />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/history"
+            element={
+              <PrivateRoute>
+                <History />
               </PrivateRoute>
             }
           />
@@ -81,10 +91,18 @@ function AppContent() {
             }
           />
           <Route
+            path="/profile/edit"
+            element={
+              <PrivateRoute>
+                <EditProfile />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/guestUserManage"
             element={
               <PrivateRoute>
-                <GuestUserUpdate />
+                <UserUpdate />
               </PrivateRoute>
             }
           />

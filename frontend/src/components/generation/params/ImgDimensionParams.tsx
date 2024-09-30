@@ -1,58 +1,69 @@
 import { Slider, InputNumber, Row, Col, Form } from 'antd';
 import React from 'react';
+import { ImgDimensionParamsType } from '../../../types/generation';
 
-interface ImageDimensionParamsProps {
-  width: number;
-  height: number;
-  setWidth: (value: number) => void;
-  setHeight: (value: number) => void;
+interface ImgDimensionParamsProps {
+  imgDimensionParams: ImgDimensionParamsType;
+  updateImgDimensionParams: (width: number, height: number) => void;
 }
 
-const ImageDimensionParams = ({ width, height, setWidth, setHeight }: ImageDimensionParamsProps) => {
-  const handleWidthChange = (value: number | null) => {
-    if (value !== null) setWidth(value);
-  };
-
-  const handleHeightChange = (value: number | null) => {
-    if (value !== null) setHeight(value);
+const ImgDimensionParams = ({ imgDimensionParams, updateImgDimensionParams }: ImgDimensionParamsProps) => {
+  const handleDimensionChange = (key: 'width' | 'height', value: number | null) => {
+    if (value !== null) {
+      const newWidth = key === 'width' ? value : imgDimensionParams.width;
+      const newHeight = key === 'height' ? value : imgDimensionParams.height;
+      updateImgDimensionParams(newWidth, newHeight);
+    }
   };
 
   return (
     <div className="p-6">
       <p className="text-[14px] font-semibold text-[#222] mb-3 dark:text-gray-300">Image Dimensions</p>
       <Form layout="vertical" className="space-y-4">
+        {/* Width 설정 */}
         <Form.Item label="Width">
           <Row gutter={16}>
             <Col span={16}>
               <Slider
-                min={128}
+                min={0}
                 max={2048}
-                step={8}
-                value={width}
-                onChange={(value) => setWidth(value)}
-                tooltip={{ open: undefined }}
+                value={imgDimensionParams.width}
+                onChange={(value) => handleDimensionChange('width', value)}
+                tooltip={undefined}
               />
             </Col>
             <Col span={8}>
-              <InputNumber min={128} max={2048} value={width} onChange={handleWidthChange} className="w-full" />
+              <InputNumber
+                min={0}
+                max={2048}
+                value={imgDimensionParams.width}
+                onChange={(value) => handleDimensionChange('width', value)}
+                className="w-full"
+              />
             </Col>
           </Row>
         </Form.Item>
 
+        {/* Height 설정 */}
         <Form.Item label="Height">
           <Row gutter={16}>
             <Col span={16}>
               <Slider
-                min={128}
+                min={0}
                 max={2048}
-                step={8}
-                value={height}
-                onChange={(value) => setHeight(value)}
-                tooltip={{ open: undefined }}
+                value={imgDimensionParams.height}
+                onChange={(value) => handleDimensionChange('height', value)}
+                tooltip={undefined}
               />
             </Col>
             <Col span={8}>
-              <InputNumber min={128} max={2048} value={height} onChange={handleHeightChange} className="w-full" />
+              <InputNumber
+                min={0}
+                max={2048}
+                value={imgDimensionParams.height}
+                onChange={(value) => handleDimensionChange('height', value)}
+                className="w-full"
+              />
             </Col>
           </Row>
         </Form.Item>
@@ -61,4 +72,4 @@ const ImageDimensionParams = ({ width, height, setWidth, setHeight }: ImageDimen
   );
 };
 
-export default React.memo(ImageDimensionParams);
+export default React.memo(ImgDimensionParams);

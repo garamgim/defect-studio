@@ -14,38 +14,49 @@ import Konva from 'konva';
 interface MaskingModalProps {
   onClose: () => void;
   imageSrc: string;
-  setInitImageList: (value: string[]) => void;
-  setMaskImageList: (value: string[]) => void;
-  setCombinedImg: (value: string) => void;
+  updateInitImageList: (initImgList: string[]) => void; // 배경 이미지
+  updateMaskImageList: (maskImgList: string[]) => void; // 캔버스 이미지
+  updateCombinedImg: (combinedImg: string) => void; // 배경+캔버스 결합이미지
 }
 
 interface LineObject {
-  tool: 'brush' | 'polygon';
-  points: number[];
-  strokeWidth?: number;
-  fill?: string;
+  tool: 'brush' | 'polygon'; // 선 객체에서 브러쉬랑 폴리곤 중 선택
+  points: number[]; // 점의 좌표를 배열로 저장
+  strokeWidth?: number; // 브러쉬면 반지름 값을 가지고, 폴리곤일 때는 안가짐
+  fill?: string; // ?
 }
 
-const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList, setCombinedImg }: MaskingModalProps) => {
-  const [tool, setTool] = useState<'brush' | 'polygon' | 'select' | null>(null);
-  const [isMovingPoints, setIsMovingPoints] = useState(false);
-  const [brushSize, setBrushSize] = useState<number>(10);
-  const [objects, setObjects] = useState<LineObject[]>([]);
-  const [undoStack, setUndoStack] = useState<LineObject[][]>([]);
-  const [redoStack, setRedoStack] = useState<LineObject[][]>([]);
-  const [polygonPoints, setPolygonPoints] = useState<{ x: number; y: number }[]>([]);
-  const [isPolygonComplete, setIsPolygonComplete] = useState(false);
-  const [selectedObjectIndex, setSelectedObjectIndex] = useState<number | null>(null);
-  const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | null>(null);
-  const isDrawing = useRef(false);
-  const [scale, setScale] = useState<number>(1);
-  const stageRef = useRef<Konva.Stage | null>(null);
-  const [image, imageStatus] = useImage(imageSrc);
+const MaskingModal = ({
+  onClose,
+  imageSrc, // initImageList의 첫번째 배열에는 메뉴얼모드에서 업로드한 사진한장이 담김
+  updateInitImageList,
+  updateMaskImageList,
+  updateCombinedImg
+}: MaskingModalProps) => {
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null); // 마우스 위치 저장 (x, y값), 이미지 벗어나면 null
+  const [rgbColor, setRgbColor] = useState<string | null>(null); // RGB 스트링값, 마찬가지로 이미지 벗어나면 null
 
-  const [stageSize, setStageSize] = useState<{ width: number; height: number }>({ width: 512, height: 512 });
-  const [imagePos, setImagePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [imageSize, setImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
-  const [minImageSize, setMinImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+  const [, setImageScale] = useState(1); // 이미지 배율 상태관리, 초기에 1를 부여해서 처음에 렌더링 된 이미지의 상태를 1이라고 판단함
+
+  const [tool, setTool] = useState<'brush' | 'polygon' | 'select' | null>(null); // 도구 선택은 브러쉬, 폴리곤, 점 선택, 또는 개체 선택
+  const [isMovingPoints, setIsMovingPoints] = useState(false); // 점 움직이기 기능
+  const [brushSize, setBrushSize] = useState<number>(10);
+  const [objects, setObjects] = useState<LineObject[]>([]); // redo, undo기능을 만들기 위해 한번 작업할 때마다 한 작업을 객체로 묶어서 저장함
+  const [undoStack, setUndoStack] = useState<LineObject[][]>([]); // 초기값은 빈배열, ?
+  const [redoStack, setRedoStack] = useState<LineObject[][]>([]); // 여기도 위와 마찬가지로 초기값 빈배열, ?
+  const [polygonPoints, setPolygonPoints] = useState<{ x: number; y: number }[]>([]); // 폴리곤 점 찍을 때 {x, y} 객체로 저장
+  const [isPolygonComplete, setIsPolygonComplete] = useState(false); // 폴리곤 완성됐는지 체크
+  const [selectedObjectIndex, setSelectedObjectIndex] = useState<number | null>(null); // 선택된 객체의 인덱스, 선택 안됐을 경우에는 null
+  const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | null>(null); // 커서 위치 {x, y}, 기본값은 null
+  const isDrawing = useRef(false); // 그림그리고 있는 지 체크
+  const [scale, setScale] = useState<number>(1); //여기도 1체크 <- 중복해서 배율 관리하고 있음
+  const stageRef = useRef<Konva.Stage | null>(null); // ?
+  const [image, imageStatus] = useImage(imageSrc); // useImage ?
+
+  const [stageSize, setStageSize] = useState<{ width: number; height: number }>({ width: 512, height: 512 }); // 처음에 stageSize를 {512, 512}
+  const [imagePos, setImagePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 }); // 이미지 위치도 {0,0}
+  const [imageSize, setImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 }); // 이미지 크기도 {0,0}
+  const [minImageSize, setMinImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 }); // 이미지 최소 크기?
 
   // 캔버스를 흑백으로 변환
   const convertCanvasToGrayscale = async (imageBase64: string): Promise<string> => {
@@ -92,51 +103,47 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList, s
       };
     });
   };
-  const handleSaveImages = async () => {
+  const handlesaveImgs = async () => {
     if (!stageRef.current) {
       return;
     }
 
     setIsMovingPoints(false); // 점 움직이는 버튼 클릭한채이면 점도 캔버스에 포함되므로 false처리함
 
-    // const stageOriginalScale = scale; // 현재의 확대 비율 저장
     const stage = stageRef.current;
 
-    // 1. Stage와 Canvas를 축소 상태로 설정
+    // 원본 크기로 배율 복원
+    const originalScaleX = stage.scaleX();
+    const originalScaleY = stage.scaleY();
     stage.scale({ x: 1, y: 1 });
-    stage.batchDraw(); // 축소 상태로 다시 그리기
+    stage.batchDraw(); // 배율 복원 후 다시 그리기
 
     try {
-      // 1. backgroundImg: 배경 이미지 레이어만 저장
+      // 1. 배경 이미지 저장 (원본 크기)
       const imageNode = stage.findOne((node: Konva.Node) => node instanceof Konva.Image) as Konva.Image;
-
       if (!imageNode) {
         return; // 이미지 노드가 없으면 리턴
       }
 
-      // 배경 이미지만 저장
       const backgroundImgBase64 = imageNode.toDataURL({
         mimeType: 'image/png',
         x: imagePos.x,
         y: imagePos.y,
-        width: imageSize.width,
-        height: imageSize.height,
-        pixelRatio: 1 // 원래 크기로 저장
+        width: imageSize.width, // 원본 크기 저장
+        height: imageSize.height, // 원본 크기 저장
+        pixelRatio: 1 // 원본 크기로 저장
       });
 
-      // 2. canvasImg: 투명한 캔버스를 흑백 이미지로 변환하여 저장
-      const canvasLayer = stageRef.current.findOne('#canvas-layer');
-
+      // 2. 캔버스 레이어를 흑백 이미지로 변환하여 저장
+      const canvasLayer = stage.findOne('#canvas-layer');
       if (!canvasLayer) {
         return; // 캔버스 레이어가 없으면 리턴
       }
 
-      // 배경 이미지 숨기고 캔버스만 보이도록 설정
       imageNode.visible(false); // 배경 이미지 비활성화
       canvasLayer.visible(true); // 캔버스만 보이게 설정
       stage.batchDraw();
 
-      // 캔버스에서 색칠된 부분만 흑백으로 변환
       const canvasImgBase64 = await convertCanvasToGrayscale(
         canvasLayer.toDataURL({
           mimeType: 'image/png',
@@ -144,7 +151,7 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList, s
           y: imagePos.y,
           width: imageSize.width,
           height: imageSize.height,
-          pixelRatio: 1 // 축소 상태로 저장
+          pixelRatio: 1 // 축소되지 않고 원본 크기로 저장
         })
       );
 
@@ -152,61 +159,57 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList, s
       imageNode.visible(true); // 배경 이미지 다시 보이게 설정
       canvasLayer.visible(true); // 캔버스 레이어 다시 활성화
 
-      // 3. Combined Image: 배경과 캔버스를 합친 이미지 저장
+      // 3. 결합된 이미지 저장 (배경 이미지와 캔버스 결합)
       const combinedImgBase64 = stage.toDataURL({
         mimeType: 'image/png',
         x: imagePos.x,
         y: imagePos.y,
         width: imageSize.width,
         height: imageSize.height,
-        pixelRatio: 1
+        pixelRatio: 1 // 원본 크기로 결합된 이미지 저장
       });
 
-      setInitImageList([backgroundImgBase64]);
-      setMaskImageList([canvasImgBase64]);
-      setCombinedImg(combinedImgBase64);
+      updateInitImageList([backgroundImgBase64]); // 원본 크기의 배경 이미지
+      updateMaskImageList([canvasImgBase64]); // 흑백 이미지로 변환된 캔버스
+      updateCombinedImg(combinedImgBase64); // 결합된 이미지 저장
     } catch (error) {
       console.error('Error saving images:', error);
     } finally {
+      // 원래 스케일로 복원
+      stage.scale({ x: originalScaleX, y: originalScaleY });
+      stage.batchDraw(); // 스테이지 다시 그리기
       onClose();
     }
   };
 
   useEffect(() => {
     if (image && imageStatus === 'loaded') {
+      // 이미지의 원본 크기를 사용하여 스테이지에 맞는 배율을 계산
       const imgAspectRatio = image.width / image.height;
       const stageAspectRatio = stageSize.width / stageSize.height;
 
-      let newWidth = stageSize.width;
-      let newHeight = stageSize.height;
+      let newScale = 1;
+      let newWidth = image.width;
+      let newHeight = image.height;
 
+      // 스테이지 크기에 맞게 이미지의 크기와 배율을 조정
       if (imgAspectRatio > stageAspectRatio) {
+        newScale = stageSize.width / image.width;
         newWidth = stageSize.width;
         newHeight = newWidth / imgAspectRatio;
       } else {
+        newScale = stageSize.height / image.height;
         newHeight = stageSize.height;
         newWidth = newHeight * imgAspectRatio;
       }
 
-      // 여기서 의존성 배열에 들어가는 상태를 최소화하여 무한 루프를 방지
-      setImageSize((prevSize) => {
-        if (prevSize.width !== newWidth || prevSize.height !== newHeight) {
-          return { width: newWidth, height: newHeight };
-        }
-        return prevSize;
-      });
-
+      setImageScale(newScale); // 이미지 배율 설정
+      setImageSize({ width: newWidth, height: newHeight }); // 이미지 크기 설정
       const centerX = (stageSize.width - newWidth) / 2;
       const centerY = (stageSize.height - newHeight) / 2;
-
-      setImagePos((prevPos) => {
-        if (prevPos.x !== centerX || prevPos.y !== centerY) {
-          return { x: centerX, y: centerY };
-        }
-        return prevPos;
-      });
+      setImagePos({ x: centerX, y: centerY }); // 이미지 위치 설정
     }
-  }, [image, imageStatus, stageSize]); // 의존성 배열을 최소한의 값으로 설정
+  }, [image, imageStatus, stageSize]);
 
   const updateStageSize = () => {
     const modalElement = document.querySelector('.ant-modal-body');
@@ -300,7 +303,8 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList, s
     const transform = stage.getAbsoluteTransform().copy();
     transform.invert();
     const pos = stage.getPointerPosition();
-    return pos ? transform.point(pos) : null;
+    const scale = stage.scaleX(); // scaleX와 scaleY가 동일하므로 하나만 사용
+    return pos ? { x: pos.x / scale, y: pos.y / scale } : null;
   };
 
   const handlePointDrag = (e: Konva.KonvaEventObject<DragEvent>, objIndex: number, pointIndex: number) => {
@@ -313,22 +317,48 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList, s
   };
 
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    const stage = e.target.getStage();
+    if (!stage) return;
+
+    // 현재 스테이지의 scale 값을 가져옴
+    const scale = stage.scaleX(); // scaleX와 scaleY가 동일하므로 하나만 사용
+    const pos = stage.getPointerPosition();
+    if (!pos) return;
+
+    // 마우스 좌표를 scale에 맞게 보정
+    const correctedPos = { x: pos.x / scale, y: pos.y / scale };
+    setMousePosition(correctedPos);
+
+    // 브러시 도구가 활성화되고 드로잉 중인 경우
     if (tool === 'brush' && isDrawing.current) {
-      const stage = e.target.getStage();
-      if (!stage) return;
-
-      const pos = getRelativePointerPosition(stage);
-      if (!pos) return;
-
       const lastObject = objects[objects.length - 1];
-      lastObject.points = lastObject.points.concat([pos.x, pos.y]);
+      lastObject.points = lastObject.points.concat([correctedPos.x, correctedPos.y]);
       setObjects([...objects.slice(0, objects.length - 1), lastObject]);
     }
 
+    // 마우스 커서에 브러시 크기만큼 원을 표시
     if (tool === 'brush') {
-      const pos = getRelativePointerPosition(stageRef.current);
-      if (pos) {
-        setCursorPosition(pos);
+      setCursorPosition(correctedPos); // 브러시 크기 원을 표시할 위치 설정
+    }
+
+    // 배경 이미지의 RGB 색상 값 얻기
+    const imageNode = stage.findOne((node: Konva.Node) => node instanceof Konva.Image) as Konva.Image;
+    if (imageNode) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) return;
+
+      // 배경 이미지가 로드되어 있으면 drawImage 수행
+      const imgSource = imageNode.image();
+      if (imgSource) {
+        canvas.width = imageNode.width();
+        canvas.height = imageNode.height();
+
+        context.drawImage(imgSource, 0, 0);
+        const imageData = context.getImageData(Math.floor(correctedPos.x), Math.floor(correctedPos.y), 1, 1).data;
+        const rgb = `rgb(${imageData[0]}, ${imageData[1]}, ${imageData[2]})`;
+
+        setRgbColor(rgb);
       }
     }
   };
@@ -432,6 +462,32 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList, s
       width="100%"
       className="max-w-screen-sm w-full md:max-w-screen-md lg:max-w-screen-lg"
     >
+      <div>
+        {mousePosition && (
+          <p>
+            Mouse Position: X: {mousePosition.x}, Y: {mousePosition.y}
+          </p>
+        )}
+        {rgbColor && <p>RGB: {rgbColor}</p>}
+      </div> 
+      <div className="flex items-center space-x-4 mt-3">
+        <Slider
+          min={1} // 최소 확대 배율
+          max={3} // 최대 확대 배율
+          step={0.05} // 슬라이더 단위
+          value={scale} // 현재 scale 상태와 연결
+          onChange={(newScale) => setScale(newScale)} // 슬라이더 값 변경 시 scale 상태 업데이트
+          style={{ width: '150px' }}
+        />
+        <InputNumber
+          min={1}
+          max={3}
+          step={0.05}
+          value={scale}
+          onChange={(newScale) => setScale(newScale ?? 1)} // 숫자 입력으로도 확대/축소 가능
+          className="w-[60px]"
+        />
+      </div>
       <div className="flex flex-col h-full w-full justify-center">
         <div className="flex justify-center items-center w-full h-[80%]">
           <Stage
@@ -631,7 +687,7 @@ const MaskingModal = ({ onClose, imageSrc, setInitImageList, setMaskImageList, s
             <Button onClick={onClose} className="border-none bg-white text-blue-500">
               Cancel
             </Button>
-            <Button onClick={handleSaveImages} type="primary" className="bg-blue-500 text-white">
+            <Button onClick={handlesaveImgs} type="primary" className="bg-blue-500 text-white">
               Apply
             </Button>
           </div>

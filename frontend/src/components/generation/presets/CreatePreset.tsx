@@ -2,40 +2,43 @@ import { Typography, Row, Col, Divider, Checkbox, Input, Modal, Button, message 
 import { PresetDataType } from '../../../types/generation';
 import React, { useState } from 'react';
 import { postPreset } from '../../../api/generation';
+import {
+  ModelParamsType,
+  BatchParamsType,
+  ImgDimensionParamsType,
+  GuidanceParamsType,
+  SamplingParamsType,
+  SeedParamsType,
+  StrengthParamsType
+} from '../../../types/generation';
 
 const { Title, Text } = Typography;
 
 interface CreatePresetProps {
-  model: string;
-  width: number;
-  height: number;
-  guidanceScale: number;
-  numInferenceSteps: number;
-  seed: number;
+  modelParams: ModelParamsType;
+  batchParams: BatchParamsType;
+  imgDimensionParams: ImgDimensionParamsType;
+  guidanceParams: GuidanceParamsType;
+  samplingParams: SamplingParamsType;
+  seedParams: SeedParamsType;
+  strengthParams?: StrengthParamsType;
   prompt: string;
   negativePrompt: string;
-  batchCount: number;
-  batchSize: number;
-  scheduler: string;
   type: 'text_to_image' | 'image_to_image' | 'inpainting' | 'remove_background' | 'clean_up';
   isModalOpen: boolean;
-  strength?: number;
   closeModal: () => void;
 }
 
 const CreatePreset = ({
-  model,
-  width,
-  height,
-  guidanceScale,
-  numInferenceSteps,
-  seed,
+  modelParams,
+  batchParams,
+  imgDimensionParams,
+  guidanceParams,
+  samplingParams,
+  seedParams,
   prompt,
   negativePrompt,
-  batchCount,
-  batchSize,
-  scheduler,
-  strength,
+  strengthParams,
   type,
   isModalOpen,
   closeModal
@@ -74,25 +77,25 @@ const CreatePreset = ({
       };
 
       // 선택된 필드만 데이터에 포함
-      if (selectedFields.model) presetData.model = model;
+      if (selectedFields.model) presetData.model = modelParams.model;
       if (selectedFields.prompt) presetData.prompt = prompt;
       if (selectedFields.negativePrompt) presetData.negative_prompt = negativePrompt;
-      if (selectedFields.width) presetData.width = width;
-      if (selectedFields.height) presetData.height = height;
-      if (selectedFields.batchCount) presetData.batch_count = batchCount;
-      if (selectedFields.batchSize) presetData.batch_size = batchSize;
-      if (selectedFields.guidanceScale) presetData.guidance_scale = guidanceScale;
-      if (selectedFields.numInferenceSteps) presetData.sampling_steps = numInferenceSteps;
-      if (selectedFields.scheduler) presetData.sampling_method = scheduler;
-      if (selectedFields.seed) presetData.seed = seed;
-      if (selectedFields.strength) presetData.strength = strength;
+      if (selectedFields.width) presetData.width = imgDimensionParams.width;
+      if (selectedFields.height) presetData.height = imgDimensionParams.height;
+      if (selectedFields.batchCount) presetData.batch_count = batchParams.batchCount;
+      if (selectedFields.batchSize) presetData.batch_size = batchParams.batchSize;
+      if (selectedFields.guidanceScale) presetData.guidance_scale = guidanceParams.guidanceScale;
+      if (selectedFields.numInferenceSteps) presetData.sampling_steps = samplingParams.numInferenceSteps;
+      if (selectedFields.scheduler) presetData.sampling_method = samplingParams.scheduler;
+      if (selectedFields.seed) presetData.seed = seedParams.seed;
+      if (strengthParams?.strength !== undefined && selectedFields.strength)
+        presetData.strength = strengthParams?.strength;
 
       await postPreset(presetData as PresetDataType);
       message.success('Preset created successfully!');
+      closeModal();
     } catch (error) {
       message.error('Failed to create preset');
-    } finally {
-      closeModal();
     }
   };
 
@@ -139,7 +142,7 @@ const CreatePreset = ({
               <br />
               <div className="ml-[24px]">
                 <Text type="secondary" className="dark:text-gray-400">
-                  {model}
+                  {modelParams.model}
                 </Text>
               </div>
             </div>
@@ -150,7 +153,7 @@ const CreatePreset = ({
               <br />
               <div className="ml-[24px]">
                 <Text type="secondary" className="dark:text-gray-400">
-                  {width}
+                  {imgDimensionParams.width}
                 </Text>
               </div>
             </div>
@@ -161,7 +164,7 @@ const CreatePreset = ({
               <br />
               <div className="ml-[24px]">
                 <Text type="secondary" className="dark:text-gray-400">
-                  {height}
+                  {imgDimensionParams.height}
                 </Text>
               </div>
             </div>
@@ -172,7 +175,7 @@ const CreatePreset = ({
               <br />
               <div className="ml-[24px]">
                 <Text type="secondary" className="dark:text-gray-400">
-                  {guidanceScale}
+                  {guidanceParams.guidanceScale}
                 </Text>
               </div>
             </div>
@@ -186,7 +189,7 @@ const CreatePreset = ({
               <br />
               <div className="ml-[24px]">
                 <Text type="secondary" className="dark:text-gray-400">
-                  {numInferenceSteps}
+                  {samplingParams.numInferenceSteps}
                 </Text>
               </div>
             </div>
@@ -197,7 +200,7 @@ const CreatePreset = ({
               <br />
               <div className="ml-[24px]">
                 <Text type="secondary" className="dark:text-gray-400">
-                  {seed}
+                  {seedParams.seed}
                 </Text>
               </div>
             </div>
@@ -234,7 +237,7 @@ const CreatePreset = ({
               <br />
               <div className="ml-[24px]">
                 <Text type="secondary" className="dark:text-gray-400">
-                  {batchCount}
+                  {batchParams.batchCount}
                 </Text>
               </div>
             </div>
@@ -245,11 +248,11 @@ const CreatePreset = ({
               <br />
               <div className="ml-[24px]">
                 <Text type="secondary" className="dark:text-gray-400">
-                  {batchSize}
+                  {batchParams.batchSize}
                 </Text>
               </div>
             </div>
-            {strength && (
+            {strengthParams?.strength !== undefined && (
               <div className="mt-3">
                 <Checkbox checked={selectedFields.strength} onChange={() => handleCheckboxChange('strength')}>
                   <Text strong>Strength</Text>
@@ -257,7 +260,7 @@ const CreatePreset = ({
                 <br />
                 <div className="ml-[24px]">
                   <Text type="secondary" className="dark:text-gray-400">
-                    {strength}
+                    {strengthParams.strength}
                   </Text>
                 </div>
               </div>
@@ -269,7 +272,7 @@ const CreatePreset = ({
               <br />
               <div className="ml-[24px]">
                 <Text type="secondary" className="dark:text-gray-400">
-                  {scheduler}
+                  {samplingParams.scheduler}
                 </Text>
               </div>
             </div>
