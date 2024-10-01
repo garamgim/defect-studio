@@ -35,6 +35,7 @@ export const getDeviceCudaAvailable = async () => {
   }
 };
 
+// Cuda Usage 가져오기
 export const getDeviceCudaUsage = async (): Promise<GpuInfoType[]> => {
   try {
     const response = await axiosInstance.get<gpuInfoResponse>('/device/cuda_usage');

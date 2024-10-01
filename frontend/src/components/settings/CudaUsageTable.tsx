@@ -1,16 +1,7 @@
-import { useGetDeviceCudaUsage } from '@/hooks/settings/useGetStatus';
-// import { queryClient } from '@/main';
 import { Table, TableColumnsType, ConfigProvider, theme } from 'antd';
 import { GpuInfoType } from '@/types/settings';
 import { RootState } from '@/store/store';
 import { useSelector } from 'react-redux';
-
-// const refreshData = () => {
-//   console.log('refreshing data', 'deviceCudaUsage');
-//   queryClient.invalidateQueries({
-//     queryKey: ['deviceCudaUsage']
-//   });
-// };
 
 const columns: TableColumnsType<GpuInfoType> = [
   {
@@ -49,28 +40,24 @@ const columns: TableColumnsType<GpuInfoType> = [
     render: (value) => value.toFixed(2)
   }
 ];
-const CudaUsageTable = () => {
-  const { data, isPending, isError, error } = useGetDeviceCudaUsage();
+
+interface CudaUsageTableProps {
+  data: GpuInfoType[];
+}
+const CudaUsageTable = ({ data }: CudaUsageTableProps) => {
   const { defaultAlgorithm, darkAlgorithm } = theme;
 
   const setThemeMode = useSelector((state: RootState) => state.theme.mode);
 
   return (
     <div className="w-full flex flex-col mt-5">
-      {isPending && <div>Loading...</div>}
-      {isError && <div>Error: {error?.message || 'Something Went Wrong'}</div>}
-      {data && (
-        <ConfigProvider
-          theme={{
-            algorithm: setThemeMode === 'dark' ? darkAlgorithm : defaultAlgorithm
-          }}
-        >
-          <Table
-            columns={columns}
-            dataSource={data.map((item, index) => ({ ...item, key: item['GPU num'] || index }))}
-          />
-        </ConfigProvider>
-      )}
+      <ConfigProvider
+        theme={{
+          algorithm: setThemeMode === 'dark' ? darkAlgorithm : defaultAlgorithm
+        }}
+      >
+        <Table columns={columns} dataSource={data.map((item, index) => ({ ...item, key: item['GPU num'] || index }))} />
+      </ConfigProvider>
     </div>
   );
 };
