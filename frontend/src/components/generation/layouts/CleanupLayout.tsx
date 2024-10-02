@@ -13,6 +13,7 @@ import { message } from 'antd';
 const Cleanup = () => {
   const dispatch = useDispatch();
   const { params, gpuNum } = useSelector((state: RootState) => state.cleanup);
+  const newGpuNum = useSelector((state: RootState) => state.settings.gpuNum);
   const { isLoading, isSidebarVisible } = useCleanupOutputs();
 
   const convertBase64ToFileArray = (base64Array: string[], fileType: string) => {
@@ -41,7 +42,7 @@ const Cleanup = () => {
       );
     }
 
-    const gpuNumber = gpuNum || 1; // GPU 번호 설정 간소화
+    const gpuNumber = gpuNum || newGpuNum;
 
     const data = {
       gpu_device: gpuNumber,

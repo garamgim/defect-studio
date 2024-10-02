@@ -17,6 +17,7 @@ import { useClipOutputs } from '../../../hooks/generation/outputs/useClipOutputs
 
 const InpaintingLayout = () => {
   const dispatch = useDispatch();
+  const newGpuNum = useSelector((state: RootState) => state.settings.gpuNum);
   const { params, gpuNum } = useSelector((state: RootState) => state.inpainting);
   const { isLoading, isSidebarVisible } = useInpaintingOutputs();
   const { isLoading: clipIsLoading, taskId: clipTaskId } = useClipOutputs();
@@ -90,7 +91,7 @@ const InpaintingLayout = () => {
       );
     }
 
-    const gpuNumber = gpuNum || 1; // GPU 번호 설정 간소화
+    const gpuNumber = gpuNum || newGpuNum;
 
     const data = {
       gpu_device: gpuNumber,
