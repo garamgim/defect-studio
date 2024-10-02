@@ -196,6 +196,8 @@ export const postCleanupGeneration = async (gpu_env: CleanupDataType['gpu_env'],
         value.forEach((file) => {
           formData.append(key, file);
         });
+      } else {
+        formData.append(key, value);
       }
     });
 
