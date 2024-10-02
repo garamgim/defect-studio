@@ -54,7 +54,7 @@ const Settings = () => {
     register,
     handleSubmit,
     formState: { isSubmitting, isValid },
-    setValue,
+    setValue
   } = useForm<gpuServerType>({ mode: 'onChange', defaultValues: { device_num: -1 } });
 
   const [isRefreshEnable, setIsRefreshEnable] = useState(true);
