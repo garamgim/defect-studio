@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { setGpuNum } from '@/store/slices/settings/settingsSlice';
+import { Slider, InputNumber, Row, Col, Form } from 'antd';
 
 type queryKeyType = 'deviceHealth' | 'deviceCudaAvailable' | 'deviceCudaUsage';
 
@@ -102,9 +103,10 @@ const Settings = () => {
         {/* 그래프 서버 상태 및 설정 */}
         <main>
           <h1 className="mb-8 text-[18px] font-bold text-gray-800 dark:text-gray-200">Gpu Server Status</h1>
-          <section className="flex flex-row justify-evenly">
+
+          <div className="mb-4 flex justify-evenly align-middle items-center">
             <div className="mb-4 flex flex-col justify-center align-middle items-center">
-              <span className="font-bold text-black dark:text-white">Health Status</span>
+              <span className="font-bold text-black dark:text-white">Server Health Status</span>
               <span className={`ml-3 ${isHealthError ? 'text-red-400' : 'text-dark dark:text-white'}`}>
                 {isHealthPending
                   ? 'Checking health status...'
@@ -114,12 +116,17 @@ const Settings = () => {
               </span>
             </div>
 
-        <div className="mb-4">
-          <Button type="primary" onClick={checkCudaAvailability} loading={isCudaAvailabilityLoading}>
-            CUDA Availability Check
-          </Button>
-          <span className="ml-3">{cudaAvailability ? 'Status of gpu enabled' : 'gpu unavailable status'}</span>
-        </div>
+            <div className="mb-4 flex flex-col justify-center align-middle items-center">
+              <span className="font-bold text-black dark:text-white">Cuda Status</span>
+              <span className={`ml-3 ${isCudaAvailabilityError ? 'text-red-400' : 'text-dark dark:text-white'}`}>
+                {isCudaAvailabilityPending
+                  ? 'Checking CUDA availability...'
+                  : cudaAvailability
+                    ? 'Available'
+                    : cudaAvailabilityError?.message || 'Unavailable'}
+              </span>
+            </div>
+          </div>
 
           <hr className="my-4" />
 
@@ -175,6 +182,13 @@ const Settings = () => {
             )}
           </section>
         </main>
+
+        <div className="mt-12 mb-4">
+          <h1 className="text-[24px] font-semibold mb-6 text-dark dark:text-white">
+            Limit the number of images to be created
+          </h1>
+          <InputNumber min={1} max={2048} className="w-full" />
+        </div>
 
         {/* <Form layout="vertical" onFinish={handleSave}>
           <Form.Item
