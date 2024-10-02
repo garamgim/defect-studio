@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { useGetMyInfo, deleteProfile } from '../api/user';
+import { deleteProfile } from '../api/user';
+import { useGetMyInfo } from '@hooks/user/useGetMyInfo';
+
 import { Button, message } from 'antd';
 import Modal from './../components/common/Modal';
 import { useState } from 'react';

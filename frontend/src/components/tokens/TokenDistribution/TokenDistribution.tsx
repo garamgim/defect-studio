@@ -8,7 +8,7 @@ import SearchDepartmentUsageToken from './SearchDepartmentUsageToken';
 import TokenDistributionInput from './TokenDistributionInput';
 import { TableTokenUsageType } from './SearchDepartmentUsageToken';
 import { distributeTokenRequest } from './../../../api/token';
-import { useGetMyInfo } from '../../../api/user';
+import { useGetMyInfo } from '@hooks/user/useGetMyInfo';
 
 type departmentType = {
   department_id: number;

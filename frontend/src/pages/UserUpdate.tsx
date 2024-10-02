@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useGetMyInfo } from '../api/user';
+import { useGetMyInfo } from '@hooks/user/useGetMyInfo';
 import { message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import GuestUserList from '../components/userManagement/GuestUserList';

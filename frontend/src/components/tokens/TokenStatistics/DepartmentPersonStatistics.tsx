@@ -1,4 +1,4 @@
-import { useGetMyInfo } from '@/api/user';
+import { useGetMyInfo } from '@hooks/user/useGetMyInfo';
 import PersonStatisticSection from './PersonStatisticSection';
 
 // interface DepartmentPersonStatisticsProps {

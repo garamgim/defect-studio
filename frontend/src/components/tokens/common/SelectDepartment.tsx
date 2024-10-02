@@ -3,7 +3,7 @@ import { Select } from 'antd';
 import { AxiosError, AxiosResponse } from 'axios';
 import { getAllDepartments } from '../../../api/department';
 import { departmentType } from '../../../api/department';
-import { useGetMyInfo } from '../../../api/user';
+import { useGetMyInfo } from '@hooks/user/useGetMyInfo';
 import { useEffect } from 'react';
 
 interface SelectOptionType {
