@@ -1,62 +1,65 @@
 import { useState } from 'react';
-import { Input, Button, Form } from 'antd';
+import { Input, Button, Form, message } from 'antd';
 import { showToastSuccess, showToastError } from '../components/common/ToastNotification';
 import ToastNotification from '../components/common/ToastNotification';
-import { useGetDeviceCudaAvailable, useGetDeviceHealth, useGetDeviceCudaUsage } from '@/hooks/settings/useGetStatus';
-import { postSetDevice } from '@/api/settings'; // server 설정
-import { queryClient } from '@/main';
-import CudaUsageTable from '@/components/settings/CudaUsageTable';
-import { useForm } from 'react-hook-form';
-
-type queryKeyType = 'deviceHealth' | 'deviceCudaAvailable' | 'deviceCudaUsage';
-
-// 데이터 갱신 요청 함수
-const refreshData = async (updateQueryKey: queryKeyType) => {
-  console.log('refreshing data', updateQueryKey);
-  await queryClient.invalidateQueries({
-    queryKey: [updateQueryKey]
-  });
-};
+import { getDeviceHealth, getDeviceCudaAvailable } from '../api/settings';
 
 const Settings = () => {
-  // GPU 서버 연결 상태 확인
-  const {
-    data: healthStatus,
-    isPending: isHealthPending,
-    isError: isHealthError,
-    error: healthError
-  } = useGetDeviceHealth();
-
-  // CUDA 사용 가능 여부 확인
-  const {
-    data: cudaAvailability,
-    isPending: isCudaAvailabilityPending,
-    isError: isCudaAvailabilityError,
-    error: cudaAvailabilityError
-  } = useGetDeviceCudaAvailable();
-
-  const {
-    data: cudaUsageData,
-    isPending: cudaUsagePending,
-    isError: isCudaUsageError,
-    error: cudaUsageError
-  } = useGetDeviceCudaUsage();
-
-  // Gpu 서버 선택 위한 react-hook-form
-  type gpuServerType = {
-    device_num: number;
-  };
-  const {
-    register,
-    handleSubmit,
-    formState: { isSubmitting, isValid }
-  } = useForm<gpuServerType>({ mode: 'onChange', defaultValues: { device_num: -1 } });
-
-  //
-  const [isRefreshEnable, setIsRefreshEnable] = useState(true);
-
+  const [health, setHealth] = useState<boolean>(false);
+  const [isHealthLoading, setHealthIsLoading] = useState<boolean>(false);
+  const [cudaAvailability, setCudaAvailability] = useState<boolean>(false);
+  const [isCudaAvailabilityLoading, setCudaAvailabilityIsLoading] = useState<boolean>(false);
+  // const [cudaUsage, setCudaUsage] = useState<boolean>(false);
+  // const [isCudaUsageLoading, setIsCudaUsageLoading] = useState<boolean>(false);
   const [imagePath, setImagePath] = useState<string>('');
   const [modelPath, setModelPath] = useState<string>('');
+
+  // Health Check
+  const checkHealthStatus = async () => {
+    setHealthIsLoading(true);
+    try {
+      await getDeviceHealth();
+      setHealth(true);
+    } catch (error) {
+      setHealth(false);
+    } finally {
+      setHealthIsLoading(false);
+    }
+  };
+
+  // CUDA Availability
+  const checkCudaAvailability = async () => {
+    if (!health) {
+      message.error('Check health status first');
+    } else {
+      setCudaAvailabilityIsLoading(true);
+      try {
+        await getDeviceCudaAvailable();
+        setCudaAvailability(true);
+      } catch (error) {
+        setCudaAvailability(false);
+      } finally {
+        setCudaAvailabilityIsLoading(false);
+      }
+    }
+  };
+
+  // CUDA Usage Monitoring
+  // const checkCudaUsage = async () => {
+  //   if (!health && !cudaAvailability) {
+  //     message.error('Check health status first');
+  //   } else {
+  //     setIsCudaUsageLoading(true);
+  //     try {
+  //       const response = await getDeviceCudaUsage();
+  //       setCudaUsage(true);
+  //     } catch (error) {
+  //       setCudaUsage(false);
+  //     } finally {
+  //       setIsCudaUsageLoading(false);
+  //     }
+  //   }
+  // };
 
   // 설정 저장
   const handleSave = () => {
@@ -69,122 +72,33 @@ const Settings = () => {
 
   return (
     <div className="flex justify-center items-center h-[calc(100vh-60px)] bg-gray-100 p-4 overflow-hidden dark:bg-gray-800">
-      <div className="w-full max-w-5xl bg-white py-10 px-12 rounded-[20px] mx-auto border border-gray-300 shadow-md h-full dark:bg-gray-600 dark:border-none overflow-y-auto custom-scrollbar ">
-        <h1 className="text-[24px] font-semibold mb-6 text-dark dark:text-white">Device Monitoring and Management</h1>
+      <div className="w-full max-w-5xl bg-white py-10 px-12 rounded-[20px] mx-auto border border-gray-300 shadow-md h-full dark:bg-gray-600 dark:border-none">
+        <h1 className="text-[24px] font-semibold mb-6 text-gray-800 dark:text-gray-300">
+          Device Monitoring and Management
+        </h1>
 
-        {/* 그래프 서버 상태 및 설정 */}
-        <main>
-          <h1 className="text-[20px] font-bold text-gray-800 dark:text-gray-200">Graph Server Status</h1>
-          <section className="flex flex-row justify-evenly">
-            <div className="mb-4 flex flex-col justify-center align-middle items-center">
-              <span className="font-bold text-black dark:text-white">Server Health Status</span>
-              <span className={`ml-3 ${isHealthError ? 'text-red-400' : 'text-dark dark:text-white'}`}>
-                {isHealthPending
-                  ? 'Checking health status...'
-                  : healthStatus
-                    ? 'Available'
-                    : healthError?.message || 'Unhealthy'}
-              </span>
-            </div>
+        <div className="mb-4">
+          <Button type="primary" onClick={checkHealthStatus} loading={isHealthLoading}>
+            Health Status Check
+          </Button>
+          <span className="ml-3">
+            {health ? 'Connectable status to GPU server' : 'Unable to connect to GPU server'}
+          </span>
+        </div>
 
-            <div className="mb-4 flex flex-col justify-center align-middle items-center">
-              <span className="font-bold text-black dark:text-white">Cuda Status</span>
-              <span className={`ml-3 ${isCudaAvailabilityError ? 'text-red-400' : 'text-dark dark:text-white'}`}>
-                {isCudaAvailabilityPending
-                  ? 'Checking CUDA availability...'
-                  : cudaAvailability
-                    ? 'Available'
-                    : cudaAvailabilityError?.message || 'Unavailable'}
-              </span>
-            </div>
-          </section>
+        <div className="mb-4">
+          <Button type="primary" onClick={checkCudaAvailability} loading={isCudaAvailabilityLoading}>
+            CUDA Availability Check
+          </Button>
+          <span className="ml-3">{cudaAvailability ? 'Status of gpu enabled' : 'gpu unavailable status'}</span>
+        </div>
 
-          <hr />
+        {/* <div className="mb-4">
+          <Button type="primary" onClick={checkCudaUsage} loading={isCudaUsageLoading}>
+            CUDA Usage Monitoring
+          </Button>
+        </div> */}
 
-          <section>
-            {cudaUsagePending && <div>Loading...</div>}
-            {isCudaUsageError && <div>Error: {cudaUsageError?.message || 'SomeThing went wrong'}</div>}
-            {cudaUsageData && <CudaUsageTable data={cudaUsageData} />}
-          </section>
-
-          {/* 사용사 서버 선택 */}
-          <section>
-            <h4 className="text-[16px] font-bold text-gray-800 dark:text-gray-200">
-              Please select the GPU server to use
-            </h4>
-
-            {isCudaUsageError && <div>Error: {cudaUsageError?.message || "You can't select gpu server now"}</div>}
-            {cudaUsagePending && <div>Loading...</div>}
-            {cudaUsageData && (
-              <form
-                onSubmit={handleSubmit((data) => {
-                  try {
-                    postSetDevice(data.device_num);
-                    refreshData('deviceCudaUsage');
-                    showToastSuccess(<span>Successfully set the GPU server.</span>);
-                  } catch (error) {
-                    console.error(error);
-                    showToastError(<span>error?.message || 'Failed to set the GPU server.'</span>);
-                  }
-                })}
-              >
-                <select
-                  {...register('device_num', {
-                    required: 'Select GPU server',
-                    min: {
-                      value: 0,
-                      message: 'Select GPU server'
-                    }
-                  })}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full h-[50px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 focus:outline-none"
-                >
-                  <option defaultValue={-1} key={-1} value={-1} disabled>
-                    Select a GPU server
-                  </option>
-                  {cudaUsageData.map((item) => (
-                    <option key={item['GPU num']} value={item['GPU num']}>
-                      Num : {item['GPU num']} // {item['GPU name']}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  disabled={isSubmitting || !isValid}
-                  type="submit"
-                  className="active:scale-95 hover:scale-105 disabled:hover:scale-100 font-bold w-[400px] h-[50px] bg-blue-500 text-white rounded-lg mt-10 disabled:opacity-50 transition transform duration-150 ease-in-out"
-                >
-                  Set GPU server
-                </button>
-              </form>
-            )}
-          </section>
-
-          {/* 데이터 갱신 버튼 */}
-          <section className="flex flex-row justify-end">
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50"
-              disabled={isHealthPending || isCudaAvailabilityPending || cudaUsagePending || !isRefreshEnable}
-              onClick={async (e) => {
-                e.preventDefault();
-                setIsRefreshEnable(false);
-                try {
-                  await refreshData('deviceHealth');
-                  await refreshData('deviceCudaAvailable');
-                  await refreshData('deviceCudaUsage');
-                  showToastSuccess(<span>Data has been successfully refreshed.</span>);
-                } catch (error) {
-                  console.error(error);
-                  showToastError(<span>error?.message || 'Failed to refresh data.'</span>);
-                } finally {
-                  setTimeout(() => {
-                    setIsRefreshEnable(true);
-                  }, 3000); // 3초 후 버튼 활성화
-                }
-              }}
-            >
-              {isHealthPending || isCudaAvailabilityPending || cudaUsagePending ? 'Refreshing...' : 'Refresh Data'}
-            </button>
-          </section>
-        </main>
         <Form layout="vertical" onFinish={handleSave}>
           <Form.Item
             label="Default Path for Generated Images"

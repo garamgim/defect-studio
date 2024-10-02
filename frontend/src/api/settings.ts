@@ -1,15 +1,13 @@
-import { AxiosResponse } from 'axios';
-import { GpuInfoType, gpuInfoResponse } from '@/types/settings';
 import axiosInstance from './token/axiosInstance';
 
 // health 체크
-export const getDeviceHealth = async (): Promise<string> => {
+export const getDeviceHealth = async () => {
   try {
     const response = await axiosInstance.get('/device/health', {
       timeout: 10000 // 10초 타임아웃
     });
     if (response.status === 200) {
-      return response.data;
+      return 'can connect';
     } else {
       throw new Error('Unable to connect to gpu server.');
     }
@@ -22,7 +20,7 @@ export const getDeviceHealth = async (): Promise<string> => {
 // cuda-available 체크
 export const getDeviceCudaAvailable = async () => {
   try {
-    const response = await axiosInstance.get<AxiosResponse<string>>('/device/cuda_available');
+    const response = await axiosInstance.get('/device/cuda_available');
 
     if (response.status === 200) {
       return response.data;
@@ -35,13 +33,13 @@ export const getDeviceCudaAvailable = async () => {
   }
 };
 
-// Cuda Usage 가져오기
-export const getDeviceCudaUsage = async (): Promise<GpuInfoType[]> => {
+// cuda-usage 체크
+export const getDeviceCudaUsage = async () => {
   try {
-    const response = await axiosInstance.get<gpuInfoResponse>('/device/cuda_usage');
+    const response = await axiosInstance.get('/device/cuda_usage');
 
     if (response.status === 200) {
-      return response.data.data.gpu_info;
+      return response.data;
     } else {
       throw new Error('Falied to get cuda-usage');
     }

@@ -90,7 +90,6 @@ const History = () => {
       <ImageFolderList
         folders={filteredFolders}
         handleDetailClick={handleDetailClick} // 세부 정보 핸들러 전달
-        handleDownload={(id) => console.log(`Downloading folder with ID: ${id}`)} // 다운로드 핸들러 전달
         handleDelete={handleDelete} // 삭제 핸들러 전달
       />
 

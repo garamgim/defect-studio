@@ -28,7 +28,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           placeholder="Enter Folder ID"
           value={searchId}
           onChange={(e) => setSearchId(e.target.value)}
-          className="w-full border border-gray-300 dark:border-gray-600 p-2 rounded-md"
+          className="w-full border border-gray-300 dark:border-gray-400 p-2 rounded-md"
         />
       </div>
 
