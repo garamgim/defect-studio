@@ -114,17 +114,12 @@ const Settings = () => {
               </span>
             </div>
 
-            <div className="mb-4 flex flex-col justify-center align-middle items-center">
-              <span className="font-bold text-black dark:text-white">Cuda Status</span>
-              <span className={`ml-3 ${isCudaAvailabilityError ? 'text-red-400' : 'text-dark dark:text-white'}`}>
-                {isCudaAvailabilityPending
-                  ? 'Checking CUDA availability...'
-                  : cudaAvailability
-                    ? 'Available'
-                    : cudaAvailabilityError?.message || 'Unavailable'}
-              </span>
-            </div>
-          </section>
+        <div className="mb-4">
+          <Button type="primary" onClick={checkCudaAvailability} loading={isCudaAvailabilityLoading}>
+            CUDA Availability Check
+          </Button>
+          <span className="ml-3">{cudaAvailability ? 'Status of gpu enabled' : 'gpu unavailable status'}</span>
+        </div>
 
           <hr className="my-4" />
 
