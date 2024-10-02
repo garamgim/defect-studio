@@ -4,7 +4,7 @@ import TokenDistribution from '../components/tokens/TokenDistribution/TokenDistr
 import TokenStatistics from '../components/tokens/TokenStatistics/TokenStatistics';
 import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
-import { useGetMyInfo } from '../api/user';
+import { useGetMyInfo } from '@hooks/user/useGetMyInfo';
 
 const Tokens = () => {
   const { myInfo, myInfoPending, myInfoLoading, isGetMyInfoError, myInfoError } = useGetMyInfo({

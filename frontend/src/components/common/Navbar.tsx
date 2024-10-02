@@ -7,7 +7,7 @@ import logo from '../../assets/logo.png';
 import token from '../../assets/token.png';
 import { Dropdown, Button, Switch } from 'antd';
 import type { MenuProps } from 'antd';
-import { useGetMyInfo } from '../../api/user';
+import { useGetMyInfo } from '@hooks/user/useGetMyInfo';
 
 import MiniProfile from '../profile/MiniProfile';
 

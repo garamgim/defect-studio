@@ -4,12 +4,11 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { getAllDepartments } from '../../../api/department';
 import SearchDepartmentPeople from './SearchDepartmentPeople';
 import { useEffect, useState } from 'react';
-import { getDepartmentTokenUsage } from '../../../api/token';
 import SearchDepartmentUsageToken from './SearchDepartmentUsageToken';
 import TokenDistributionInput from './TokenDistributionInput';
 import { TableTokenUsageType } from './SearchDepartmentUsageToken';
 import { distributeTokenRequest } from './../../../api/token';
-import { useGetMyInfo } from '../../../api/user';
+import { useGetMyInfo } from '@hooks/user/useGetMyInfo';
 
 type departmentType = {
   department_id: number;
@@ -20,7 +19,6 @@ type SelectOptionType = {
   value: number;
   label: string;
 };
-getDepartmentTokenUsage();
 const TokenDistribution = () => {
   // 로그인 유저 정보 호출
   const { myInfo, myInfoPending, myInfoLoading, isGetMyInfoError, myInfoError } = useGetMyInfo({
