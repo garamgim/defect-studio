@@ -19,7 +19,7 @@ export interface FolderDetailDataType {
   batch_size: number;
   strength: number | null;
   guidance_scale: number | null;
-  sampling_steps: number | null;
+  num_inference_steps: number | null;
   scheduler: string | null;
   seed: number | null;
   member_id: number;
