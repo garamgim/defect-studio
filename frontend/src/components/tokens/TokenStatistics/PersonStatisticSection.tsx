@@ -1,8 +1,9 @@
 import { Tabs, TabsProps } from 'antd';
-import MemberImageUsage from '@components/tokens/statistics/member/ImageUsage/MemberImageUsage';
-import MemberToolUsage from '@components/tokens/statistics/member/ToolUsage/MemberToolUsage';
-import MemberModelUsage from '@components/tokens/statistics/member/ModelUsage/MemberModelUsage';
-import MemberTokenUsage from '../statistics/member/TokenUsage/MemberTokenUsage';
+import { lazy, Suspense } from 'react';
+const MemberImageUsage = lazy(() => import('@components/tokens/statistics/member/ImageUsage/MemberImageUsage'));
+const MemberToolUsage = lazy(() => import('@components/tokens/statistics/member/ToolUsage/MemberToolUsage'));
+const MemberModelUsage = lazy(() => import('@components/tokens/statistics/member/ModelUsage/MemberModelUsage'));
+const MemberTokenUsage = lazy(() => import('../statistics/member/TokenUsage/MemberTokenUsage'));
 
 interface PersonStatisticSectionProps {
   member_id: number;
@@ -18,7 +19,9 @@ const PersonStatisticSection = ({ member_id }: PersonStatisticSectionProps) => {
   return (
     <div>
       <p>Displays only information about you, regardless of department selection.</p>
-      <Tabs items={items} defaultActiveKey="ImageUage" />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Tabs items={items} defaultActiveKey="ImageUage" />
+      </Suspense>
     </div>
   );
 };

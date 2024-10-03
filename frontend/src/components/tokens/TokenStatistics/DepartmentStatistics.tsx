@@ -1,7 +1,12 @@
 import { Tabs, TabsProps } from 'antd';
-import DepartmentImageUsage from '@components/tokens/statistics/department/ImageUsage/DepartmentImageUsage';
-import DepartmentToolUsage from '../statistics/department/ToolUsage/DepartmentToolUsage';
-import DepartmentDistributionState from '@components/tokens/statistics/department/DistributeState/DistributeState';
+import { lazy, Suspense } from 'react';
+const DepartmentImageUsage = lazy(
+  () => import('@components/tokens/statistics/department/ImageUsage/DepartmentImageUsage')
+);
+const DepartmentToolUsage = lazy(() => import('../statistics/department/ToolUsage/DepartmentToolUsage'));
+const DepartmentDistributionState = lazy(
+  () => import('@components/tokens/statistics/department/DistributeState/DistributeState')
+);
 
 interface DepartmentStatisticsProps {
   department_id: number;
@@ -19,7 +24,9 @@ const DepartmentStatistics = ({ department_id }: DepartmentStatisticsProps) => {
   ];
   return (
     <div className="token-content">
-      <Tabs items={items} defaultActiveKey="ImageUage" />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Tabs items={items} defaultActiveKey="ImageUage" />
+      </Suspense>
     </div>
   );
 };
