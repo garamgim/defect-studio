@@ -30,14 +30,15 @@ const options: ChartOptions<'doughnut'> = {
   },
   plugins: {
     datalabels: {
-      align: 'end',
-      anchor: 'end',
+      align: 'center',
+      anchor: 'center',
+      color: 'black',
       font: {
         size: 14,
         weight: 'bold'
       },
-      formatter: (value, context) => {
-        return `$${context.chart.data.datasets[0].data[context.dataIndex]}%`;
+      formatter: (value) => {
+        return `${value}`;
       }
     }
   }

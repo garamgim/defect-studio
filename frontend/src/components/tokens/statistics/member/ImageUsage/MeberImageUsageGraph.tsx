@@ -1,4 +1,6 @@
 import { DailyImageCount } from '@/types/statistics'; // Resoponse Data Type
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,7 +11,8 @@ import {
   Title,
   Tooltip,
   Legend,
-  ChartOptions
+  ChartOptions,
+  Plugin
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 ChartJS.register(CategoryScale, TimeScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -40,6 +43,20 @@ const options: ChartOptions<'line'> = {
         text: 'Date'
       }
     }
+  },
+  plugins: {
+    datalabels: {
+      align: 'top',
+      anchor: 'center',
+      color: 'black',
+      font: {
+        size: 14,
+        weight: 'bold'
+      },
+      formatter: (value) => {
+        return `${value.y}`;
+      }
+    }
   }
 };
 
@@ -56,7 +73,7 @@ const MemberImageUsageGraph = ({ data }: MeberImageUsageGraphProps) => {
   ];
   return (
     <div className="dark:bg-white mt-3 rounded-[10px] p-2 w-full h-[400px] flex flex-row justify-center">
-      <Line options={options} data={{ datasets }} />
+      <Line options={options} data={{ datasets }} plugins={[ChartDataLabels as Plugin<'line'>]} />
     </div>
   );
 };
