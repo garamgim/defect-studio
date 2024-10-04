@@ -1,14 +1,15 @@
-import { MemberImageCount } from '@/types/statistics';
+import { DepartmentMemberTokenUsage } from '@/types/statistics';
 import { Chart as ChartJS, ArcElement, Title, Tooltip, Legend, Plugin, ChartOptions } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import { backgroundColorList } from '../../common/constance';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+
 ChartJS.register(ArcElement, Title, Tooltip, Legend);
 
 const options: ChartOptions<'doughnut'> = {
   responsive: true, // 반응형
   interaction: {
-    intersect: true // 정확한 위치에 hover 해야 데이터 표시
+    intersect: false // 정확한 위치에 hover 해야 데이터 표시
   },
   scales: {
     x: {
@@ -41,27 +42,23 @@ const options: ChartOptions<'doughnut'> = {
   }
 };
 
-interface DepartmentImageUsageGraphProps {
-  data: MemberImageCount[];
+interface TokenUsageGraphProps {
+  data: DepartmentMemberTokenUsage[];
 }
 
-const DepartmentImageUsageGraph = ({ data }: DepartmentImageUsageGraphProps) => {
-  const memberName = data.map((item) => item.member_name);
-  const usageData = data.map((item) => item.image_quantity);
-
+const TokenUsageGraph = ({ data }: TokenUsageGraphProps) => {
   const chartData = {
-    labels: memberName,
+    labels: data.map((item) => item.member_name),
     datasets: [
       {
-        label: 'Image Usage',
-        data: usageData,
+        label: 'Token Usage',
+        data: data.map((item) => item.token_quantity),
         borderWidth: 2,
         tension: 0.1,
         backgroundColor: backgroundColorList
       }
     ]
   };
-
   return (
     <div className="dark:bg-white mt-3 rounded-[10px] p-2 w-full h-[400px] flex flex-row justify-center">
       <Doughnut options={options} data={chartData} plugins={[ChartDataLabels as Plugin<'doughnut'>]} />
@@ -69,4 +66,4 @@ const DepartmentImageUsageGraph = ({ data }: DepartmentImageUsageGraphProps) => 
   );
 };
 
-export default DepartmentImageUsageGraph;
+export default TokenUsageGraph;
