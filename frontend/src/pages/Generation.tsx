@@ -25,6 +25,7 @@ import { useRemoveBgOutputs } from '../hooks/generation/outputs/useRemoveBgOutpu
 import { useCleanupOutputs } from '../hooks/generation/outputs/useCleanupOutputs';
 import { getTaskStatus } from '../api/generation';
 import { RootState } from '@/store/store';
+import { upDateMyInfo } from '@/api/user';
 
 const Generation = () => {
   const dispatch = useDispatch();
@@ -72,6 +73,7 @@ const Generation = () => {
               dispatch(setAllOutputsInfo({ tab: tabName, outputsCnt, outputsInfo }));
               dispatch(setIsLoading({ tab: tabName, value: false }));
               dispatch(setTaskId({ tab: tabName, value: null }));
+              upDateMyInfo();
             } else if (response.detail && response.detail.task_status === 'FAILURE') {
               dispatch(setIsLoading({ tab: tabName, value: false }));
               dispatch(setTaskId({ tab: tabName, value: null }));
