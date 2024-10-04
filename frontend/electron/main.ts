@@ -87,6 +87,7 @@ app.on('ready', () => {
     win.loadFile(path.join(RENDERER_DIST, '../dist/index.html'));
   }
 
+  // App이 준비되면 splash 화면을 제거하고 메인 화면을 보여줌
   win.once('ready-to-show', () => {
     splash.destroy();
     win.show();
