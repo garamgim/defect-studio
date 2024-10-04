@@ -18,7 +18,7 @@ const Profile = lazy(() => import('./pages/Profile'));
 const UserUpdate = lazy(() => import('./pages/UserUpdate'));
 const EditProfile = lazy(() => import('./pages/EditProfile'));
 const History = lazy(() => import('./pages/History'));
-import LoadingIndicator from './pages/LoadingIndicator';
+import LoadingIndicator from './components/common/LoadingIndicator';
 
 const router = createHashRouter([
   {

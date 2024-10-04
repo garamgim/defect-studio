@@ -6,7 +6,7 @@ const Inpainting = lazy(() => import('../components/generation/layouts/Inpaintin
 const RemoveBackground = lazy(() => import('../components/generation/layouts/RemoveBgLayout'));
 const Cleanup = lazy(() => import('../components/generation/layouts/CleanupLayout'));
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from 'react-icons/ai';
-import LoadingIndicator from '@pages/LoadingIndicator';
+import LoadingIndicator from '@/components/common/LoadingIndicator';
 import { FaImage, FaMagic, FaPaintBrush, FaEraser, FaTrash, FaSpinner, FaCircle } from 'react-icons/fa';
 
 import { useDispatch, useSelector } from 'react-redux';
