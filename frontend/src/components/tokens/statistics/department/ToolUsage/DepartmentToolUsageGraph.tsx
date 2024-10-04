@@ -38,6 +38,24 @@ const options: ChartOptions<'doughnut'> = {
       formatter: (value) => {
         return `${value}`;
       }
+    },
+    tooltip: {
+      // 툴팁 설정
+      bodyFont: {
+        size: 12, // 폰트 크기
+        family: 'Arial', // 폰트 패밀리
+        weight: 'bold' // 폰트 두께
+      },
+      titleFont: {
+        size: 14, // 타이틀 폰트 크기
+        family: 'Arial', // 타이틀 폰트 패밀리
+        weight: 'bold' // 타이틀 폰트 두께
+      },
+      footerFont: {
+        size: 12, // 푸터 폰트 크기
+        family: 'Arial', // 푸터 폰트 패밀리
+        weight: 'normal' // 푸터 폰트 두께
+      }
     }
   }
 };
