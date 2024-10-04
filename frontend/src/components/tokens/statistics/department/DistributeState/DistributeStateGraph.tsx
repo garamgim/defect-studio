@@ -33,6 +33,15 @@ const options: ChartOptions<'line'> = {
       beginAtZero: true,
       grid: {
         display: false // y축 그리드 제거
+      },
+      title: {
+        display: true,
+        color: 'black',
+        text: 'Distributed Token Quantity',
+        font: {
+          size: 12,
+          family: 'GmarketSansMedium'
+        }
       }
     },
     x: {
