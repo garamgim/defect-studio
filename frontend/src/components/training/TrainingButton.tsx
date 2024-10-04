@@ -1,25 +1,20 @@
-import { Button } from 'antd';
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { Button, message } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
 import { postTraining } from '../../api/training';
 import { RootState } from '../../store/store';
-import snakecaseKeys from 'snakecase-keys';
+import { TrainingParams } from '../../types/training';
+import { setIsLoading, setTaskId } from '../../store/slices/training/outputSlice';
 
 const TrainingButton = () => {
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
-  const trainingParamsData = useSelector((state: RootState) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { maxConcepts, concepts, ...rest } = state.training;
-    return rest;
-  });
+  const { gpuNum, params } = useSelector((state: RootState) => state.training);
 
-  const concepts = useSelector((state: RootState) => state.training.concepts);
-
-  const getFilesFromFolder = async (folderPath: string) => {
+  // 폴더에서 파일을 가져오는 함수
+  const getFilesFromFolder = async (folderPath: string): Promise<File[]> => {
     const fileDataArray = await window.electron.getFilesInFolder(folderPath);
 
-    const files = fileDataArray.map((fileData) => {
+    return fileDataArray.map((fileData) => {
       const byteString = atob(fileData.data);
       const arrayBuffer = new ArrayBuffer(byteString.length);
       const uintArray = new Uint8Array(arrayBuffer);
@@ -31,55 +26,111 @@ const TrainingButton = () => {
       const blob = new Blob([arrayBuffer], { type: fileData.type });
       return new File([blob], fileData.name, { type: fileData.type });
     });
-    return files;
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const cleanObject = (obj: any) => {
-    for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        if (obj[key] === '' || obj[key] === false || obj[key] === -1) {
-          delete obj[key];
-        }
+  // 빈 값이나 false, null, undefined는 데이터에서 제거
+  const cleanObject = <T extends object>(obj: T): Partial<T> => {
+    const cleanedObj = { ...obj };
+    Object.keys(cleanedObj).forEach((key) => {
+      if (
+        cleanedObj[key as keyof T] === '' ||
+        cleanedObj[key as keyof T] === false ||
+        cleanedObj[key as keyof T] === null ||
+        cleanedObj[key as keyof T] === undefined
+      ) {
+        delete cleanedObj[key as keyof T];
       }
-    }
-    return obj;
+    });
+    return cleanedObj;
   };
 
   const handleTrainingStart = async () => {
-    setLoading(true);
-
     try {
-      const firstConcept = concepts[0];
+      const instanceImageListFiles: File[] = [];
+      const classImageListFiles: File[] = [];
 
-      const { instancePrompt, classPrompt, instanceImageFolder, classImageFolder } = firstConcept;
+      // 모든 concept에 대해 이미지 파일을 폴더에서 가져와서 배열에 추가
+      const concepts = await Promise.all(
+        params.conceptListParams.map(async (concept) => {
+          const instanceFiles = await getFilesFromFolder(concept.instanceImageList);
+          const classFiles = await getFilesFromFolder(concept.classImageList);
 
-      const instanceImageFiles = await getFilesFromFolder(instanceImageFolder);
-      const classImageListFiles = await getFilesFromFolder(classImageFolder);
+          instanceImageListFiles.push(...instanceFiles);
+          classImageListFiles.push(...classFiles);
 
-      const trainingData = {
-        ...trainingParamsData,
-        instancePrompt,
-        classPrompt,
-        instanceImageList: instanceImageFiles,
-        classImageList: classImageListFiles,
-        memberId: 1 // 나중에 본인 멤버아이디로 변경
+          return {
+            instance_prompt: concept.instancePrompt,
+            class_prompt: concept.classPrompt,
+            instance_image_count: instanceFiles.length,
+            class_image_count: classFiles.length
+          };
+        })
+      );
+
+      // 필수 필드와 선택적 필드 나누기
+      const mandatoryFields: TrainingParams = {
+        gpu_device: gpuNum !== null ? gpuNum : 1,
+        pretrained_model_name_or_path: params.modelParams.pretrainedModelNameOrPath,
+        train_model_name: params.modelParams.trainModelName,
+        instance_image_list: instanceImageListFiles,
+        class_image_list: classImageListFiles,
+        concept_list: concepts,
+        resolution: params.imgsParams.resolution,
+        train_batch_size: params.trainingParams.trainBatchSize,
+        num_train_epochs: params.trainingParams.numTrainEpochs,
+        learning_rate: params.trainingParams.learningRate
       };
 
-      let trainData = snakecaseKeys(trainingData, { deep: false });
-      trainData = cleanObject(trainData);
+      // 선택적 필드들
+      const optionalFields = {
+        is_inpaint: params.modelParams.isInpaint,
+        find_hugging_face: params.modelParams.findHuggingFace,
+        tokenizer_name: params.modelParams.tokenizerName,
+        revision: params.modelParams.revision,
+        prior_loss_weight: params.imgsParams.priorLossWeight,
+        center_crop: params.imgsParams.centerCrop,
+        gradient_checkpointing: params.trainingParams.gradientCheckpointing,
+        max_train_steps: params.trainingParams.maxTrainSteps,
+        scale_lr: params.trainingParams.scaleLr,
+        lr_scheduler: params.trainingParams.lrScheduler,
+        lr_warmup_steps: params.trainingParams.lrWarmupSteps,
+        lr_num_cycles: params.trainingParams.lrNumCycles,
+        lr_power: params.trainingParams.lrPower,
+        use_8bit_adam: params.trainingParams.use8bitAdam,
+        seed: params.trainingParams.seed,
+        train_text_encoder: params.trainingParams.trainTextEncoder,
+        adam_beta1: params.optimizerParams.adamBeta1,
+        adam_beta2: params.optimizerParams.adamBeta2,
+        adam_weight_decay: params.optimizerParams.adamWeightDecay,
+        adam_epsilon: params.optimizerParams.adamEpsilon,
+        max_grad_norm: params.optimizerParams.maxGradNorm,
+        checkpointing_steps: params.checkpointParams.checkpointingSteps,
+        checkpoints_total_limit: params.checkpointParams.checkpointsTotalLimit,
+        resume_from_checkpoint: params.checkpointParams.resumeFromCheckpoint
+      };
 
-      const response = await postTraining('remote', trainData);
-      console.log('Training started, response:', response);
+      // 선택적 필드에서 빈 값 제거
+      const cleanedOptionalFields = cleanObject(optionalFields);
+
+      // 필수 필드와 선택적 필드 병합
+      const fullTrainingData = {
+        ...mandatoryFields,
+        ...cleanedOptionalFields
+      };
+
+      dispatch(setIsLoading(true));
+      const newTaskId = await postTraining('remote', fullTrainingData as TrainingParams);
+      dispatch(setTaskId(newTaskId));
+      console.log('test', newTaskId);
     } catch (error) {
-      console.error('Error during training:', error);
+      message.error(`Error during training: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
-      setLoading(false);
+      dispatch(setIsLoading(false));
     }
   };
 
   return (
-    <Button type="primary" onClick={handleTrainingStart} loading={loading}>
+    <Button type="primary" onClick={handleTrainingStart}>
       Start Training
     </Button>
   );

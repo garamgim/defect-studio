@@ -11,6 +11,7 @@ import userInfoSlice from './slices/userInfoSlice';
 import trainingSlice from './slices/training/trainingSlice';
 import settingsSlice from './slices/settings/settingsSlice';
 import historySlice from './slices/history/historySlice';
+import trainingOutputSlice from './slices/training/outputSlice';
 
 const store = configureStore({
   reducer: {
@@ -25,7 +26,8 @@ const store = configureStore({
     history: historySlice,
     userInfo: userInfoSlice,
     training: trainingSlice,
-    settings: settingsSlice
+    settings: settingsSlice,
+    trainingOutput: trainingOutputSlice
   }
 });
 

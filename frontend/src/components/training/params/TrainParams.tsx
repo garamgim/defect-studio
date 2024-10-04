@@ -1,22 +1,4 @@
-// *train_batch_size: 훈련 배치 크기
-// *num_train_epochs: 에폭 수
-// *learning_rate: 학습률
-// max_train_steps: 최대 학습 스텝
-// gradient_accumulation_steps: 그래디언트 누적 스텝 수
-// scale_lr: 학습률 스케일링 여부
-// lr_scheduler: 학습률 스케줄러
-// lr_warmup_steps: 학습률 워밍업 스텝 수
-// lr_num_cycles: 스케줄러 사이클 수
-// lr_power: 다항식 스케줄러에서의 파워 팩터 (lr_scheduler가 "polynomial"일 때만)
-// use_8bit_adam: 8비트 Adam 옵티마이저 사용 여부
-// gradient_checkpointing: 그래디언트 체크포인팅 여부
-// with_prior_preservation: 사전 보존 손실 적용 여부
-// prior_loss_weight: 사전 보존 손실의 가중치
-// seed: 재현성을 위한 시드 값
-// train_text_encoder: 텍스트 인코더를 학습할지 여부
-
-import React from 'react';
-import { InputNumber, Checkbox, Form, Input } from 'antd';
+import { InputNumber, Checkbox, Form, Select } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
 import {
@@ -32,11 +14,11 @@ import {
   setLrPower,
   setUse8bitAdam,
   setGradientCheckpointing,
-  setWithPriorPreservation,
-  setPriorLossWeight,
   setSeed,
   setTrainTextEncoder
 } from '../../../store/slices/training/trainingSlice';
+
+const { Option } = Select;
 
 const TrainParams = () => {
   const dispatch = useDispatch();
@@ -55,20 +37,18 @@ const TrainParams = () => {
     lrPower,
     use8bitAdam,
     gradientCheckpointing,
-    withPriorPreservation,
-    priorLossWeight,
     seed,
     trainTextEncoder
-  } = useSelector((state: RootState) => state.training);
+  } = useSelector((state: RootState) => state.training.params.trainingParams);
 
   return (
     <div>
       <h3 className="text-lg font-bold mb-4 dark:text-gray-300">Training Parameters</h3>
       <Form layout="vertical">
         {/* Train Batch Size */}
-        <Form.Item label="Train Batch Size">
+        <Form.Item label="Train Batch Size" required>
           <InputNumber
-            placeholder="Train Batch Size"
+            placeholder="Enter Train Batch Size"
             className="w-full"
             value={trainBatchSize}
             onChange={(value) => {
@@ -80,9 +60,9 @@ const TrainParams = () => {
         </Form.Item>
 
         {/* Number of Epochs */}
-        <Form.Item label="Number of Epochs">
+        <Form.Item label="Number of Epochs" required>
           <InputNumber
-            placeholder="Number of Epochs"
+            placeholder="Enter Number of Epochs"
             className="w-full"
             value={numTrainEpochs}
             onChange={(value) => {
@@ -94,9 +74,9 @@ const TrainParams = () => {
         </Form.Item>
 
         {/* Learning Rate */}
-        <Form.Item label="Learning Rate">
+        <Form.Item label="Learning Rate" required>
           <InputNumber
-            placeholder="Learning Rate"
+            placeholder="Enter Learning Rate"
             className="w-full"
             value={learningRate}
             onChange={(value) => {
@@ -110,7 +90,7 @@ const TrainParams = () => {
         {/* Max Train Steps */}
         <Form.Item label="Max Train Steps">
           <InputNumber
-            placeholder="Max Train Steps"
+            placeholder="Enter Max Train Steps"
             className="w-full"
             value={maxTrainSteps}
             onChange={(value) => {
@@ -124,7 +104,7 @@ const TrainParams = () => {
         {/* Gradient Accumulation Steps */}
         <Form.Item label="Gradient Accumulation Steps">
           <InputNumber
-            placeholder="Gradient Accumulation Steps"
+            placeholder="Enter Gradient Accumulation Steps"
             className="w-full"
             value={gradientAccumulationSteps}
             onChange={(value) => {
@@ -141,19 +121,38 @@ const TrainParams = () => {
         </Form.Item>
 
         {/* Learning Rate Scheduler */}
-        <Form.Item label="Learning Rate Scheduler">
-          <Input
-            placeholder="LR Scheduler"
+        <Form.Item label="LR Scheduler">
+          <Select
+            placeholder="Select LR Scheduler"
             className="w-full"
-            value={lrScheduler}
-            onChange={(e) => dispatch(setLrScheduler(e.target.value))}
-          />
+            value={lrScheduler === null ? '' : lrScheduler}
+            onChange={(value) => {
+              dispatch(
+                setLrScheduler(
+                  value as
+                    | 'linear'
+                    | 'cosine'
+                    | 'cosine_with_restarts'
+                    | 'polynomial'
+                    | 'constant'
+                    | 'constant_with_warmup'
+                )
+              );
+            }}
+          >
+            <Option value="linear">Linear</Option>
+            <Option value="cosine">Cosine</Option>
+            <Option value="cosine_with_restarts">Cosine with Restarts</Option>
+            <Option value="polynomial">Polynomial</Option>
+            <Option value="constant">Constant</Option>
+            <Option value="constant_with_warmup">Constant with Warmup</Option>
+          </Select>
         </Form.Item>
 
         {/* LR Warmup Steps */}
         <Form.Item label="LR Warmup Steps">
           <InputNumber
-            placeholder="LR Warmup Steps"
+            placeholder="Enter LR Warmup Steps"
             className="w-full"
             value={lrWarmupSteps}
             onChange={(value) => {
@@ -205,32 +204,10 @@ const TrainParams = () => {
           />
         </Form.Item>
 
-        {/* With Prior Preservation */}
-        <Form.Item label="With Prior Preservation" valuePropName="checked">
-          <Checkbox
-            checked={withPriorPreservation}
-            onChange={(e) => dispatch(setWithPriorPreservation(e.target.checked))}
-          />
-        </Form.Item>
-
-        {/* Prior Loss Weight */}
-        <Form.Item label="Prior Loss Weight">
-          <InputNumber
-            placeholder="Prior Loss Weight"
-            className="w-full"
-            value={priorLossWeight}
-            onChange={(value) => {
-              if (value) {
-                dispatch(setPriorLossWeight(value));
-              }
-            }}
-          />
-        </Form.Item>
-
         {/* Seed */}
         <Form.Item label="Seed">
           <InputNumber
-            placeholder="Seed"
+            placeholder="Enter Seed"
             className="w-full"
             value={seed}
             onChange={(value) => {
@@ -250,4 +227,4 @@ const TrainParams = () => {
   );
 };
 
-export default React.memo(TrainParams);
+export default TrainParams;

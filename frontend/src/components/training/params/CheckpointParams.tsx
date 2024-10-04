@@ -1,8 +1,3 @@
-// checkpointing_steps: 체크포인트 저장 간격
-// checkpoints_total_limit: 체크포인트 저장 개수 제한
-// resume_from_checkpoint: 체크포인트에서 훈련 재개 여부
-
-import React from 'react';
 import { Input, Form } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
@@ -16,7 +11,7 @@ const CheckpointParams = () => {
   const dispatch = useDispatch();
 
   const { checkpointingSteps, checkpointsTotalLimit, resumeFromCheckpoint } = useSelector(
-    (state: RootState) => state.training
+    (state: RootState) => state.training.params.checkpointParams
   );
 
   return (
@@ -26,8 +21,13 @@ const CheckpointParams = () => {
         <Form.Item label="Checkpointing Steps">
           <Input
             type="number"
-            value={checkpointingSteps}
-            onChange={(e) => dispatch(setCheckpointingSteps(Number(e.target.value)))}
+            value={checkpointingSteps === null ? '' : checkpointingSteps}
+            onChange={(e) => {
+              const value = e.target.value ? Number(e.target.value) : null;
+              if (value !== null && !isNaN(value)) {
+                dispatch(setCheckpointingSteps(value));
+              }
+            }}
             placeholder="Enter checkpointing steps"
           />
         </Form.Item>
@@ -35,8 +35,13 @@ const CheckpointParams = () => {
         <Form.Item label="Checkpoints Total Limit">
           <Input
             type="number"
-            value={checkpointsTotalLimit}
-            onChange={(e) => dispatch(setCheckpointsTotalLimit(Number(e.target.value)))}
+            value={checkpointsTotalLimit === null ? '' : checkpointsTotalLimit}
+            onChange={(e) => {
+              const value = e.target.value ? Number(e.target.value) : null;
+              if (value !== null && !isNaN(value)) {
+                dispatch(setCheckpointsTotalLimit(value));
+              }
+            }}
             placeholder="Enter total limit"
           />
         </Form.Item>
@@ -53,4 +58,4 @@ const CheckpointParams = () => {
   );
 };
 
-export default React.memo(CheckpointParams);
+export default CheckpointParams;
