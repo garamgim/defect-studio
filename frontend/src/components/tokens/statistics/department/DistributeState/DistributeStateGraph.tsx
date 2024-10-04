@@ -25,7 +25,7 @@ const options: ChartOptions<'line'> = {
   spanGaps: true, // null 데이터가 있어도 선을 연결
   responsive: true, // 반응형
   interaction: {
-    intersect: true // 정확한 위치에 hover 해야 데이터 표시
+    intersect: false // 정확한 위치에 hover 해야 데이터 표시
   },
   scales: {
     y: {
@@ -53,6 +53,7 @@ const options: ChartOptions<'line'> = {
       color: 'black',
       font: {
         size: 14,
+        family: 'GmarketSansMedium',
         weight: 'bold'
       },
       formatter: (value) => {

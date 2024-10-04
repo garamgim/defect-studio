@@ -9,7 +9,7 @@ ChartJS.register(ArcElement, Title, Tooltip, Legend);
 const options: ChartOptions<'doughnut'> = {
   responsive: true, // 반응형
   interaction: {
-    intersect: true // 정확한 위치에 hover 해야 데이터 표시
+    intersect: false // 정확한 위치에 hover 해야 데이터 표시
   },
   scales: {
     x: {
@@ -32,7 +32,8 @@ const options: ChartOptions<'doughnut'> = {
       color: 'black',
       font: {
         size: 14,
-        weight: 'bold'
+        weight: 'bold',
+        family: 'GmarketSansMedium'
       },
       formatter: (value) => {
         return `${value}`;

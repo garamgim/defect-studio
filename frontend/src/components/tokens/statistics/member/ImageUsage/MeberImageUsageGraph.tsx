@@ -51,7 +51,8 @@ const options: ChartOptions<'line'> = {
       color: 'black',
       font: {
         size: 14,
-        weight: 'bold'
+        weight: 'bold',
+        family: 'GmarketSansMedium'
       },
       formatter: (value) => {
         return `${value.y}`;
