@@ -8,7 +8,7 @@ import token from '../../assets/token.png';
 import { Dropdown, Button, Switch } from 'antd';
 import type { MenuProps } from 'antd';
 import { useGetMyInfo } from '@hooks/user/useGetMyInfo';
-
+import { memo } from 'react';
 import MiniProfile from '../profile/MiniProfile';
 
 const Navbar = () => {
@@ -182,4 +182,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default memo(Navbar);

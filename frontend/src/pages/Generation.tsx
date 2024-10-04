@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import TextToImage from '../components/generation/layouts/Txt2ImgLayout';
-import ImageToImage from '../components/generation/layouts/Img2ImgLayout';
-import Inpainting from '../components/generation/layouts/InpaintingLayout';
-import RemoveBackground from '../components/generation/layouts/RemoveBgLayout';
-import Cleanup from '../components/generation/layouts/CleanupLayout';
+const TextToImage = lazy(() => import('../components/generation/layouts/Txt2ImgLayout'));
+const ImageToImage = lazy(() => import('../components/generation/layouts/Img2ImgLayout'));
+const Inpainting = lazy(() => import('../components/generation/layouts/InpaintingLayout'));
+const RemoveBackground = lazy(() => import('../components/generation/layouts/RemoveBgLayout'));
+const Cleanup = lazy(() => import('../components/generation/layouts/CleanupLayout'));
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from 'react-icons/ai';
+import LoadingIndicator from '@pages/LoadingIndicator';
 import { FaImage, FaMagic, FaPaintBrush, FaEraser, FaTrash, FaSpinner, FaCircle } from 'react-icons/fa';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -231,11 +232,46 @@ const Generation = () => {
         style={{ marginLeft: isSidebarOpen ? '80px' : '0' }}
       >
         <Routes>
-          <Route path="text-to-image" element={<TextToImage />} />
-          <Route path="image-to-image" element={<ImageToImage />} />
-          <Route path="inpainting" element={<Inpainting />} />
-          <Route path="remove-background" element={<RemoveBackground />} />
-          <Route path="cleanup" element={<Cleanup />} />
+          <Route
+            path="text-to-image"
+            element={
+              <Suspense fallback={<LoadingIndicator />}>
+                <TextToImage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="image-to-image"
+            element={
+              <Suspense fallback={<LoadingIndicator />}>
+                <ImageToImage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="inpainting"
+            element={
+              <Suspense fallback={<LoadingIndicator />}>
+                <Inpainting />
+              </Suspense>
+            }
+          />
+          <Route
+            path="remove-background"
+            element={
+              <Suspense fallback={<LoadingIndicator />}>
+                <RemoveBackground />
+              </Suspense>
+            }
+          />
+          <Route
+            path="cleanup"
+            element={
+              <Suspense fallback={<LoadingIndicator />}>
+                <Cleanup />
+              </Suspense>
+            }
+          />
         </Routes>
       </div>
     </div>
