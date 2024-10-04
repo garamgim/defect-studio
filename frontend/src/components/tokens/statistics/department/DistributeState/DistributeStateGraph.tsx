@@ -15,6 +15,7 @@ import {
 import { Line } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import dayjs from 'dayjs';
 ChartJS.register(CategoryScale, LinearScale, TimeScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 interface DistributeStateGraphProps {
@@ -58,6 +59,33 @@ const options: ChartOptions<'line'> = {
       },
       formatter: (value) => {
         return `${value.y}`;
+      }
+    },
+    tooltip: {
+      // 툴팁 설정
+      bodyFont: {
+        size: 12, // 폰트 크기
+        family: 'Arial', // 폰트 패밀리
+        weight: 'bold' // 폰트 두께
+      },
+      titleFont: {
+        size: 14, // 타이틀 폰트 크기
+        family: 'Arial', // 타이틀 폰트 패밀리
+        weight: 'bold' // 타이틀 폰트 두께
+      },
+      footerFont: {
+        size: 12, // 푸터 폰트 크기
+        family: 'Arial', // 푸터 폰트 패밀리
+        weight: 'normal' // 푸터 폰트 두께
+      },
+      callbacks: {
+        title: function (tooltipItems) {
+          // 타이틀 사용자 정의
+          return `${dayjs(tooltipItems[0].parsed.x).format('YYYY-MM-DD')}`;
+        },
+        label: (context) => {
+          return `${context.dataset.label}: ${context.parsed.y}`;
+        }
       }
     }
   }

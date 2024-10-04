@@ -1,6 +1,6 @@
 import { DailyImageCount } from '@/types/statistics'; // Resoponse Data Type
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-
+import dayjs from 'dayjs';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -24,7 +24,7 @@ interface MeberImageUsageGraphProps {
 const options: ChartOptions<'line'> = {
   responsive: true, // 반응형
   interaction: {
-    intersect: true // 정확한 위치에 hover 해야 데이터 표시
+    intersect: false // 정확한 위치에 hover 해야 데이터 표시
   },
   scales: {
     y: {
@@ -56,6 +56,33 @@ const options: ChartOptions<'line'> = {
       },
       formatter: (value) => {
         return `${value.y}`;
+      }
+    },
+    tooltip: {
+      // 툴팁 설정
+      bodyFont: {
+        size: 12, // 폰트 크기
+        family: 'Arial', // 폰트 패밀리
+        weight: 'bold' // 폰트 두께
+      },
+      titleFont: {
+        size: 14, // 타이틀 폰트 크기
+        family: 'Arial', // 타이틀 폰트 패밀리
+        weight: 'bold' // 타이틀 폰트 두께
+      },
+      footerFont: {
+        size: 12, // 푸터 폰트 크기
+        family: 'Arial', // 푸터 폰트 패밀리
+        weight: 'normal' // 푸터 폰트 두께
+      },
+      callbacks: {
+        title: function (tooltipItems) {
+          // 타이틀 사용자 정의
+          return `${dayjs(tooltipItems[0].parsed.x).format('YYYY-MM-DD')}`;
+        },
+        label: (context) => {
+          return `${context.dataset.label}: ${context.parsed.y}`;
+        }
       }
     }
   }

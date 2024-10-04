@@ -1,4 +1,5 @@
 import { TokenUsage, UseType } from '@/types/statistics'; // Response Type
+import dayjs from 'dayjs';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -24,7 +25,8 @@ const options: ChartOptions<'line'> = {
   spanGaps: true, // null 데이터가 있어도 선을 연결
   responsive: true, // 반응형
   interaction: {
-    intersect: false // 정확한 위치에 hover 해야 데이터 표시
+    intersect: false, // 정확한 위치에 hover 해야 데이터 표시
+    mode: 'index'
   },
   scales: {
     y: {
@@ -50,6 +52,35 @@ const options: ChartOptions<'line'> = {
         // 제목
         display: true,
         text: 'Date'
+      }
+    }
+  },
+  plugins: {
+    tooltip: {
+      // 툴팁 설정
+      bodyFont: {
+        size: 12, // 폰트 크기
+        family: 'Arial', // 폰트 패밀리
+        weight: 'bold' // 폰트 두께
+      },
+      titleFont: {
+        size: 14, // 타이틀 폰트 크기
+        family: 'Arial', // 타이틀 폰트 패밀리
+        weight: 'bold' // 타이틀 폰트 두께
+      },
+      footerFont: {
+        size: 12, // 푸터 폰트 크기
+        family: 'Arial', // 푸터 폰트 패밀리
+        weight: 'normal' // 푸터 폰트 두께
+      },
+      callbacks: {
+        title: function (tooltipItems) {
+          // 타이틀 사용자 정의
+          return `${dayjs(tooltipItems[0].parsed.x).format('YYYY-MM-DD')}`;
+        },
+        label: (context) => {
+          return `${context.dataset.label}: ${context.parsed.y}`;
+        }
       }
     }
   }
