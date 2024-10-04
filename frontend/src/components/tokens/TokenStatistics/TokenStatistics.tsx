@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import SelectDepartment from '../common/SelectDepartment';
-import StatisticSection from './StatisticSection';
+const StatisticSection = React.lazy(() => import('./StatisticSection'));
 
 const TokenStatistics = () => {
   const [selectedDepartment, setSelectedDepartment] = useState<number | undefined>(); // 선택된 부서, 단 1개 혹은 선택없음

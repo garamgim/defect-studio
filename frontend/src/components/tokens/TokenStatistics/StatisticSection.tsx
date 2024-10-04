@@ -1,5 +1,5 @@
 import { Tabs, TabsProps } from 'antd';
-import { lazy, Suspense } from 'react';
+import { lazy } from 'react';
 const DepartmentStatistics = lazy(() => import('./DepartmentStatistics'));
 const DepartmentPersonStatistics = lazy(() => import('./DepartmentPersonStatistics'));
 
@@ -18,9 +18,7 @@ const StatisticSection = ({ departmentId }: StatisticSectionProps) => {
 
   return (
     <div className="flex flex-col justify-center align-middle">
-      <Suspense fallback={<div>Loading...</div>}>
-        <Tabs items={items} defaultActiveKey="Department" />
-      </Suspense>
+      <Tabs items={items} defaultActiveKey="Department" destroyInactiveTabPane={true} />
     </div>
   );
 };

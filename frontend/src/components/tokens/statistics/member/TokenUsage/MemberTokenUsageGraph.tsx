@@ -30,6 +30,15 @@ const options: ChartOptions<'line'> = {
     y: {
       grid: {
         display: false // y축 그리드 제거
+      },
+      title: {
+        display: true,
+        color: 'black',
+        text: 'Tokens',
+        font: {
+          size: 12,
+          family: 'GmarketSansMedium'
+        }
       }
     },
     x: {
