@@ -20,7 +20,7 @@ const PersonStatisticSection = ({ member_id }: PersonStatisticSectionProps) => {
     <div>
       <p>Displays only information about you, regardless of department selection.</p>
       <Suspense fallback={<div>Loading...</div>}>
-        <Tabs items={items} defaultActiveKey="ImageUage" />
+        <Tabs items={items} defaultActiveKey="ImageUage" destroyInactiveTabPane={true} />
       </Suspense>
     </div>
   );
