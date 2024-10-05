@@ -119,8 +119,10 @@ const TrainingButton = () => {
       };
 
       const newTaskId = await postTraining('remote', fullTrainingData as TrainingParams);
-      dispatch(addTaskId(newTaskId));
-      console.log('test', newTaskId);
+      // 3초 후에 addTaskId 실행
+      setTimeout(() => {
+        dispatch(addTaskId(newTaskId));
+      }, 3000);
     } catch (error) {
       message.error(`Error during training: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
