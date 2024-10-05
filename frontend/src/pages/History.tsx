@@ -20,7 +20,7 @@ const History = () => {
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [folders, setFolders] = useState<FolderListDataType[]>([]);
 
-  const queryClient = useQueryClient(); // Query Client 사용
+  const queryClient = useQueryClient();
 
   // 이미지 목록 조회
   const { data, isLoading, error } = useQuery({
@@ -33,7 +33,7 @@ const History = () => {
     mutationFn: deleteImgsFolder,
     onSuccess: () => {
       message.success('Folder deleted successfully');
-      queryClient.invalidateQueries({ queryKey: ['imageFolders'] }); // 쿼리 키를 객체로 전달
+      queryClient.invalidateQueries({ queryKey: ['imageFolders'] });
     },
     onError: () => {
       message.error('Failed to delete folder');
@@ -49,14 +49,12 @@ const History = () => {
 
   const handleModalClose = () => setSelectedFolderId(null);
 
-  // 폴더 세부 정보 핸들러
   const handleDetailClick = (folder: FolderListDataType) => {
-    setSelectedFolderId(folder.id); // 선택된 폴더의 ID만 설정
+    setSelectedFolderId(folder.id);
   };
 
-  // 삭제 핸들러
   const handleDelete = (id: string) => {
-    deleteFolder(id); // 삭제 mutation 호출
+    deleteFolder(id);
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -87,11 +85,7 @@ const History = () => {
         setSearchDates={setSearchDates}
       />
 
-      <ImageFolderList
-        folders={filteredFolders}
-        handleDetailClick={handleDetailClick} // 세부 정보 핸들러 전달
-        handleDelete={handleDelete} // 삭제 핸들러 전달
-      />
+      <ImageFolderList folders={filteredFolders} handleDetailClick={handleDetailClick} handleDelete={handleDelete} />
 
       <ImagesFolderDetail folderId={selectedFolderId} onClose={handleModalClose} />
     </div>
