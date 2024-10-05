@@ -84,7 +84,7 @@ const TrainingButton = () => {
       // 선택적 필드들
       const optionalFields = {
         is_inpaint: params.modelParams.isInpaint,
-        find_hugging_face: params.modelParams.findHuggingFace,
+
         tokenizer_name: params.modelParams.tokenizerName,
         revision: params.modelParams.revision,
         prior_loss_weight: params.imgsParams.priorLossWeight,

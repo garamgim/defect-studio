@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
 import {
   setIsInpaint,
-  // setFindHuggingFace,
   setPretrainedModelNameOrPath,
   setTrainModelName,
   setTokenizerName,
@@ -40,11 +39,6 @@ const ModelParams = () => {
         <Form.Item label="Inpaint Model Learning" valuePropName="checked">
           <Checkbox checked={isInpaint} onChange={(e) => handleInpaintChange(e.target.checked)} />
         </Form.Item>
-
-        {/* findHuggingFace */}
-        {/* <Form.Item label="Hugging Face Model" valuePropName="checked">
-          <Checkbox checked={findHuggingFace} onChange={(e) => dispatch(setFindHuggingFace(e.target.checked))} />
-        </Form.Item> */}
 
         {/* Pretrained Model Name or Path */}
         <Form.Item label="Pretrained Model Name or Path" required>

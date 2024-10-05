@@ -42,7 +42,6 @@ const TrainingStatusTab = () => {
   };
 
   useEffect(() => {
-    console.log(taskIds, '다');
     taskIds.forEach((taskId) => {
       if (taskId) {
         intervalIdsRef.current[taskId] = setInterval(async () => {

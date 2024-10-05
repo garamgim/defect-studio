@@ -1,6 +1,5 @@
 export interface ModelParamsType {
   isInpaint?: boolean;
-  findHuggingFace?: boolean;
   pretrainedModelNameOrPath: string;
   trainModelName: string;
   tokenizerName?: string;
@@ -73,7 +72,6 @@ interface ConceptListParams {
 export interface TrainingParams {
   gpu_device: number;
   is_inpaint?: boolean;
-  find_hugging_face?: boolean;
   pretrained_model_name_or_path: string;
   train_model_name: string;
   tokenizer_name?: string;

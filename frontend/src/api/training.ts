@@ -25,7 +25,6 @@ export const postTraining = async (gpu_env: TrainingDataType['gpu_env'], data: T
     });
 
     if (response.status === 200) {
-      console.log('1단ㄱ{: ', response.data);
       return response.data.task_id;
     } else {
       throw new Error('Failed to training model');

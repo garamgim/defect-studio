@@ -26,7 +26,6 @@ const initialState: TrainingState = {
   params: {
     modelParams: {
       isInpaint: false,
-      findHuggingFace: false,
       pretrainedModelNameOrPath: '',
       trainModelName: '',
       tokenizerName: '',
@@ -81,9 +80,6 @@ const trainingSlice = createSlice({
     // Model Params
     setIsInpaint: (state, action: PayloadAction<boolean>) => {
       state.params.modelParams.isInpaint = action.payload;
-    },
-    setFindHuggingFace: (state, action: PayloadAction<boolean>) => {
-      state.params.modelParams.findHuggingFace = action.payload;
     },
     setPretrainedModelNameOrPath: (state, action: PayloadAction<string>) => {
       state.params.modelParams.pretrainedModelNameOrPath = action.payload;
@@ -213,7 +209,6 @@ const trainingSlice = createSlice({
 export const {
   setGpuNum,
   setIsInpaint,
-  setFindHuggingFace,
   setPretrainedModelNameOrPath,
   setTrainModelName,
   setTokenizerName,
