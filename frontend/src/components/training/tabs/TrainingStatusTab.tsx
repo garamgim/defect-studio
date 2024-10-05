@@ -29,11 +29,9 @@ const TrainingStatusTab = () => {
   const fetchTrainingStatus = async (taskId: string) => {
     try {
       const data = await getTrainingStatus(taskId);
-      console.log(`Fetched data for taskId: ${taskId}`, data);
       return {
         taskId: taskId,
         status: data.task_status,
-        // progress: data.progress, 데이터 추가되면 추가 아니면 삭제
         resultData: data.task_status === 'STARTED' ? data.result_data : null
       };
     } catch (error) {
@@ -45,16 +43,11 @@ const TrainingStatusTab = () => {
 
   useEffect(() => {
     taskIds.forEach((taskId) => {
-      console.log('All taskIds:', taskIds);
-      if (!intervalIdsRef.current[taskId]) {
-        console.log(`test1: ${taskId}`);
-
+      if (taskId) {
         intervalIdsRef.current[taskId] = setInterval(async () => {
           const progressData = await fetchTrainingStatus(taskId);
 
-          if (progressData) {
-            console.log(`test2 ${taskId}:`, progressData);
-
+          if (progressData?.resultData) {
             // 학습 중일 때만 상태 업데이트
             if (progressData.status === 'STARTED' && progressData.resultData) {
               setChartDataMap((prev) => ({
@@ -79,18 +72,16 @@ const TrainingStatusTab = () => {
                       tension: 0.1
                     }
                   ],
-                  // progress: progressData.progress
+                  progress: progressData.resultData.progress[progressData.resultData.progress.length - 1] * 100
                 }
               }));
             }
-
+          } else {
             // 학습 완료 시 interval 제거 및 Redux에서 taskId 제거
-            if (progressData.status === 'SUCCESS' || progressData.status === 'PENDING') {
-              console.log(`TaskId ${taskId} 학습 완료, interval 제거`);
-              clearInterval(intervalIdsRef.current[taskId]);
-              dispatch(removeTaskId(taskId));
-              delete intervalIdsRef.current[taskId];
-            }
+            console.log(`TaskId ${taskId} 학습 완료, interval 제거`);
+            clearInterval(intervalIdsRef.current[taskId]);
+            dispatch(removeTaskId(taskId));
+            delete intervalIdsRef.current[taskId];
           }
         }, 1000);
       }
