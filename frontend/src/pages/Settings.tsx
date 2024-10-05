@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { setGpuNum } from '@/store/slices/settings/settingsSlice';
-import { Slider, InputNumber, Row, Col, Form } from 'antd';
+import { InputNumber } from 'antd';
 
 type queryKeyType = 'deviceHealth' | 'deviceCudaAvailable' | 'deviceCudaUsage';
 
@@ -60,12 +60,11 @@ const Settings = () => {
 
   const [isRefreshEnable, setIsRefreshEnable] = useState(true);
 
-  const onSubmit = (data) => {
-    // data는 폼에 입력된 값들이 객체 형태로 전달됩니다.
+  const onSubmit = (data: { device_num: number }) => {
     dispatch(setGpuNum(data.device_num));
   };
 
-  const handleChange = (event) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setValue('device_num', Number(event.target.value)); // 선택된 값 설정
   };
 
