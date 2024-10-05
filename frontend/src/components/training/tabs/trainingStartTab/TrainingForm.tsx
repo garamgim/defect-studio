@@ -4,10 +4,8 @@ import ImageParams from '../../params/ImageParams';
 import TrainParams from '../../params/TrainParams';
 import OptimizerParams from '../../params/OptimizerParams';
 import CheckpointParams from '../../params/CheckpointParams';
-import ValidationParams from '../../params/ValidationParams';
-import MiscParams from '../../params/MiscParams';
 import styled from 'styled-components';
-import TrainingButton from '../../TrainingButton';
+import TrainingButton from '../../common/TrainingButton';
 
 const { TabPane } = Tabs;
 
@@ -46,12 +44,6 @@ const TrainingForm = () => {
           </TabPane>
           <TabPane tab="Checkpoint Parameters" key="5" className="pr-4 overflow-y-auto custom-scrollbar3">
             <CheckpointParams />
-          </TabPane>
-          <TabPane tab="Validation Parameters" key="6" className="pr-4 overflow-y-auto custom-scrollbar3">
-            <ValidationParams />
-          </TabPane>
-          <TabPane tab="Miscellaneous Parameters" key="7" className="pr-4 overflow-y-auto custom-scrollbar3">
-            <MiscParams />
           </TabPane>
         </CustomTabs>
       </div>

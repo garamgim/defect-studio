@@ -1,10 +1,3 @@
-// adam_beta1: Adam 옵티마이저의 Beta1 값
-// adam_beta2: Adam 옵티마이저의 Beta2 값
-// adam_weight_decay: 가중치 감쇠 값
-// adam_epsilon: Adam 옵티마이저의 Epsilon 값
-// max_grad_norm: 그래디언트 클리핑 최대 노름
-
-import React from 'react';
 import { InputNumber, Form } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
@@ -21,13 +14,13 @@ const OptimizerParams = () => {
 
   // Redux 상태에서 필요한 값 가져오기
   const { adamBeta1, adamBeta2, adamWeightDecay, adamEpsilon, maxGradNorm } = useSelector(
-    (state: RootState) => state.training
+    (state: RootState) => state.training.params.optimizerParams
   );
 
   return (
-    <div>
+    <>
       <h3 className="text-lg font-bold mb-4 dark:text-gray-300">Optimizer Parameters</h3>
-      <Form layout="vertical">
+      <Form layout="horizontal">
         {/* Adam Beta 1 */}
         <Form.Item label="Adam Beta 1">
           <InputNumber
@@ -59,7 +52,7 @@ const OptimizerParams = () => {
         {/* Adam Weight Decay */}
         <Form.Item label="Adam Weight Decay">
           <InputNumber
-            placeholder="Weight Decay"
+            placeholder="Enter Weight Decay"
             className="w-full"
             value={adamWeightDecay}
             onChange={(value) => {
@@ -73,7 +66,7 @@ const OptimizerParams = () => {
         {/* Adam Epsilon */}
         <Form.Item label="Adam Epsilon">
           <InputNumber
-            placeholder="Epsilon Value"
+            placeholder="Enter Epsilon Value"
             className="w-full"
             value={adamEpsilon}
             onChange={(value) => {
@@ -87,7 +80,7 @@ const OptimizerParams = () => {
         {/* Max Gradient Norm */}
         <Form.Item label="Max Gradient Norm">
           <InputNumber
-            placeholder="Max Gradient Norm"
+            placeholder="Enter Max Gradient Norm"
             className="w-full"
             value={maxGradNorm}
             onChange={(value) => {
@@ -98,8 +91,8 @@ const OptimizerParams = () => {
           />
         </Form.Item>
       </Form>
-    </div>
+    </>
   );
 };
 
-export default React.memo(OptimizerParams);
+export default OptimizerParams;

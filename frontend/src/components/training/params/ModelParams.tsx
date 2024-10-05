@@ -1,16 +1,13 @@
-import React from 'react';
-import { Input, Select, Checkbox, Form } from 'antd';
+import { Input, Checkbox, Form, Select } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
 import {
+  setIsInpaint,
+  // setFindHuggingFace,
+  setPretrainedModelNameOrPath,
   setTrainModelName,
-  setModel,
-  setRevision,
-  setVariant,
   setTokenizerName,
-  setHubModelId,
-  setPushToHub,
-  setHubToken
+  setRevision
 } from '../../../store/slices/training/trainingSlice';
 
 const { Option } = Select;
@@ -18,77 +15,87 @@ const { Option } = Select;
 const ModelParams = () => {
   const dispatch = useDispatch();
 
-  const { trainModelName, model, revision, variant, tokenizerName, hubModelId, pushToHub, hubToken } = useSelector(
-    (state: RootState) => state.training
+  const { isInpaint, pretrainedModelNameOrPath, trainModelName, tokenizerName, revision } = useSelector(
+    (state: RootState) => state.training.params.modelParams
   );
+
+  const inpaintModels = ['stable-diffusion-2-inpainting'];
+  const otherModels = ['stable-diffusion-2', 'stable-diffusion-v1-5', 'stable-diffusion-v1-4'];
+
+  const handleModelChange = (value: string) => {
+    dispatch(setPretrainedModelNameOrPath(value));
+  };
+
+  const handleInpaintChange = (checked: boolean) => {
+    dispatch(setIsInpaint(checked));
+    // isInpaint 변경될 때 pretrainedModelNameOrPath 초기화
+    dispatch(setPretrainedModelNameOrPath(''));
+  };
 
   return (
     <>
       <h3 className="text-lg font-bold mb-4 dark:text-gray-300">Model Parameters</h3>
-      <Form layout="vertical">
-        {/* Train Model Name */}
+      <Form layout="horizontal">
+        {/* isInpaint */}
+        <Form.Item label="Inpaint Model Learning" valuePropName="checked">
+          <Checkbox checked={isInpaint} onChange={(e) => handleInpaintChange(e.target.checked)} />
+        </Form.Item>
+
+        {/* findHuggingFace */}
+        {/* <Form.Item label="Hugging Face Model" valuePropName="checked">
+          <Checkbox checked={findHuggingFace} onChange={(e) => dispatch(setFindHuggingFace(e.target.checked))} />
+        </Form.Item> */}
+
+        {/* Pretrained Model Name or Path */}
+        <Form.Item label="Pretrained Model Name or Path" required>
+          <Select
+            placeholder="Select a model"
+            value={pretrainedModelNameOrPath || undefined} // undefined: 초기화된 상태
+            onChange={handleModelChange}
+          >
+            {isInpaint
+              ? inpaintModels.map((model) => (
+                  <Option key={model} value={model}>
+                    {model}
+                  </Option>
+                ))
+              : otherModels.map((model) => (
+                  <Option key={model} value={model}>
+                    {model}
+                  </Option>
+                ))}
+          </Select>
+        </Form.Item>
+
+        {/* trainModelName */}
         <Form.Item label="Train Model Name" required>
           <Input
-            placeholder="Enter model name"
+            placeholder="Enter train model name"
             value={trainModelName}
             onChange={(e) => dispatch(setTrainModelName(e.target.value))}
           />
         </Form.Item>
 
-        {/* Model */}
-        <Form.Item label="Model" required>
-          <Select placeholder="Select a model" value={model} onChange={(value) => dispatch(setModel(value))}>
-            <Option value="stable-diffusion">Stable Diffusion</Option>
-            <Option value="gpt-3">GPT-3</Option>
-          </Select>
-        </Form.Item>
-
-        {/* Revision */}
-        <Form.Item label="Revision">
-          <Input placeholder="Revision" value={revision} onChange={(e) => dispatch(setRevision(e.target.value))} />
-        </Form.Item>
-
-        {/* Variant */}
-        <Form.Item label="Variant">
-          <Input
-            placeholder="Variant (e.g., fp16)"
-            value={variant}
-            onChange={(e) => dispatch(setVariant(e.target.value))}
-          />
-        </Form.Item>
-
-        {/* Tokenizer Name */}
+        {/* tokenizerName */}
         <Form.Item label="Tokenizer Name">
           <Input
-            placeholder="Tokenizer Name"
+            placeholder="Enter tokenizer name"
             value={tokenizerName}
             onChange={(e) => dispatch(setTokenizerName(e.target.value))}
           />
         </Form.Item>
 
-        {/* Hub Model ID */}
-        <Form.Item label="Hub Model ID">
+        {/* revision */}
+        <Form.Item label="Revision">
           <Input
-            placeholder="Hub Model ID"
-            value={hubModelId}
-            onChange={(e) => dispatch(setHubModelId(e.target.value))}
+            placeholder="Enter revision"
+            value={revision}
+            onChange={(e) => dispatch(setRevision(e.target.value))}
           />
-        </Form.Item>
-
-        {/* Push to Hub */}
-        <Form.Item label="Push to Hub" valuePropName="checked">
-          <Checkbox checked={pushToHub} onChange={(e) => dispatch(setPushToHub(e.target.checked))}>
-            Push to Hub
-          </Checkbox>
-        </Form.Item>
-
-        {/* Hub Token */}
-        <Form.Item label="Hub Token">
-          <Input placeholder="Hub Token" value={hubToken} onChange={(e) => dispatch(setHubToken(e.target.value))} />
         </Form.Item>
       </Form>
     </>
   );
 };
 
-export default React.memo(ModelParams);
+export default ModelParams;

@@ -125,7 +125,7 @@ const initialState: MultiTabOutputState = {
 };
 
 const outputSlice = createSlice({
-  name: 'output',
+  name: 'generatedOutput',
   initialState,
   reducers: {
     // 이미지 생성 체크를 위한 로딩

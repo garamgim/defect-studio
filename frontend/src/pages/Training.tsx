@@ -36,7 +36,7 @@ const Training = () => {
         {/* 모델 훈련 진행상황 */}
         <TabPane tab="Training Status" key="2" className="h-full">
           <div className="h-full">
-            <TrainingStatusTab trainProgress={trainProgress} />
+            <TrainingStatusTab />
           </div>
         </TabPane>
       </CustomTabs>
