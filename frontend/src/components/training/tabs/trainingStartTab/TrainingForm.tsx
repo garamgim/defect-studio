@@ -5,7 +5,7 @@ import TrainParams from '../../params/TrainParams';
 import OptimizerParams from '../../params/OptimizerParams';
 import CheckpointParams from '../../params/CheckpointParams';
 import styled from 'styled-components';
-import TrainingButton from '../../TrainingButton';
+import TrainingButton from '../../common/TrainingButton';
 
 const { TabPane } = Tabs;
 

@@ -1,9 +1,9 @@
 import { Button, message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { postTraining } from '../../api/training';
-import { RootState } from '../../store/store';
-import { TrainingParams } from '../../types/training';
-import { setIsLoading, setTaskId } from '../../store/slices/training/outputSlice';
+import { postTraining } from '../../../api/training';
+import { RootState } from '../../../store/store';
+import { TrainingParams } from '../../../types/training';
+import { addTaskId } from '../../../store/slices/training/outputSlice';
 
 const TrainingButton = () => {
   const dispatch = useDispatch();
@@ -118,14 +118,11 @@ const TrainingButton = () => {
         ...cleanedOptionalFields
       };
 
-      dispatch(setIsLoading(true));
       const newTaskId = await postTraining('remote', fullTrainingData as TrainingParams);
-      dispatch(setTaskId(newTaskId));
+      dispatch(addTaskId(newTaskId));
       console.log('test', newTaskId);
     } catch (error) {
       message.error(`Error during training: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    } finally {
-      dispatch(setIsLoading(false));
     }
   };
 

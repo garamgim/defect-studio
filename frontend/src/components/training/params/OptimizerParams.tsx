@@ -18,9 +18,9 @@ const OptimizerParams = () => {
   );
 
   return (
-    <div>
+    <>
       <h3 className="text-lg font-bold mb-4 dark:text-gray-300">Optimizer Parameters</h3>
-      <Form layout="vertical">
+      <Form layout="horizontal">
         {/* Adam Beta 1 */}
         <Form.Item label="Adam Beta 1">
           <InputNumber
@@ -91,7 +91,7 @@ const OptimizerParams = () => {
           />
         </Form.Item>
       </Form>
-    </div>
+    </>
   );
 };
 

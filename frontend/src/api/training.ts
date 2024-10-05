@@ -7,8 +7,9 @@ export const postTraining = async (gpu_env: TrainingDataType['gpu_env'], data: T
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
-      console.log(key, value, typeof value);
-      if (Array.isArray(value)) {
+      if (key === 'concept_list') {
+        formData.append(key, JSON.stringify(value));
+      } else if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
         });
@@ -23,9 +24,8 @@ export const postTraining = async (gpu_env: TrainingDataType['gpu_env'], data: T
       }
     });
 
-    console.log(response, '응답');
-
     if (response.status === 200) {
+      console.log('1단ㄱ{: ', response.data);
       return response.data.task_id;
     } else {
       throw new Error('Failed to training model');
@@ -33,5 +33,22 @@ export const postTraining = async (gpu_env: TrainingDataType['gpu_env'], data: T
   } catch (error) {
     console.error(error);
     throw new Error('Failed to training model');
+  }
+};
+
+// ai 동작 진행 상황 확인
+export const getTrainingStatus = async (task_id: string) => {
+  try {
+    const response = await axiosInstance.get(`/training/tasks/${task_id}`);
+
+    if (response.status === 200) {
+      console.log('2단계', response.data);
+      return response.data;
+    } else {
+      throw new Error('Failed to get training-status');
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to get training-status');
   }
 };

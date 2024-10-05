@@ -1,52 +1,76 @@
-import { Input, Checkbox, Form } from 'antd';
+import { Input, Checkbox, Form, Select } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
 import {
   setIsInpaint,
-  setFindHuggingFace,
+  // setFindHuggingFace,
   setPretrainedModelNameOrPath,
   setTrainModelName,
   setTokenizerName,
   setRevision
 } from '../../../store/slices/training/trainingSlice';
 
+const { Option } = Select;
+
 const ModelParams = () => {
   const dispatch = useDispatch();
 
-  const { isInpaint, findHuggingFace, pretrainedModelNameOrPath, trainModelName, tokenizerName, revision } =
-    useSelector((state: RootState) => state.training.params.modelParams);
+  const { isInpaint, pretrainedModelNameOrPath, trainModelName, tokenizerName, revision } = useSelector(
+    (state: RootState) => state.training.params.modelParams
+  );
+
+  const inpaintModels = ['stable-diffusion-2-inpainting'];
+  const otherModels = ['stable-diffusion-2', 'stable-diffusion-v1-5', 'stable-diffusion-v1-4'];
+
+  const handleModelChange = (value: string) => {
+    dispatch(setPretrainedModelNameOrPath(value));
+  };
+
+  const handleInpaintChange = (checked: boolean) => {
+    dispatch(setIsInpaint(checked));
+    // isInpaint 변경될 때 pretrainedModelNameOrPath 초기화
+    dispatch(setPretrainedModelNameOrPath(''));
+  };
 
   return (
     <>
       <h3 className="text-lg font-bold mb-4 dark:text-gray-300">Model Parameters</h3>
-      <Form layout="vertical">
+      <Form layout="horizontal">
         {/* isInpaint */}
-        <Form.Item valuePropName="checked">
-          <Checkbox checked={isInpaint} onChange={(e) => dispatch(setIsInpaint(e.target.checked))}>
-            Inpaint Model Learning
-          </Checkbox>
+        <Form.Item label="Inpaint Model Learning" valuePropName="checked">
+          <Checkbox checked={isInpaint} onChange={(e) => handleInpaintChange(e.target.checked)} />
         </Form.Item>
 
         {/* findHuggingFace */}
-        <Form.Item valuePropName="checked">
-          <Checkbox checked={findHuggingFace} onChange={(e) => dispatch(setFindHuggingFace(e.target.checked))}>
-            Hugging face model
-          </Checkbox>
-        </Form.Item>
+        {/* <Form.Item label="Hugging Face Model" valuePropName="checked">
+          <Checkbox checked={findHuggingFace} onChange={(e) => dispatch(setFindHuggingFace(e.target.checked))} />
+        </Form.Item> */}
 
-        {/* pretrainedModelNameOrPath */}
+        {/* Pretrained Model Name or Path */}
         <Form.Item label="Pretrained Model Name or Path" required>
-          <Input
-            placeholder="Enter pretrained model name or path"
-            value={pretrainedModelNameOrPath}
-            onChange={(e) => dispatch(setPretrainedModelNameOrPath(e.target.value))}
-          />
+          <Select
+            placeholder="Select a model"
+            value={pretrainedModelNameOrPath || undefined} // undefined: 초기화된 상태
+            onChange={handleModelChange}
+          >
+            {isInpaint
+              ? inpaintModels.map((model) => (
+                  <Option key={model} value={model}>
+                    {model}
+                  </Option>
+                ))
+              : otherModels.map((model) => (
+                  <Option key={model} value={model}>
+                    {model}
+                  </Option>
+                ))}
+          </Select>
         </Form.Item>
 
         {/* trainModelName */}
         <Form.Item label="Train Model Name" required>
           <Input
-            placeholder="Enter  train model name"
+            placeholder="Enter train model name"
             value={trainModelName}
             onChange={(e) => dispatch(setTrainModelName(e.target.value))}
           />

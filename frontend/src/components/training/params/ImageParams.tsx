@@ -79,16 +79,17 @@ const ImageParams = () => {
       </Form.Item>
 
       {/* priorLossWeight */}
-      <Form.Item label="priorLossWeight">
+      <Form.Item label="Prior Loss Weight">
         <Input
           type="number"
           placeholder="Enter prior loss weight"
           value={priorLossWeight}
           onChange={(e) => dispatch(setPriorLossWeight(Number(e.target.value)))}
+          disabled={!conceptListParams.some((concept) => concept.classPrompt)}
         />
       </Form.Item>
 
-      {/* priorLossWeight */}
+      {/* Center Crop */}
       <Form.Item label="Center Crop" valuePropName="checked">
         <Checkbox checked={centerCrop} onChange={(e) => dispatch(setCenterCrop(e.target.checked))}></Checkbox>
       </Form.Item>
@@ -123,7 +124,7 @@ const ImageParams = () => {
               </Form.Item>
 
               {/* Class Prompt */}
-              <Form.Item label="Class Prompt" required>
+              <Form.Item label="Class Prompt">
                 <Input
                   placeholder="Enter class prompt"
                   value={concept.classPrompt}
@@ -147,7 +148,7 @@ const ImageParams = () => {
               </Form.Item>
 
               {/* Class Image Folder */}
-              <Form.Item label="Class Image Folder" required>
+              <Form.Item label="Class Image Folder">
                 <div className="flex items-center gap-2">
                   <Input
                     value={concept.classImageList || ''}

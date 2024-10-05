@@ -15,9 +15,9 @@ const CheckpointParams = () => {
   );
 
   return (
-    <div>
+    <>
       <h3 className="text-lg font-bold mb-4 dark:text-gray-300">Checkpoint Parameters</h3>
-      <Form layout="vertical">
+      <Form layout="horizontal">
         <Form.Item label="Checkpointing Steps">
           <Input
             type="number"
@@ -48,13 +48,13 @@ const CheckpointParams = () => {
 
         <Form.Item label="Resume From Checkpoint">
           <Input
-            placeholder="Hub Token"
+            placeholder="Enter resume from checkpoint"
             value={resumeFromCheckpoint}
             onChange={(e) => dispatch(setResumeFromCheckpoint(e.target.value))}
           />
         </Form.Item>
       </Form>
-    </div>
+    </>
   );
 };
 

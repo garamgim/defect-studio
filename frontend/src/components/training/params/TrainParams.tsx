@@ -23,7 +23,6 @@ const { Option } = Select;
 const TrainParams = () => {
   const dispatch = useDispatch();
 
-  // Redux 상태에서 필요한 값들을 가져옴
   const {
     trainBatchSize,
     numTrainEpochs,
@@ -42,11 +41,11 @@ const TrainParams = () => {
   } = useSelector((state: RootState) => state.training.params.trainingParams);
 
   return (
-    <div>
+    <>
       <h3 className="text-lg font-bold mb-4 dark:text-gray-300">Training Parameters</h3>
-      <Form layout="vertical">
+      <Form layout="horizontal">
         {/* Train Batch Size */}
-        <Form.Item label="Train Batch Size" required>
+        <Form.Item label="Train Batch Size:" required>
           <InputNumber
             placeholder="Enter Train Batch Size"
             className="w-full"
@@ -60,7 +59,7 @@ const TrainParams = () => {
         </Form.Item>
 
         {/* Number of Epochs */}
-        <Form.Item label="Number of Epochs" required>
+        <Form.Item label="Number of Epochs:" required>
           <InputNumber
             placeholder="Enter Number of Epochs"
             className="w-full"
@@ -74,7 +73,7 @@ const TrainParams = () => {
         </Form.Item>
 
         {/* Learning Rate */}
-        <Form.Item label="Learning Rate" required>
+        <Form.Item label="Learning Rate:" required>
           <InputNumber
             placeholder="Enter Learning Rate"
             className="w-full"
@@ -88,7 +87,7 @@ const TrainParams = () => {
         </Form.Item>
 
         {/* Max Train Steps */}
-        <Form.Item label="Max Train Steps">
+        <Form.Item label="Max Train Steps:">
           <InputNumber
             placeholder="Enter Max Train Steps"
             className="w-full"
@@ -102,7 +101,7 @@ const TrainParams = () => {
         </Form.Item>
 
         {/* Gradient Accumulation Steps */}
-        <Form.Item label="Gradient Accumulation Steps">
+        <Form.Item label="Gradient Accumulation Steps:">
           <InputNumber
             placeholder="Enter Gradient Accumulation Steps"
             className="w-full"
@@ -116,16 +115,16 @@ const TrainParams = () => {
         </Form.Item>
 
         {/* Scale Learning Rate */}
-        <Form.Item label="Scale Learning Rate" valuePropName="checked">
+        <Form.Item label="Scale Learning Rate:" valuePropName="checked">
           <Checkbox checked={scaleLr} onChange={(e) => dispatch(setScaleLr(e.target.checked))} />
         </Form.Item>
 
         {/* Learning Rate Scheduler */}
-        <Form.Item label="LR Scheduler">
+        <Form.Item label="LR Scheduler:">
           <Select
             placeholder="Select LR Scheduler"
             className="w-full"
-            value={lrScheduler === null ? '' : lrScheduler}
+            value={lrScheduler || undefined}
             onChange={(value) => {
               dispatch(
                 setLrScheduler(
@@ -150,7 +149,7 @@ const TrainParams = () => {
         </Form.Item>
 
         {/* LR Warmup Steps */}
-        <Form.Item label="LR Warmup Steps">
+        <Form.Item label="LR Warmup Steps:">
           <InputNumber
             placeholder="Enter LR Warmup Steps"
             className="w-full"
@@ -164,9 +163,9 @@ const TrainParams = () => {
         </Form.Item>
 
         {/* LR Cycles */}
-        <Form.Item label="LR Cycles">
+        <Form.Item label="LR Cycles:">
           <InputNumber
-            placeholder="LR Cycles"
+            placeholder="Enter LR Cycles"
             className="w-full"
             value={lrNumCycles}
             onChange={(value) => {
@@ -178,9 +177,9 @@ const TrainParams = () => {
         </Form.Item>
 
         {/* LR Power */}
-        <Form.Item label="LR Power">
+        <Form.Item label="LR Power:">
           <InputNumber
-            placeholder="LR Power"
+            placeholder="Enter LR Power"
             className="w-full"
             value={lrPower}
             onChange={(value) => {
@@ -192,12 +191,12 @@ const TrainParams = () => {
         </Form.Item>
 
         {/* Use 8-bit Adam Optimizer */}
-        <Form.Item label="Use 8-bit Adam Optimizer" valuePropName="checked">
+        <Form.Item label="Use 8-bit Adam Optimizer:" valuePropName="checked">
           <Checkbox checked={use8bitAdam} onChange={(e) => dispatch(setUse8bitAdam(e.target.checked))} />
         </Form.Item>
 
         {/* Gradient Checkpointing */}
-        <Form.Item label="Gradient Checkpointing" valuePropName="checked">
+        <Form.Item label="Gradient Checkpointing:" valuePropName="checked">
           <Checkbox
             checked={gradientCheckpointing}
             onChange={(e) => dispatch(setGradientCheckpointing(e.target.checked))}
@@ -205,7 +204,7 @@ const TrainParams = () => {
         </Form.Item>
 
         {/* Seed */}
-        <Form.Item label="Seed">
+        <Form.Item label="Seed:">
           <InputNumber
             placeholder="Enter Seed"
             className="w-full"
@@ -219,11 +218,11 @@ const TrainParams = () => {
         </Form.Item>
 
         {/* Train Text Encoder */}
-        <Form.Item label="Train Text Encoder" valuePropName="checked">
+        <Form.Item label="Train Text Encoder:" valuePropName="checked">
           <Checkbox checked={trainTextEncoder} onChange={(e) => dispatch(setTrainTextEncoder(e.target.checked))} />
         </Form.Item>
       </Form>
-    </div>
+    </>
   );
 };
 
