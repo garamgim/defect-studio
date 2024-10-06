@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Modal, message } from 'antd';
 import { FaRegCopy } from 'react-icons/fa6';
 import styled from 'styled-components';
+import Loading from '../../../assets/hourglass.gif';
 
 const CustomModal = styled(Modal)`
   html.dark & .ant-modal-content {
@@ -77,7 +78,18 @@ const Img2ImgDisplay = () => {
                 paddingBottom: '100%'
               }}
             >
+              {/* 배경 */}
               <div className="absolute top-0 left-0 w-full h-full bg-gray-200 dark:bg-gray-700 animate-pulse rounded-xl border border-gray-300 dark:border-gray-700" />
+
+              {/* GIF 중앙 배치 */}
+              <img
+                src={Loading}
+                alt="Loading GIF"
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12"
+                style={{
+                  filter: 'brightness(2)'
+                }}
+              />
             </div>
           ))}
           {allOutputs.outputsInfo.map((outputInfo) =>

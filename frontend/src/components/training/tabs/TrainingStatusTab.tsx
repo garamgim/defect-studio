@@ -90,7 +90,7 @@ const TrainingStatusTab = () => {
     return () => {
       Object.values(intervalIdsRef.current).forEach(clearInterval);
     };
-  }, [taskIds]);
+  }, [dispatch, taskIds]);
 
   const toggleChartVisibility = (taskId: string) => {
     setVisibleCharts((prevState) => ({
