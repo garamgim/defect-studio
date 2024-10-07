@@ -12,7 +12,8 @@ import useImage from 'use-image';
 import Konva from 'konva';
 
 interface MaskingModalProps {
-  onClose: () => void;
+  isModalOpen: boolean;
+  closeModal: () => void;
   imageSrc: string;
   updateInitImageList: (initImgList: string[]) => void; // 배경 이미지
   updateMaskImageList: (maskImgList: string[]) => void; // 캔버스 이미지
@@ -27,11 +28,12 @@ interface LineObject {
 }
 
 const MaskingModal = ({
-  onClose,
+  closeModal,
   imageSrc, // initImageList의 첫번째 배열에는 메뉴얼모드에서 업로드한 사진한장이 담김
   updateInitImageList,
   updateMaskImageList,
-  updateCombinedImg
+  updateCombinedImg,
+  isModalOpen
 }: MaskingModalProps) => {
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null); // 마우스 위치 저장 (x, y값), 이미지 벗어나면 null
   const [rgbColor, setRgbColor] = useState<string | null>(null); // RGB 스트링값, 마찬가지로 이미지 벗어나면 null
@@ -178,7 +180,7 @@ const MaskingModal = ({
       // 원래 스케일로 복원
       stage.scale({ x: originalScaleX, y: originalScaleY });
       stage.batchDraw(); // 스테이지 다시 그리기
-      onClose();
+      closeModal();
     }
   };
 
@@ -454,9 +456,9 @@ const MaskingModal = ({
 
   return (
     <Modal
-      open={true}
+      open={isModalOpen}
       footer={null}
-      onCancel={onClose}
+      onCancel={closeModal}
       closable={false}
       centered
       styles={{ body: { height: '80vh' } }}
@@ -507,16 +509,15 @@ const MaskingModal = ({
             className="border border-white"
           >
             <Layer id="canvas-layer">
-              {image && (
-                <KonvaImage
-                  image={image}
-                  width={imageSize.width}
-                  height={imageSize.height}
-                  x={imagePos.x}
-                  y={imagePos.y}
-                  draggable={false} // 이미지 드래그 비활성화
-                />
-              )}
+              <KonvaImage
+                image={image}
+                width={imageSize.width}
+                height={imageSize.height}
+                x={imagePos.x}
+                y={imagePos.y}
+                draggable={false} // 이미지 드래그 비활성화
+              />
+
               {tool === 'brush' && cursorPosition && (
                 <Circle
                   x={cursorPosition.x}
@@ -685,7 +686,7 @@ const MaskingModal = ({
           </div>
 
           <div className="flex space-x-4">
-            <Button onClick={onClose} className="border-none bg-white text-blue-500">
+            <Button onClick={closeModal} className="border-none bg-white text-blue-500">
               Cancel
             </Button>
             <Button onClick={handlesaveImgs} type="primary" className="bg-blue-500 text-white">

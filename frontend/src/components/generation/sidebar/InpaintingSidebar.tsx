@@ -62,8 +62,6 @@ const InpaintingSidebar = () => {
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
-  const [showModal, setShowModal] = useState(false);
-
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -91,12 +89,9 @@ const InpaintingSidebar = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
   const [isCreatePresetOpen, setIsCreatePresetOpen] = useState(false);
   const [isLoadPresetOpen, setIsLoadPresetOpen] = useState(false);
+  const [isMaskingOpen, setIsMaskingOpen] = useState(false);
 
   const showCreatePreset = () => {
     setIsCreatePresetOpen(true);
@@ -109,6 +104,10 @@ const InpaintingSidebar = () => {
   };
   const closeLoadPreset = () => {
     setIsLoadPresetOpen(false);
+  };
+
+  const closeMasking = () => {
+    setIsMaskingOpen(false);
   };
 
   const handleReset = () => {
@@ -204,7 +203,7 @@ const InpaintingSidebar = () => {
               <Button
                 type="primary"
                 icon={<FormatPainterOutlined />}
-                onClick={() => setShowModal(true)} // 버튼 클릭 시 모달 열기
+                onClick={() => setIsMaskingOpen(true)} // 버튼 클릭 시 모달 열기
                 className="w-full mt-2"
               >
                 Start Masking
@@ -253,15 +252,14 @@ const InpaintingSidebar = () => {
       </div>
 
       {/* Masking 모달 창 */}
-      {showModal && initImageList[0] && (
-        <MaskingModal
-          imageSrc={initImageList[0]}
-          onClose={handleCloseModal}
-          updateInitImageList={updateInitImageList}
-          updateMaskImageList={updateMaskImageList}
-          updateCombinedImg={updateCombinedImg}
-        />
-      )}
+      <MaskingModal
+        isModalOpen={isMaskingOpen}
+        imageSrc={initImageList[0]}
+        closeModal={closeMasking}
+        updateInitImageList={updateInitImageList}
+        updateMaskImageList={updateMaskImageList}
+        updateCombinedImg={updateCombinedImg}
+      />
 
       {/* gpu 선택 모달 */}
       <Modal open={isGpuModalVisible} closable={false} onOk={handleGpuModalOk} onCancel={handleGpuModalCancel}>
