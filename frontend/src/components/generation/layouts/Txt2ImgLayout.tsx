@@ -41,7 +41,6 @@ const Txt2ImgLayout = () => {
 
   const handleGenerate = async () => {
     const gpuNumber = gpuNum || newGpuNum;
-    console.log('pp', params.promptParams.prompt);
 
     const data = {
       gpu_device: gpuNumber,
