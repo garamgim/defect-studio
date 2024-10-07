@@ -93,15 +93,10 @@ const InpaintingSidebar = () => {
   const [isLoadPresetOpen, setIsLoadPresetOpen] = useState(false);
   const [isMaskingOpen, setIsMaskingOpen] = useState(false);
 
-  const showCreatePreset = () => {
-    setIsCreatePresetOpen(true);
-  };
   const closeCreatePreset = () => {
     setIsCreatePresetOpen(false);
   };
-  const showLoadPreset = () => {
-    setIsLoadPresetOpen(true);
-  };
+
   const closeLoadPreset = () => {
     setIsLoadPresetOpen(false);
   };
@@ -154,14 +149,14 @@ const InpaintingSidebar = () => {
 
               <Tooltip title="Create Preset">
                 <FileAddOutlined
-                  onClick={showCreatePreset}
+                  onClick={() => setIsCreatePresetOpen(true)}
                   className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
                 />
               </Tooltip>
 
               <Tooltip title="Load Preset">
                 <FileSearchOutlined
-                  onClick={showLoadPreset}
+                  onClick={() => setIsLoadPresetOpen(true)}
                   className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
                 />
               </Tooltip>
@@ -203,7 +198,7 @@ const InpaintingSidebar = () => {
               <Button
                 type="primary"
                 icon={<FormatPainterOutlined />}
-                onClick={() => setIsMaskingOpen(true)} // 버튼 클릭 시 모달 열기
+                onClick={() => setIsMaskingOpen(true)}
                 className="w-full mt-2"
               >
                 Start Masking
