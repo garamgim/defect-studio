@@ -341,8 +341,19 @@ const MaskingModal = ({
     // 브러시 도구가 활성화되고 드로잉 중인 경우
     if (tool === 'brush' && isDrawing.current) {
       const lastObject = objects[objects.length - 1];
-      lastObject.points = lastObject.points.concat([correctedPos.x, correctedPos.y]);
-      setObjects([...objects.slice(0, objects.length - 1), lastObject]);
+
+      // 마지막 점 가져오기
+      const lastPointX = lastObject.points[lastObject.points.length - 2];
+      const lastPointY = lastObject.points[lastObject.points.length - 1];
+
+      // 두 점 사이의 거리 계산 (최소 간격 2px 이상인 경우만 추가)
+      const distance = Math.sqrt(Math.pow(correctedPos.x - lastPointX, 2) + Math.pow(correctedPos.y - lastPointY, 2));
+
+      if (distance > 2) {
+        // 2px 이상의 간격만 새로운 점을 추가
+        lastObject.points = lastObject.points.concat([correctedPos.x, correctedPos.y]);
+        setObjects([...objects.slice(0, objects.length - 1), lastObject]);
+      }
     }
 
     // 마우스 커서에 브러시 크기만큼 원을 표시
