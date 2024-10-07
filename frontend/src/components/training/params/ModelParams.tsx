@@ -3,11 +3,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
 import {
   setIsInpaint,
-  // setFindHuggingFace,
   setPretrainedModelNameOrPath,
   setTrainModelName,
   setTokenizerName,
-  setRevision
+  setRevision,
+  setGpuNum
 } from '../../../store/slices/training/trainingSlice';
 
 const { Option } = Select;
@@ -18,6 +18,8 @@ const ModelParams = () => {
   const { isInpaint, pretrainedModelNameOrPath, trainModelName, tokenizerName, revision } = useSelector(
     (state: RootState) => state.training.params.modelParams
   );
+
+  const gpuNum = useSelector((state: RootState) => state.training.gpuNum);
 
   const inpaintModels = ['stable-diffusion-2-inpainting'];
   const otherModels = ['stable-diffusion-2', 'stable-diffusion-v1-5', 'stable-diffusion-v1-4'];
@@ -36,15 +38,21 @@ const ModelParams = () => {
     <>
       <h3 className="text-lg font-bold mb-4 dark:text-gray-300">Model Parameters</h3>
       <Form layout="horizontal">
+        {/* gpuNum */}
+        <Form.Item label="Gpu number">
+          <Input
+            type="number"
+            min={0}
+            placeholder="Enter gpu number"
+            value={gpuNum !== undefined ? String(gpuNum) : ''}
+            onChange={(e) => dispatch(setGpuNum(Number(e.target.value)))}
+          />
+        </Form.Item>
+
         {/* isInpaint */}
         <Form.Item label="Inpaint Model Learning" valuePropName="checked">
           <Checkbox checked={isInpaint} onChange={(e) => handleInpaintChange(e.target.checked)} />
         </Form.Item>
-
-        {/* findHuggingFace */}
-        {/* <Form.Item label="Hugging Face Model" valuePropName="checked">
-          <Checkbox checked={findHuggingFace} onChange={(e) => dispatch(setFindHuggingFace(e.target.checked))} />
-        </Form.Item> */}
 
         {/* Pretrained Model Name or Path */}
         <Form.Item label="Pretrained Model Name or Path" required>

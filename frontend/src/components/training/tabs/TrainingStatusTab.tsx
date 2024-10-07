@@ -22,6 +22,7 @@ const TrainingStatusTab = () => {
   const dispatch = useDispatch();
   const [chartDataMap, setChartDataMap] = useState<{ [key: string]: any }>({});
   const [visibleCharts, setVisibleCharts] = useState<{ [key: string]: boolean }>({});
+  const [completedTaskIds, setCompletedTaskIds] = useState<string[]>([]); // 완료된 taskId를 저장하는 상태
   const taskIds = useSelector((state: RootState) => state.trainingOutput.taskId);
   const intervalIdsRef = useRef<{ [key: string]: NodeJS.Timeout }>({});
 
@@ -29,11 +30,9 @@ const TrainingStatusTab = () => {
   const fetchTrainingStatus = async (taskId: string) => {
     try {
       const data = await getTrainingStatus(taskId);
-      console.log(`Fetched data for taskId: ${taskId}`, data);
       return {
         taskId: taskId,
         status: data.task_status,
-        // progress: data.progress, 데이터 추가되면 추가 아니면 삭제
         resultData: data.task_status === 'STARTED' ? data.result_data : null
       };
     } catch (error) {
@@ -45,17 +44,12 @@ const TrainingStatusTab = () => {
 
   useEffect(() => {
     taskIds.forEach((taskId) => {
-      console.log('All taskIds:', taskIds);
-      if (!intervalIdsRef.current[taskId]) {
-        console.log(`test1: ${taskId}`);
-
+      if (taskId) {
         intervalIdsRef.current[taskId] = setInterval(async () => {
           const progressData = await fetchTrainingStatus(taskId);
 
-          if (progressData) {
-            console.log(`test2 ${taskId}:`, progressData);
-
-            // 학습 중일 때만 상태 업데이트
+          if (progressData?.resultData) {
+            // 학습 중일 때 상태 업데이트
             if (progressData.status === 'STARTED' && progressData.resultData) {
               setChartDataMap((prev) => ({
                 ...prev,
@@ -79,33 +73,41 @@ const TrainingStatusTab = () => {
                       tension: 0.1
                     }
                   ],
-                  // progress: progressData.progress
+                  progress: progressData.resultData.progress[progressData.resultData.progress.length - 1] * 100
                 }
               }));
             }
+          } else {
+            // 학습 완료 시 처리
+            clearInterval(intervalIdsRef.current[taskId]); // interval 제거
+            delete intervalIdsRef.current[taskId];
 
-            // 학습 완료 시 interval 제거 및 Redux에서 taskId 제거
-            if (progressData.status === 'SUCCESS' || progressData.status === 'PENDING') {
-              console.log(`TaskId ${taskId} 학습 완료, interval 제거`);
-              clearInterval(intervalIdsRef.current[taskId]);
-              dispatch(removeTaskId(taskId));
-              delete intervalIdsRef.current[taskId];
-            }
+            // 완료된 taskId를 completedTaskIds에 추가
+            setCompletedTaskIds((prev) => [taskId, ...prev]);
+
+            // Redux에서 taskId 제거
+            dispatch(removeTaskId(taskId));
           }
         }, 1000);
       }
     });
 
     return () => {
+      // 컴포넌트가 unmount될 때 모든 interval 제거
       Object.values(intervalIdsRef.current).forEach(clearInterval);
     };
-  }, [taskIds]);
+  }, [dispatch, taskIds]);
 
   const toggleChartVisibility = (taskId: string) => {
     setVisibleCharts((prevState) => ({
       ...prevState,
       [taskId]: !prevState[taskId]
     }));
+  };
+
+  // 완료된 taskId를 수동으로 제거하는 함수
+  const removeCompletedTask = (taskId: string) => {
+    setCompletedTaskIds((prev) => prev.filter((id) => id !== taskId));
   };
 
   const chartOptions = {
@@ -118,9 +120,10 @@ const TrainingStatusTab = () => {
   };
 
   return (
-    <div className="h-full bg-white rounded-lg p-6 shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
+    <div className="h-full bg-white rounded-lg p-6 shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none overflow-y-auto custom-scrollbar">
       <h3 className="text-lg font-bold mb-4 dark:text-gray-300">Training Progress Overview</h3>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] lg:grid-cols-[repeat(3,minmax(200px,1fr))]">
+        {/* 진행 중인 학습 상태 표시 */}
         {taskIds.map((taskId) => (
           <div
             key={taskId}
@@ -129,14 +132,7 @@ const TrainingStatusTab = () => {
           >
             <p className="font-medium mb-2 dark:text-gray-300">Id: {taskId}</p>
             <Progress percent={chartDataMap[taskId]?.progress || 0} />
-            {/* View Training Logs 버튼 */}
-            <Button
-              type="default"
-              className="mt-2 w-full dark:bg-gray-600 dark:border-none dark:text-gray-400"
-              onClick={() => toggleChartVisibility(taskId)}
-            >
-              {visibleCharts[taskId] ? 'Hide Training Logs' : 'View Training Logs'}
-            </Button>
+
             {/* 학습 진행 상황 차트 */}
             {visibleCharts[taskId] && (
               <div style={{ marginTop: '20px', height: '300px', overflowY: 'auto' }}>
@@ -147,7 +143,54 @@ const TrainingStatusTab = () => {
                 )}
               </div>
             )}
+
+            {/* View Training Logs 버튼 */}
+            <Button
+              type="default"
+              className="mt-4 w-full dark:bg-gray-600 dark:border-none dark:text-gray-400"
+              onClick={() => toggleChartVisibility(taskId)}
+            >
+              {visibleCharts[taskId] ? 'Hide Training Logs' : 'View Training Logs'}
+            </Button>
           </div>
+        ))}
+
+        {/* 완료된 학습 상태 표시 */}
+        {completedTaskIds.map((taskId) => (
+          <>
+            <div
+              key={taskId}
+              className={`p-4 border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-none transition-all duration-300 overflow-hidden`}
+              style={{ minHeight: '150px', height: visibleCharts[taskId] ? 'auto' : '150px', maxHeight: '500px' }}
+            >
+              <p className="font-medium mb-2 dark:text-gray-300">Id: {taskId} (Completed)</p>
+              <Progress percent={100} /> {/* 완료된 학습은 progress 100% */}
+              {/* 학습 진행 상황 차트 */}
+              {visibleCharts[taskId] && (
+                <div style={{ marginTop: '20px', height: '300px', overflowY: 'auto' }}>
+                  {chartDataMap[taskId] ? (
+                    <Line data={chartDataMap[taskId]} options={chartOptions} />
+                  ) : (
+                    <p>Loading chart...</p>
+                  )}
+                </div>
+              )}
+              {/* View Training Logs 버튼 */}
+              <Button
+                type="default"
+                className="mt-4 w-full dark:bg-gray-600 dark:border-none dark:text-gray-400"
+                onClick={() => toggleChartVisibility(taskId)}
+              >
+                {visibleCharts[taskId] ? 'Hide Training Logs' : 'View Training Logs'}
+              </Button>
+              {/* 삭제 버튼 */}
+              {visibleCharts[taskId] && (
+                <Button type="primary" danger className="mt-2 w-full" onClick={() => removeCompletedTask(taskId)}>
+                  Remove Completed Task
+                </Button>
+              )}
+            </div>
+          </>
         ))}
       </div>
     </div>

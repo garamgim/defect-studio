@@ -6,6 +6,12 @@ import styled from 'styled-components';
 
 const { TabPane } = Tabs;
 
+const CustomTabs = styled(Tabs)`
+  .ant-tabs-nav::before {
+    border-bottom: none !important;
+  }
+`;
+
 const Training = () => {
   // 진행상황 dummyData
   const [trainProgress] = useState([
@@ -16,12 +22,6 @@ const Training = () => {
   const handleStopTraining = (modelName: string) => {
     console.log(`${modelName} training stopped.`);
   };
-
-  const CustomTabs = styled(Tabs)`
-    .ant-tabs-nav::before {
-      border-bottom: none !important;
-    }
-  `;
 
   return (
     <div className="w-full h-[calc(100vh-60px)] bg-gray-100 px-8 pt-4 pb-8 dark:bg-gray-800">

@@ -8,6 +8,7 @@ import { addTaskId } from '../../../store/slices/training/outputSlice';
 const TrainingButton = () => {
   const dispatch = useDispatch();
 
+  const newGpuNum = useSelector((state: RootState) => state.settings.gpuNum);
   const { gpuNum, params } = useSelector((state: RootState) => state.training);
 
   // 폴더에서 파일을 가져오는 함수
@@ -67,9 +68,11 @@ const TrainingButton = () => {
         })
       );
 
+      const gpuNumber = gpuNum || newGpuNum;
+
       // 필수 필드와 선택적 필드 나누기
       const mandatoryFields: TrainingParams = {
-        gpu_device: gpuNum !== null ? gpuNum : 1,
+        gpu_device: gpuNumber,
         pretrained_model_name_or_path: params.modelParams.pretrainedModelNameOrPath,
         train_model_name: params.modelParams.trainModelName,
         instance_image_list: instanceImageListFiles,
@@ -84,7 +87,7 @@ const TrainingButton = () => {
       // 선택적 필드들
       const optionalFields = {
         is_inpaint: params.modelParams.isInpaint,
-        find_hugging_face: params.modelParams.findHuggingFace,
+
         tokenizer_name: params.modelParams.tokenizerName,
         revision: params.modelParams.revision,
         prior_loss_weight: params.imgsParams.priorLossWeight,
@@ -119,8 +122,10 @@ const TrainingButton = () => {
       };
 
       const newTaskId = await postTraining('remote', fullTrainingData as TrainingParams);
-      dispatch(addTaskId(newTaskId));
-      console.log('test', newTaskId);
+      // 3초 후에 addTaskId 실행
+      setTimeout(() => {
+        dispatch(addTaskId(newTaskId));
+      }, 3000);
     } catch (error) {
       message.error(`Error during training: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
