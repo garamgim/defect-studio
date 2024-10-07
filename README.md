@@ -32,7 +32,21 @@
 
 **AI를 통해 불량을 판별하는 모든 기업 및 부서**
 
-# Tech Stack
+### 🔍 주요 기능
+
+- **Stable Diffusion**을 이용한 결함 이미지 생성 및 이미지 수정
+
+  - text-to-image, image-to-image, remove-background, inpainting, cleanup
+
+- **학습**을 통해 특정 제품에 대한 결함, 정상 이미지 학습
+
+- 이전 생성한 이미지에 대한 **History 기록**
+
+- **Token 관리 및 통계** 제공
+
+- Settings을 통한 사용할 **GPU 서버 선택**
+
+# 🔨 Tech Stack 🔨
 
 ### Front End
 
@@ -77,3 +91,7 @@
 ![Mattermost Badge](https://img.shields.io/badge/Mattermost-0058CC?logo=mattermost&logoColor=fff&style=for-the-badge)
 ![Git Badge](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=fff&style=for-the-badge)
 ![Slack Badge](https://img.shields.io/badge/Slack-4A154B?logo=slack&logoColor=fff&style=for-the-badge)
+
+### Architecture
+
+<img src="./readme/architecture.png">
