@@ -95,11 +95,11 @@ const ImageParams = () => {
       </Form.Item>
 
       {/* Concept 아코디언 */}
-      <Collapse accordion defaultActiveKey={['0']}>
+      <Collapse className="dark:bg-gray-500 dark:border-none" accordion defaultActiveKey={['0']}>
         {conceptListParams.map((concept, index) => (
           <Panel
             header={
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center dark:text-gray-300">
                 <span className="flex items-center">Concept {index + 1}</span>
                 {conceptListParams.length > 1 && (
                   <CustomMinusSquareOutlined
