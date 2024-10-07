@@ -112,16 +112,22 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
               <div className="flex justify-between items-center mb-2">
                 <span className="font-semibold text-[18px]">Prompt</span>
                 <div
-                  className="flex items-center cursor-pointer text-sm text-gray-400 transition-transform transform hover:scale-110"
-                  onClick={() => copyToClipboard(folderDetails.prompt || 'N/A')}
+                  className="flex items-center cursor-pointer text-[14px] hover:text-[#222] text-gray-400 dark:hover:text-white transition-transform transform hover:scale-110"
+                  onClick={() => copyToClipboard(folderDetails.prompt || '')}
                 >
                   <FaRegCopy className="mr-2" />
                   <span>Copy</span>
                 </div>
               </div>
-              <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-sm leading-relaxed">
-                {folderDetails.prompt || 'N/A'}
-              </div>
+              {folderDetails.prompt ? (
+                <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-[14px] leading-relaxed">
+                  {folderDetails.prompt}
+                </div>
+              ) : (
+                <div className="p-4 text-gray-300 dark:text-gray-500 text-center bg-gray-100 dark:bg-gray-700 rounded-lg text-[14px] leading-relaxed">
+                  Prompt does not exist.
+                </div>
+              )}
             </div>
 
             {/* Negative Prompt */}
@@ -129,20 +135,26 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
               <div className="flex justify-between items-center mb-2">
                 <span className="font-semibold text-[18px]">Negative Prompt</span>
                 <div
-                  className="flex items-center cursor-pointer text-[14px] text-gray-400 transition-transform transform hover:scale-110"
-                  onClick={() => copyToClipboard(folderDetails.negative_prompt || 'N/A')}
+                  className="flex items-center cursor-pointer text-[14px] hover:text-[#222] text-gray-400 dark:hover:text-white transition-transform transform hover:scale-110"
+                  onClick={() => copyToClipboard(folderDetails.negative_prompt || '')}
                 >
                   <FaRegCopy className="mr-2" />
                   <span>Copy</span>
                 </div>
               </div>
-              <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-[14px] leading-relaxed">
-                {folderDetails.negative_prompt || 'N/A'}
-              </div>
+              {folderDetails.negative_prompt ? (
+                <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-[14px] leading-relaxed">
+                  {folderDetails.negative_prompt}
+                </div>
+              ) : (
+                <div className="p-4 text-gray-300 dark:text-gray-500 text-center bg-gray-100 dark:bg-gray-700 rounded-lg text-[14px] leading-relaxed">
+                  Negative Prompt does not exist.
+                </div>
+              )}
             </div>
 
             {/* 기타 정보 */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-[14px]">
               <div className="flex flex-col">
                 <span className="text-gray-400 mb-1">Generation Type</span>
                 <span className="font-medium mb-2">{folderDetails.generation_type}</span>
@@ -150,7 +162,7 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
 
               <div className="flex flex-col">
                 <span className="text-gray-400 mb-1">Date</span>
-                <span className="font-medium mb-2">{folderDetails.date}</span>
+                <span className="font-medium mb-2">{folderDetails.date.slice(0, 19).replace('T', ' ')}</span>
               </div>
 
               <div className="flex flex-col">
@@ -172,23 +184,25 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
 
               <div className="flex flex-col">
                 <span className="text-gray-400 mb-1">Sampling Steps</span>
-                <span className="font-medium mb-2">{folderDetails.sampling_steps || 'N/A'}</span>
+                <span className="font-medium mb-2">{folderDetails.num_inference_steps}</span>
               </div>
 
               <div className="flex flex-col">
                 <span className="text-gray-400 mb-1">Guidance Scale</span>
-                <span className="font-medium mb-2">{folderDetails.guidance_scale || 'N/A'}</span>
+                <span className="font-medium mb-2">{folderDetails.guidance_scale}</span>
               </div>
 
               <div className="flex flex-col">
                 <span className="text-gray-400 mb-1">Scheduler</span>
-                <span className="font-medium mb-2">{folderDetails.scheduler || 'N/A'}</span>
+                <span className="font-medium mb-2">{folderDetails.scheduler}</span>
               </div>
 
-              <div className="flex flex-col">
-                <span className="text-gray-400 mb-1">Strength</span>
-                <span className="font-medium mb-2">{folderDetails.strength || 'N/A'}</span>
-              </div>
+              {folderDetails.generation_type !== 'text_to_image' && (
+                <div className="flex flex-col">
+                  <span className="text-gray-400 mb-1">Strength</span>
+                  <span className="font-medium mb-2">{folderDetails.strength}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

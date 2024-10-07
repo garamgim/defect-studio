@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Modal, message } from 'antd';
 import { FaRegCopy } from 'react-icons/fa6';
 import styled from 'styled-components';
+import Loading from '../../../assets/hourglass.gif';
 
 const CustomModal = styled(Modal)`
   html.dark & .ant-modal-content {
@@ -35,7 +36,7 @@ const Txt2ImgDisplay = () => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.key === 'p' && selectedImgs.length > 0) {
-        setIsModalOpen(true); // 모달 열기
+        setIsModalOpen(true);
       }
     };
 
@@ -77,7 +78,18 @@ const Txt2ImgDisplay = () => {
                 paddingBottom: '100%'
               }}
             >
+              {/* 배경 */}
               <div className="absolute top-0 left-0 w-full h-full bg-gray-200 dark:bg-gray-700 animate-pulse rounded-xl border border-gray-300 dark:border-gray-700" />
+
+              {/* GIF */}
+              <img
+                src={Loading}
+                alt="Loading GIF"
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-36"
+                style={{
+                  filter: 'brightness(0.5)'
+                }}
+              />
             </div>
           ))}
           {allOutputs.outputsInfo.map((outputInfo) =>
@@ -140,7 +152,9 @@ const Txt2ImgDisplay = () => {
           )}
         </div>
       ) : (
-        <p>No images generated yet.</p>
+        <div className="flex justify-center items-center">
+          <p className="text-gray-400 dark:text-gray-500">No images generated yet</p>
+        </div>
       )}
 
       {/* 모달: 마지막으로 선택된 이미지에 대한 프롬프트 표시 */}

@@ -1,4 +1,4 @@
-interface GpuInfo {
+export interface GpuInfoType {
   'GPU num': number;
   'GPU name': string;
   'Total memory (MB)': number;
@@ -8,6 +8,9 @@ interface GpuInfo {
   'Used memory (%)': number;
 }
 
-export interface gpuInfo {
-  gpu_info: GpuInfo[];
+export interface gpuInfoResponse {
+  data: {
+    gpu_info: GpuInfoType[];
+  };
 }
+

@@ -1,96 +1,71 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { TrainingParams } from '../../../types/training';
-import { SnakeToCamel } from '../../../utils/snakeToCamel';
+import {
+  ModelParamsType,
+  ImgsParamsType,
+  TrainingParamsType,
+  OptimizerParamsType,
+  CheckpointParamsType,
+  ConceptListParamsType
+} from '../../../types/training';
 
-interface Concept {
-  instancePrompt: string;
-  classPrompt: string;
-  instanceImageFolder: string;
-  classImageFolder: string;
-  validationImageFolder: string;
-}
-
-export interface TrainingState
-  extends Omit<
-    SnakeToCamel<TrainingParams>,
-    'instancePrompt' | 'classPrompt' | 'instanceImageList' | 'classImageList' | 'validationImages'
-  > {
-  concepts: Concept[];
+export interface TrainingState {
+  gpuNum: number | null;
+  params: {
+    modelParams: ModelParamsType;
+    imgsParams: ImgsParamsType;
+    trainingParams: TrainingParamsType;
+    optimizerParams: OptimizerParamsType;
+    checkpointParams: CheckpointParamsType;
+    conceptListParams: ConceptListParamsType[];
+  };
   maxConcepts: number;
 }
 
 const initialState: TrainingState = {
-  memberId: -1,
-  trainModelName: '',
-  model: 'stable-diffusion-2', // 드롭다운
-  // instancePrompt: '', // 범주 중에 특징(선 잘린 케이블)
-  // classPrompt: '', // 큰 범주(케이블)
-  resolution: 512, // 학습할 이미지 크기
-  trainBatchSize: 1, ////////////////////////////////8로 고치기!!!!!!!!!!!!!!!!!!
-  numTrainEpochs: 2, ////////////////////10으로 고치기!!!!!!!!!!!!
-  learningRate: 0.001, // 0과 1사이 실수
-
-  revision: '', // 모델의 버전 <- 여기서는 사용x
-  variant: '', // ?????????(이거 드롭다운 같은데 적는 양식이 정해져 있을 것 같음)
-  tokenizerName: '', // 이거 경로?? 어디
-  withPriorPreservation: false,
-  priorLossWeight: 0, // withPriorPreservation: true일 때 작성
-  seed: 42, // 해당 시드로 재현성 테스트
-  centerCrop: false,
-  trainTextEncoder: false, // ?? textEncoder학습 왜 default false??
-  sampleBatchSize: 1, //////////////////////4로 고치기
-  maxTrainSteps: 10, //1000//////////////////////////
-  checkpointingSteps: 500,
-  checkpointsTotalLimit: -1, // default: None 맞는지 확인!
-  resumeFromCheckpoint: '', //경로 "none, latest, path"
-  gradientAccumulationSteps: 1,
-  gradientCheckpointing: false,
-  scaleLr: false,
-  lrScheduler: 'linear', // 드롭다운 <- ""은 뭔지? ("", "constant", "linear", "cosine", "cosineWithRestarts", "polynomial", "constantWithWarmup")
-  lrWarmupSteps: 0,
-  lrNumCycles: 1,
-  lrPower: 1.0, // lrScheduler가 polynomial일때만 넣어야함
-  use8bitAdam: false,
-  dataloaderNumWorkers: 4,
-  adamBeta1: 0.9,
-  adamBeta2: 0.999,
-  adamWeightDecay: 0.01,
-  adamEpsilon: 1e-8,
-  maxGradNorm: 1.0,
-  pushToHub: false, // 이거 가능한건가?????????
-  hubToken: '', //pushToHub있으면 넣어야함
-  hubModelId: '', //pushToHub있으면 넣어야함
-  loggingDir: '', // 이 디렉토리는??? 지정안하면 어디에 저장? 뭔지모르겠음
-  allowTf32: false,
-  reportTo: '', // 이것도 뭐지
-  validationPrompt: '', // 검증을 위한 프롬프트 예시??
-  numValidationImages: 5,
-  validationSteps: 100,
-  mixedPrecision: '', // 드롭다운 (fp16, bf16) <- 기본값뭔지 데이터 안보낼때 뭘로 들어가고 있는지
-  priorGenerationPrecision: '', // 드롭다운 (fp16, fp32 또는 bf16) <- 기본값뭔지
-  localRank: -1,
-  enableXformersMemoryEfficientAttention: false,
-  setGradsToNone: false,
-  offsetNoise: false,
-  snrGamma: 5.0,
-  preComputeTextEmbeddings: false,
-  tokenizerMaxLength: -1, // 이거 기본값 맞는지 확인
-  textEncoderUseAttentionMask: false,
-  skipSaveTextEncoder: false,
-  // validationImages: '', //왜 문자열??????????
-  // instanceImageList: [''],
-  // classImageList: [''],
-  classLabelsConditioning: '',
-  validationScheduler: '',
-  concepts: [
-    {
-      instancePrompt: '',
-      classPrompt: '',
-      instanceImageFolder: '',
-      classImageFolder: '',
-      validationImageFolder: ''
-    }
-  ],
+  gpuNum: null,
+  params: {
+    modelParams: {
+      isInpaint: false,
+      pretrainedModelNameOrPath: '',
+      trainModelName: '',
+      tokenizerName: '',
+      revision: ''
+    },
+    imgsParams: {
+      resolution: 512,
+      priorLossWeight: 1,
+      centerCrop: false
+    },
+    trainingParams: {
+      trainBatchSize: 2,
+      numTrainEpochs: 50,
+      learningRate: 5e-6,
+      maxTrainSteps: null,
+      gradientAccumulationSteps: null,
+      scaleLr: false,
+      lrScheduler: null,
+      lrWarmupSteps: null,
+      lrNumCycles: null,
+      lrPower: null,
+      use8bitAdam: false,
+      gradientCheckpointing: false,
+      seed: null,
+      trainTextEncoder: false
+    },
+    optimizerParams: {
+      adamBeta1: null,
+      adamBeta2: null,
+      adamWeightDecay: null,
+      adamEpsilon: null,
+      maxGradNorm: null
+    },
+    checkpointParams: {
+      checkpointingSteps: null,
+      checkpointsTotalLimit: null,
+      resumeFromCheckpoint: ''
+    },
+    conceptListParams: [{ instancePrompt: '', classPrompt: '', instanceImageList: '', classImageList: '' }]
+  },
   maxConcepts: 10
 };
 
@@ -98,294 +73,177 @@ const trainingSlice = createSlice({
   name: 'training',
   initialState,
   reducers: {
-    setMemberId(state, action: PayloadAction<number>) {
-      state.memberId = action.payload;
+    setGpuNum: (state, action: PayloadAction<number | null>) => {
+      state.gpuNum = action.payload;
     },
-    setTrainModelName(state, action: PayloadAction<string>) {
-      state.trainModelName = action.payload;
+
+    // Model Params
+    setIsInpaint: (state, action: PayloadAction<boolean>) => {
+      state.params.modelParams.isInpaint = action.payload;
     },
-    setModel(state, action: PayloadAction<string>) {
-      state.model = action.payload;
+    setPretrainedModelNameOrPath: (state, action: PayloadAction<string>) => {
+      state.params.modelParams.pretrainedModelNameOrPath = action.payload;
     },
-    // setInstancePrompt(state, action: PayloadAction<string>) {
-    //   state.instancePrompt = action.payload;
-    // },
-    // setClassPrompt(state, action: PayloadAction<string>) {
-    //   state.classPrompt = action.payload;
-    // },
-    setResolution(state, action: PayloadAction<number>) {
-      state.resolution = action.payload;
+    setTrainModelName: (state, action: PayloadAction<string>) => {
+      state.params.modelParams.trainModelName = action.payload;
     },
-    setTrainBatchSize(state, action: PayloadAction<number>) {
-      state.trainBatchSize = action.payload;
+    setTokenizerName: (state, action: PayloadAction<string>) => {
+      state.params.modelParams.tokenizerName = action.payload;
     },
-    setNumTrainEpochs(state, action: PayloadAction<number>) {
-      state.numTrainEpochs = action.payload;
+    setRevision: (state, action: PayloadAction<string>) => {
+      state.params.modelParams.revision = action.payload;
     },
-    setLearningRate(state, action: PayloadAction<number>) {
-      state.learningRate = action.payload;
+
+    // Image Params
+    setResolution: (state, action: PayloadAction<number>) => {
+      state.params.imgsParams.resolution = action.payload;
     },
-    setRevision(state, action: PayloadAction<string>) {
-      state.revision = action.payload;
+    setPriorLossWeight: (state, action: PayloadAction<number>) => {
+      state.params.imgsParams.priorLossWeight = action.payload;
     },
-    setVariant(state, action: PayloadAction<string>) {
-      state.variant = action.payload;
+    setCenterCrop: (state, action: PayloadAction<boolean>) => {
+      state.params.imgsParams.centerCrop = action.payload;
     },
-    setTokenizerName(state, action: PayloadAction<string>) {
-      state.tokenizerName = action.payload;
+
+    // Training Params
+    setTrainBatchSize: (state, action: PayloadAction<number>) => {
+      state.params.trainingParams.trainBatchSize = action.payload;
     },
-    setWithPriorPreservation(state, action: PayloadAction<boolean>) {
-      state.withPriorPreservation = action.payload;
+    setNumTrainEpochs: (state, action: PayloadAction<number>) => {
+      state.params.trainingParams.numTrainEpochs = action.payload;
     },
-    setPriorLossWeight(state, action: PayloadAction<number>) {
-      state.priorLossWeight = action.payload;
+    setLearningRate: (state, action: PayloadAction<number>) => {
+      state.params.trainingParams.learningRate = action.payload;
     },
-    setSeed(state, action: PayloadAction<number>) {
-      state.seed = action.payload;
+    setMaxTrainSteps: (state, action: PayloadAction<number | null>) => {
+      state.params.trainingParams.maxTrainSteps = action.payload;
     },
-    setCenterCrop(state, action: PayloadAction<boolean>) {
-      state.centerCrop = action.payload;
+    setGradientAccumulationSteps: (state, action: PayloadAction<number | null>) => {
+      state.params.trainingParams.gradientAccumulationSteps = action.payload;
     },
-    setTrainTextEncoder(state, action: PayloadAction<boolean>) {
-      state.trainTextEncoder = action.payload;
+    setScaleLr: (state, action: PayloadAction<boolean>) => {
+      state.params.trainingParams.scaleLr = action.payload;
     },
-    setSampleBatchSize(state, action: PayloadAction<number>) {
-      state.sampleBatchSize = action.payload;
+    setLrScheduler: (state, action: PayloadAction<TrainingParamsType['lrScheduler']>) => {
+      state.params.trainingParams.lrScheduler = action.payload;
     },
-    setMaxTrainSteps(state, action: PayloadAction<number>) {
-      state.maxTrainSteps = action.payload;
+    setLrWarmupSteps: (state, action: PayloadAction<number | null>) => {
+      state.params.trainingParams.lrWarmupSteps = action.payload;
     },
-    setCheckpointingSteps(state, action: PayloadAction<number>) {
-      state.checkpointingSteps = action.payload;
+    setLrNumCycles: (state, action: PayloadAction<number | null>) => {
+      state.params.trainingParams.lrNumCycles = action.payload;
     },
-    setCheckpointsTotalLimit(state, action: PayloadAction<number>) {
-      state.checkpointsTotalLimit = action.payload;
+    setLrPower: (state, action: PayloadAction<number | null>) => {
+      state.params.trainingParams.lrPower = action.payload;
     },
-    setResumeFromCheckpoint(state, action: PayloadAction<string>) {
-      state.resumeFromCheckpoint = action.payload;
+    setUse8bitAdam: (state, action: PayloadAction<boolean>) => {
+      state.params.trainingParams.use8bitAdam = action.payload;
     },
-    setGradientAccumulationSteps(state, action: PayloadAction<number>) {
-      state.gradientAccumulationSteps = action.payload;
+    setGradientCheckpointing: (state, action: PayloadAction<boolean>) => {
+      state.params.trainingParams.gradientCheckpointing = action.payload;
     },
-    setGradientCheckpointing(state, action: PayloadAction<boolean>) {
-      state.gradientCheckpointing = action.payload;
+    setSeed: (state, action: PayloadAction<number | null>) => {
+      state.params.trainingParams.seed = action.payload;
     },
-    setScaleLr(state, action: PayloadAction<boolean>) {
-      state.scaleLr = action.payload;
+    setTrainTextEncoder: (state, action: PayloadAction<boolean>) => {
+      state.params.trainingParams.trainTextEncoder = action.payload;
     },
-    setLrScheduler(state, action: PayloadAction<string>) {
-      state.lrScheduler = action.payload;
+
+    // Optimizer Params
+    setAdamBeta1: (state, action: PayloadAction<number | null>) => {
+      state.params.optimizerParams.adamBeta1 = action.payload;
     },
-    setLrWarmupSteps(state, action: PayloadAction<number>) {
-      state.lrWarmupSteps = action.payload;
+    setAdamBeta2: (state, action: PayloadAction<number | null>) => {
+      state.params.optimizerParams.adamBeta2 = action.payload;
     },
-    setLrNumCycles(state, action: PayloadAction<number>) {
-      state.lrNumCycles = action.payload;
+    setAdamWeightDecay: (state, action: PayloadAction<number | null>) => {
+      state.params.optimizerParams.adamWeightDecay = action.payload;
     },
-    setLrPower(state, action: PayloadAction<number>) {
-      state.lrPower = action.payload;
+    setAdamEpsilon: (state, action: PayloadAction<number | null>) => {
+      state.params.optimizerParams.adamEpsilon = action.payload;
     },
-    setUse8bitAdam(state, action: PayloadAction<boolean>) {
-      state.use8bitAdam = action.payload;
+    setMaxGradNorm: (state, action: PayloadAction<number | null>) => {
+      state.params.optimizerParams.maxGradNorm = action.payload;
     },
-    setDataloaderNumWorkers(state, action: PayloadAction<number>) {
-      state.dataloaderNumWorkers = action.payload;
+
+    // Checkpoint Params
+    setCheckpointingSteps: (state, action: PayloadAction<number | null>) => {
+      state.params.checkpointParams.checkpointingSteps = action.payload;
     },
-    setAdamBeta1(state, action: PayloadAction<number>) {
-      state.adamBeta1 = action.payload;
+    setCheckpointsTotalLimit: (state, action: PayloadAction<number | null>) => {
+      state.params.checkpointParams.checkpointsTotalLimit = action.payload;
     },
-    setAdamBeta2(state, action: PayloadAction<number>) {
-      state.adamBeta2 = action.payload;
+    setResumeFromCheckpoint: (state, action: PayloadAction<string>) => {
+      state.params.checkpointParams.resumeFromCheckpoint = action.payload;
     },
-    setAdamWeightDecay(state, action: PayloadAction<number>) {
-      state.adamWeightDecay = action.payload;
-    },
-    setAdamEpsilon(state, action: PayloadAction<number>) {
-      state.adamEpsilon = action.payload;
-    },
-    setMaxGradNorm(state, action: PayloadAction<number>) {
-      state.maxGradNorm = action.payload;
-    },
-    setPushToHub(state, action: PayloadAction<boolean>) {
-      state.pushToHub = action.payload;
-    },
-    setHubToken(state, action: PayloadAction<string>) {
-      state.hubToken = action.payload;
-    },
-    setHubModelId(state, action: PayloadAction<string>) {
-      state.hubModelId = action.payload;
-    },
-    setLoggingDir(state, action: PayloadAction<string>) {
-      state.loggingDir = action.payload;
-    },
-    setAllowTf32(state, action: PayloadAction<boolean>) {
-      state.allowTf32 = action.payload;
-    },
-    setReportTo(state, action: PayloadAction<string>) {
-      state.reportTo = action.payload;
-    },
-    setValidationPrompt(state, action: PayloadAction<string>) {
-      state.validationPrompt = action.payload;
-    },
-    setNumValidationImages(state, action: PayloadAction<number>) {
-      state.numValidationImages = action.payload;
-    },
-    setValidationSteps(state, action: PayloadAction<number>) {
-      state.validationSteps = action.payload;
-    },
-    setMixedPrecision(state, action: PayloadAction<string>) {
-      state.mixedPrecision = action.payload;
-    },
-    setPriorGenerationPrecision(state, action: PayloadAction<string>) {
-      state.priorGenerationPrecision = action.payload;
-    },
-    setLocalRank(state, action: PayloadAction<number>) {
-      state.localRank = action.payload;
-    },
-    setEnableXformersMemoryEfficientAttention(state, action: PayloadAction<boolean>) {
-      state.enableXformersMemoryEfficientAttention = action.payload;
-    },
-    setSetGradsToNone(state, action: PayloadAction<boolean>) {
-      state.setGradsToNone = action.payload;
-    },
-    setOffsetNoise(state, action: PayloadAction<boolean>) {
-      state.offsetNoise = action.payload;
-    },
-    setSnrGamma(state, action: PayloadAction<number>) {
-      state.snrGamma = action.payload;
-    },
-    setPreComputeTextEmbeddings(state, action: PayloadAction<boolean>) {
-      state.preComputeTextEmbeddings = action.payload;
-    },
-    setTokenizerMaxLength(state, action: PayloadAction<number>) {
-      state.tokenizerMaxLength = action.payload;
-    },
-    setTextEncoderUseAttentionMask(state, action: PayloadAction<boolean>) {
-      state.textEncoderUseAttentionMask = action.payload;
-    },
-    setSkipSaveTextEncoder(state, action: PayloadAction<boolean>) {
-      state.skipSaveTextEncoder = action.payload;
-    },
-    // setValidationImages(state, action: PayloadAction<string>) {
-    //   state.validationImages = action.payload;
-    // },
-    // setInstanceImageList(state, action: PayloadAction<{ index: number; value: string }>) {
-    //   state.instanceImageList[action.payload.index] = action.payload.value;
-    // },
-    // setClassImageList(state, action: PayloadAction<{ index: number; value: string }>) {
-    //   state.classImageList[action.payload.index] = action.payload.value;
-    // },
-    setValidationScheduler(state, action: PayloadAction<string>) {
-      state.validationScheduler = action.payload;
-    },
-    setClassLabelsConditioning(state, action: PayloadAction<string>) {
-      state.classLabelsConditioning = action.payload;
-    },
-    addConcept(state) {
-      if (state.concepts.length < state.maxConcepts) {
-        state.concepts.push({
+
+    // Concept Management
+    addConcept: (state) => {
+      if (state.params.conceptListParams.length < state.maxConcepts) {
+        state.params.conceptListParams.push({
+          instanceImageList: '',
           instancePrompt: '',
-          classPrompt: '',
-          instanceImageFolder: '',
-          classImageFolder: '',
-          validationImageFolder: ''
+          classImageList: '',
+          classPrompt: ''
         });
       }
     },
-
-    removeConcept(state, action: PayloadAction<number>) {
-      state.concepts.splice(action.payload, 1);
+    removeConcept: (state, action: PayloadAction<number>) => {
+      state.params.conceptListParams.splice(action.payload, 1);
     },
-
-    setInstancePrompt(state, action: PayloadAction<{ index: number; prompt: string }>) {
-      state.concepts[action.payload.index].instancePrompt = action.payload.prompt;
+    setInstancePrompt: (state, action: PayloadAction<{ index: number; prompt: string }>) => {
+      state.params.conceptListParams[action.payload.index].instancePrompt = action.payload.prompt;
     },
-
-    setClassPrompt(state, action: PayloadAction<{ index: number; prompt: string }>) {
-      state.concepts[action.payload.index].classPrompt = action.payload.prompt;
+    setClassPrompt: (state, action: PayloadAction<{ index: number; prompt: string }>) => {
+      state.params.conceptListParams[action.payload.index].classPrompt = action.payload.prompt;
     },
-
-    setInstanceImageFolder(state, action: PayloadAction<{ index: number; folderPath: string }>) {
-      state.concepts[action.payload.index].instanceImageFolder = action.payload.folderPath;
+    setInstanceImageList: (state, action: PayloadAction<{ index: number; folderPath: string }>) => {
+      state.params.conceptListParams[action.payload.index].instanceImageList = action.payload.folderPath;
     },
-
-    setClassImageFolder(state, action: PayloadAction<{ index: number; folderPath: string }>) {
-      state.concepts[action.payload.index].classImageFolder = action.payload.folderPath;
-    },
-
-    setValidationImageFolder(state, action: PayloadAction<{ index: number; folderPath: string }>) {
-      state.concepts[action.payload.index].validationImageFolder = action.payload.folderPath;
+    setClassImageList: (state, action: PayloadAction<{ index: number; folderPath: string }>) => {
+      state.params.conceptListParams[action.payload.index].classImageList = action.payload.folderPath;
     }
   }
 });
 
 export const {
-  setMemberId,
+  setGpuNum,
+  setIsInpaint,
+  setPretrainedModelNameOrPath,
   setTrainModelName,
-  setModel,
+  setTokenizerName,
+  setRevision,
   setResolution,
+  setPriorLossWeight,
+  setCenterCrop,
   setTrainBatchSize,
   setNumTrainEpochs,
   setLearningRate,
-  setRevision,
-  setVariant,
-  setTokenizerName,
-  setWithPriorPreservation,
-  setPriorLossWeight,
-  setSeed,
-  setCenterCrop,
-  setTrainTextEncoder,
-  setSampleBatchSize,
   setMaxTrainSteps,
-  setCheckpointingSteps,
-  setCheckpointsTotalLimit,
-  setResumeFromCheckpoint,
   setGradientAccumulationSteps,
-  setGradientCheckpointing,
   setScaleLr,
   setLrScheduler,
   setLrWarmupSteps,
   setLrNumCycles,
   setLrPower,
   setUse8bitAdam,
-  setDataloaderNumWorkers,
+  setGradientCheckpointing,
+  setSeed,
+  setTrainTextEncoder,
   setAdamBeta1,
   setAdamBeta2,
   setAdamWeightDecay,
   setAdamEpsilon,
   setMaxGradNorm,
-  setPushToHub,
-  setHubToken,
-  setHubModelId,
-  setLoggingDir,
-  setAllowTf32,
-  setReportTo,
-  setValidationPrompt,
-  setNumValidationImages,
-  setValidationSteps,
-  setMixedPrecision,
-  setPriorGenerationPrecision,
-  setLocalRank,
-  setEnableXformersMemoryEfficientAttention,
-  setSetGradsToNone,
-  setOffsetNoise,
-  setSnrGamma,
-  setPreComputeTextEmbeddings,
-  setTokenizerMaxLength,
-  setTextEncoderUseAttentionMask,
-  setSkipSaveTextEncoder,
-  // setValidationImages,
-  // setInstanceImageList,
-  // setClassImageList,
-  setValidationScheduler,
-  setClassLabelsConditioning,
+  setCheckpointingSteps,
+  setCheckpointsTotalLimit,
+  setResumeFromCheckpoint,
   addConcept,
   removeConcept,
   setInstancePrompt,
   setClassPrompt,
-  setInstanceImageFolder,
-  setClassImageFolder,
-  setValidationImageFolder
+  setInstanceImageList,
+  setClassImageList
 } = trainingSlice.actions;
 
 export default trainingSlice.reducer;

@@ -18,6 +18,7 @@ import { useClipOutputs } from '@/hooks/generation/outputs/useClipOutputs';
 const Img2ImgLayout = () => {
   const dispatch = useDispatch();
   const { params, gpuNum } = useSelector((state: RootState) => state.img2Img);
+  const newGpuNum = useSelector((state: RootState) => state.settings.gpuNum);
   const { isLoading, isSidebarVisible } = useImg2ImgOutputs();
   const { isLoading: clipIsLoading, taskId: clipTaskId } = useClipOutputs();
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useImg2ImgParams();
@@ -75,12 +76,7 @@ const Img2ImgLayout = () => {
       });
     }
 
-    let gpuNumber: number;
-    if (gpuNum) {
-      gpuNumber = gpuNum;
-    } else {
-      gpuNumber = 1; // settings 기본값 가져오기
-    }
+    const gpuNumber = gpuNum || newGpuNum;
 
     const data = {
       gpu_device: gpuNumber,

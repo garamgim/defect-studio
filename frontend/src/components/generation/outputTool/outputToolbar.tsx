@@ -14,6 +14,10 @@ import {
   setIsSidebarVisible
 } from '../../../store/slices/generation/outputSlice';
 import { RootState } from '../../../store/store';
+import { setImageList as txtSetImageList } from '../../../store/slices/generation/img2ImgSlice';
+import { setInitImageList as inpaintingSetImageList } from '../../../store/slices/generation/inpaintingSlice';
+import { setImageList as removeSetImageList } from '../../../store/slices/generation/removeBgSlice';
+import { setInitImageList as cleanupSetImageList } from '../../../store/slices/generation/cleanupSlice';
 
 interface OutputToolbarProps {
   type: 'txt2Img' | 'img2Img' | 'inpainting' | 'removeBg' | 'cleanup';
@@ -67,7 +71,34 @@ const OutputToolbar = ({ type }: OutputToolbarProps) => {
   };
 
   const showModal = () => {
-    setIsModalVisible(true);
+    if (selectedImgs.length !== 1) {
+      message.error('Please choose one image');
+    } else {
+      setIsModalVisible(true);
+    }
+  };
+
+  const handleTabSelect = (tab: string, route: string) => {
+    switch (tab) {
+      case 'txt2Img':
+        dispatch(txtSetImageList(selectedImgs));
+        break;
+      case 'inpainting':
+        dispatch(inpaintingSetImageList(selectedImgs));
+        break;
+      case 'removeBg':
+        dispatch(removeSetImageList(selectedImgs));
+        break;
+      case 'cleanup':
+        dispatch(cleanupSetImageList(selectedImgs));
+        break;
+      default:
+        message.error('Invalid type selected');
+        return;
+    }
+
+    goToPage(route);
+    setIsModalVisible(false);
   };
 
   const handleCancel = () => {
@@ -183,10 +214,12 @@ const OutputToolbar = ({ type }: OutputToolbarProps) => {
         <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Select a tab to navigate</div>
         <div className="flex flex-col gap-4 my-10">
           <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
-            <Button onClick={() => goToPage('/generation/image-to-image')}>Img2Img</Button>
-            <Button onClick={() => goToPage('/generation/inpainting')}>Inpainting</Button>
-            <Button onClick={() => goToPage('/generation/remove-background')}>Remove Background</Button>
-            <Button onClick={() => goToPage('/generation/cleanup')}>Cleanup</Button>
+            <Button onClick={() => handleTabSelect('txt2Img', '/generation/image-to-image')}>Img2Img</Button>
+            <Button onClick={() => handleTabSelect('inpainting', '/generation/inpainting')}>Inpainting</Button>
+            <Button onClick={() => handleTabSelect('removeBg', '/generation/remove-background')}>
+              Remove Background
+            </Button>
+            <Button onClick={() => handleTabSelect('cleanup', '/generation/cleanup')}>Cleanup</Button>
           </div>
         </div>
       </Modal>

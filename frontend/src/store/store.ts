@@ -9,6 +9,9 @@ import cleanupSlice from './slices/generation/cleanupSlice';
 import generatedOutputSlice from './slices/generation/outputSlice';
 import userInfoSlice from './slices/userInfoSlice';
 import trainingSlice from './slices/training/trainingSlice';
+import settingsSlice from './slices/settings/settingsSlice';
+import historySlice from './slices/history/historySlice';
+import trainingOutputSlice from './slices/training/outputSlice';
 
 const store = configureStore({
   reducer: {
@@ -20,8 +23,11 @@ const store = configureStore({
     removeBg: removeBgSlice,
     cleanup: cleanupSlice,
     generatedOutput: generatedOutputSlice,
+    history: historySlice,
     userInfo: userInfoSlice,
-    training: trainingSlice
+    training: trainingSlice,
+    settings: settingsSlice,
+    trainingOutput: trainingOutputSlice
   }
 });
 

@@ -2,8 +2,8 @@ import noAuthAxios from './token/noAuthAxios';
 import { loginData } from '../types/user';
 import axiosInstance from './token/axiosInstance';
 import { AxiosError, AxiosResponse } from 'axios';
-import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../main';
+import { userInfoType } from '@/types/user';
 
 // 로그인 함수
 export async function login(user: loginData) {
@@ -35,18 +35,6 @@ export async function login(user: loginData) {
   }
 }
 
-// 유저 정보 가져올 떄 쓰는 정보
-export type userInfoType = {
-  member_id: number;
-  login_id: string;
-  nickname: string;
-  email: string;
-  role: 'super_admin' | 'department_member' | 'department_admin';
-  department_id: number;
-  department_name: string;
-  token_quantity: number;
-};
-
 // 서버로부터 유저 정보 가져오기
 export const getUserInfo = async (): Promise<AxiosResponse<userInfoType, AxiosError>> => {
   try {
@@ -59,30 +47,6 @@ export const getUserInfo = async (): Promise<AxiosResponse<userInfoType, AxiosEr
     }
     throw Error('Unexpected error occurred'); // Add a return statement at the end of the function
   }
-};
-
-// 커스텀 훅 -> 유저 정보 가져오기
-export const useGetMyInfo = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
-  const {
-    data: myInfo,
-    isPending: myInfoPending,
-    isLoading: myInfoLoading,
-    isError: isGetMyInfoError,
-    error: myInfoError
-  } = useQuery<AxiosResponse<userInfoType>, AxiosError, userInfoType, string[]>({
-    queryKey: ['myInfo'],
-    queryFn: getUserInfo,
-    select: (data) => data.data,
-    enabled: isLoggedIn
-  });
-
-  return {
-    myInfo,
-    myInfoPending,
-    myInfoLoading,
-    isGetMyInfoError,
-    myInfoError
-  };
 };
 
 // 내 정보 업데이트 요청하기

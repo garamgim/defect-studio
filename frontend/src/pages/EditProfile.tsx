@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { useGetMyInfo } from '../api/user';
+import { useGetMyInfo } from '@hooks/user/useGetMyInfo';
+
 import { useForm } from 'react-hook-form';
 import { editProfile, upDateMyInfo } from '../api/user';
 import { message } from 'antd';

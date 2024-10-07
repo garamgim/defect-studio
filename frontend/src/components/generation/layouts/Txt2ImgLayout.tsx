@@ -15,6 +15,7 @@ import { setIsLoading, setOutputImgsCnt, setTaskId } from '../../../store/slices
 
 const Txt2ImgLayout = () => {
   const dispatch = useDispatch();
+  const newGpuNum = useSelector((state: RootState) => state.settings.gpuNum);
   const { params, gpuNum } = useSelector((state: RootState) => state.txt2Img);
   const { isLoading, isSidebarVisible } = useTxt2ImgOutputs();
   const { prompt, negativePrompt, isNegativePrompt, updatePrompt, updateNegativePrompt } = useTxt2ImgParams();
@@ -39,8 +40,7 @@ const Txt2ImgLayout = () => {
   }, [prompt]);
 
   const handleGenerate = async () => {
-    const gpuNumber = gpuNum || 1; // gpuNum이 없으면 기본값 1 사용
-    console.log('pp', params.promptParams.prompt);
+    const gpuNumber = gpuNum || newGpuNum;
 
     const data = {
       gpu_device: gpuNumber,

@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../store/store';
 import { setLevel, LevelState } from '../../store/slices/levelSlice';
 import { toggleMode } from '../../store/slices/themeSlice';
-import logo from '../../assets/logo.png';
+import Logo from '../../assets/logo.png';
 import token from '../../assets/token.png';
 import { Dropdown, Button, Switch } from 'antd';
 import type { MenuProps } from 'antd';
-import { useGetMyInfo } from '../../api/user';
-
+import { useGetMyInfo } from '@hooks/user/useGetMyInfo';
+import { memo } from 'react';
 import MiniProfile from '../profile/MiniProfile';
 
 const Navbar = () => {
@@ -71,9 +71,9 @@ const Navbar = () => {
     <div className="fixed z-20 w-full h-[60px] flex items-center px-10 bg-white border-b border-gray-300 dark:bg-gray-800 dark:border-none">
       <div className="flex items-center">
         <img
-          src={logo}
-          className="w-[30px] h-[30px] mr-2 object-cover cursor-pointer"
-          alt="logo"
+          src={Logo}
+          className="w-[25px] mr-2 object-cover cursor-pointer"
+          alt="Logo"
           onClick={() => navigateTo('/')}
         />
         <p
@@ -182,4 +182,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default memo(Navbar);

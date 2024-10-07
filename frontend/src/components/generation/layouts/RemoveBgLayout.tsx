@@ -13,6 +13,7 @@ import OutputToolbar from '../outputTool/OutputToolbar';
 
 const RemoveBackground = () => {
   const dispatch = useDispatch();
+  const newGpuNum = useSelector((state: RootState) => state.settings.gpuNum);
   const { params, gpuNum } = useSelector((state: RootState) => state.removeBg);
   const { isLoading, isSidebarVisible } = useSelector((state: RootState) => state.generatedOutput.removeBg);
   useRemoveBgParams();
@@ -49,12 +50,7 @@ const RemoveBackground = () => {
       });
     }
 
-    let gpuNumber: number;
-    if (gpuNum) {
-      gpuNumber = gpuNum;
-    } else {
-      gpuNumber = 1; // settings 기본값 가져오기
-    }
+    const gpuNumber = gpuNum || newGpuNum;
 
     const data = {
       gpu_device: gpuNumber,

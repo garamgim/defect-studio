@@ -18,7 +18,8 @@ const DistributeState = ({ department_id }: DistributeStateProps) => {
   >({
     queryKey: ['departmentDistributeState', department_id],
     queryFn: () => getDepartmentTokenDistributionState(department_id),
-    select: (response) => response.data,
+    select: (response) =>
+      response.data.sort((a, b) => new Date(a.distribute_date).getTime() - new Date(b.distribute_date).getTime()),
     staleTime,
     gcTime
   });

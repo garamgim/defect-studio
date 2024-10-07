@@ -456,6 +456,7 @@ const MaskingModal = ({
     <Modal
       open={true}
       footer={null}
+      onCancel={onClose}
       closable={false}
       centered
       styles={{ body: { height: '80vh' } }}
@@ -469,7 +470,7 @@ const MaskingModal = ({
           </p>
         )}
         {rgbColor && <p>RGB: {rgbColor}</p>}
-      </div> 
+      </div>
       <div className="flex items-center space-x-4 mt-3">
         <Slider
           min={1} // 최소 확대 배율

@@ -1,13 +1,8 @@
 import { Row, Col } from 'antd';
 import TrainingForm from './trainingStartTab/TrainingForm';
-import CurrentTrainings from './trainingStartTab/CurrentTrainings';
+import TrainingStatusTab from './TrainingStatusTab';
 
-interface TrainingStartTabProps {
-  trainProgress: { name: string; progress: number }[];
-  handleStopTraining: (modelName: string) => void;
-}
-
-const TrainingStartTab = ({ trainProgress, handleStopTraining }: TrainingStartTabProps) => {
+const TrainingStartTab = () => {
   return (
     <Row gutter={24}>
       <Col xs={24} lg={18}>
@@ -18,7 +13,7 @@ const TrainingStartTab = ({ trainProgress, handleStopTraining }: TrainingStartTa
 
       {/* Training Progress only visible on larger screens */}
       <Col xs={0} lg={6}>
-        <CurrentTrainings trainProgress={trainProgress} handleStopTraining={handleStopTraining} />
+        <TrainingStatusTab />
       </Col>
     </Row>
   );

@@ -1,10 +1,11 @@
 import TokenHeader from '../components/tokens/TokenHeader/TokenHeader';
-import TokenIssurance from '../components/tokens/TokenIssurance/TokenIssurance';
-import TokenDistribution from '../components/tokens/TokenDistribution/TokenDistribution';
-import TokenStatistics from '../components/tokens/TokenStatistics/TokenStatistics';
+import { lazy, Suspense } from 'react';
+const TokenIssurance = lazy(() => import('../components/tokens/TokenIssurance/TokenIssurance'));
+const TokenDistribution = lazy(() => import('../components/tokens/TokenDistribution/TokenDistribution'));
+const TokenStatistics = lazy(() => import('../components/tokens/TokenStatistics/TokenStatistics'));
 import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
-import { useGetMyInfo } from '../api/user';
+import { useGetMyInfo } from '@hooks/user/useGetMyInfo';
 
 const Tokens = () => {
   const { myInfo, myInfoPending, myInfoLoading, isGetMyInfoError, myInfoError } = useGetMyInfo({
@@ -39,7 +40,9 @@ const Tokens = () => {
         <hr className="border-[#E6E6E6] dark:border-gray-700" />
 
         <section>
-          <Tabs defaultActiveKey={defaultActiveKey} items={items} />
+          <Suspense fallback={<div>Loading...</div>}>
+            <Tabs defaultActiveKey={defaultActiveKey} items={items} />
+          </Suspense>
         </section>
       </div>
     </div>

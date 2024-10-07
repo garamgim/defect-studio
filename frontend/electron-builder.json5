@@ -1,9 +1,8 @@
-// @see - https://www.electron.build/configuration/configuration
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   "appId": "YourAppID",
   "asar": true,
-  "productName": "YourAppName",
+  "productName": "DefectStudio",
   "directories": {
     "output": "release/${version}"
   },
@@ -12,12 +11,14 @@
     "dist-electron"
   ],
   "mac": {
+    "icon": "./src/assets/logo.icns",
     "target": [
       "dmg"
     ],
     "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
   },
   "win": {
+    "icon": "./src/assets/logo.ico",
     "target": [
       {
         "target": "nsis",
@@ -35,6 +36,7 @@
     "deleteAppDataOnUninstall": false
   },
   "linux": {
+    "icon": "src/assets/logo.png",
     "target": [
       "AppImage"
     ],
