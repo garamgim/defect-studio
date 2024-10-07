@@ -456,6 +456,7 @@ const MaskingModal = ({
 
   return (
     <Modal
+      key={imageSrc}
       open={isModalOpen}
       footer={null}
       onCancel={closeModal}
