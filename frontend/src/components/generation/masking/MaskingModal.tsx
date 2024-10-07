@@ -55,7 +55,7 @@ const MaskingModal = ({
   const stageRef = useRef<Konva.Stage | null>(null); // ?
   const [image, imageStatus] = useImage(imageSrc); // useImage ?
 
-  const [stageSize, setStageSize] = useState<{ width: number; height: number }>({ width: 512, height: 512 }); // 처음에 stageSize를 {512, 512}
+  const [stageSize, setStageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
   const [imagePos, setImagePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 }); // 이미지 위치도 {0,0}
   const [imageSize, setImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 }); // 이미지 크기도 {0,0}
   const [minImageSize, setMinImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 }); // 이미지 최소 크기?
@@ -183,6 +183,13 @@ const MaskingModal = ({
       closeModal();
     }
   };
+
+  // 모달이 열릴 때 스테이지 크기 업데이트
+  useEffect(() => {
+    if (isModalOpen) {
+      updateStageSize();
+    }
+  }, [isModalOpen]);
 
   useEffect(() => {
     if (image && imageStatus === 'loaded') {
