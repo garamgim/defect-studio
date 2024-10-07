@@ -10,6 +10,7 @@ import { HiOutlinePaintBrush } from 'react-icons/hi2';
 import { Stage, Layer, Line, Image as KonvaImage, Circle } from 'react-konva';
 import useImage from 'use-image';
 import Konva from 'konva';
+import { FaMousePointer, FaPalette } from 'react-icons/fa';
 
 interface MaskingModalProps {
   isModalOpen: boolean;
@@ -21,44 +22,43 @@ interface MaskingModalProps {
 }
 
 interface LineObject {
-  tool: 'brush' | 'polygon'; // 선 객체에서 브러쉬랑 폴리곤 중 선택
-  points: number[]; // 점의 좌표를 배열로 저장
-  strokeWidth?: number; // 브러쉬면 반지름 값을 가지고, 폴리곤일 때는 안가짐
-  fill?: string; // ?
+  tool: 'brush' | 'polygon';
+  points: number[];
+  strokeWidth?: number;
+  fill?: string;
 }
 
 const MaskingModal = ({
   closeModal,
-  imageSrc, // initImageList의 첫번째 배열에는 메뉴얼모드에서 업로드한 사진한장이 담김
+  imageSrc,
   updateInitImageList,
   updateMaskImageList,
   updateCombinedImg,
   isModalOpen
 }: MaskingModalProps) => {
-  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null); // 마우스 위치 저장 (x, y값), 이미지 벗어나면 null
-  const [rgbColor, setRgbColor] = useState<string | null>(null); // RGB 스트링값, 마찬가지로 이미지 벗어나면 null
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
+  const [rgbColor, setRgbColor] = useState<string | null>(null);
 
-  const [, setImageScale] = useState(1); // 이미지 배율 상태관리, 초기에 1를 부여해서 처음에 렌더링 된 이미지의 상태를 1이라고 판단함
+  const [, setImageScale] = useState(1);
 
-  const [tool, setTool] = useState<'brush' | 'polygon' | 'select' | null>(null); // 도구 선택은 브러쉬, 폴리곤, 점 선택, 또는 개체 선택
-  const [isMovingPoints, setIsMovingPoints] = useState(false); // 점 움직이기 기능
-  const [brushSize, setBrushSize] = useState<number>(10);
-  const [objects, setObjects] = useState<LineObject[]>([]); // redo, undo기능을 만들기 위해 한번 작업할 때마다 한 작업을 객체로 묶어서 저장함
-  const [undoStack, setUndoStack] = useState<LineObject[][]>([]); // 초기값은 빈배열, ?
-  const [redoStack, setRedoStack] = useState<LineObject[][]>([]); // 여기도 위와 마찬가지로 초기값 빈배열, ?
-  const [polygonPoints, setPolygonPoints] = useState<{ x: number; y: number }[]>([]); // 폴리곤 점 찍을 때 {x, y} 객체로 저장
-  const [isPolygonComplete, setIsPolygonComplete] = useState(false); // 폴리곤 완성됐는지 체크
-  const [selectedObjectIndex, setSelectedObjectIndex] = useState<number | null>(null); // 선택된 객체의 인덱스, 선택 안됐을 경우에는 null
-  const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | null>(null); // 커서 위치 {x, y}, 기본값은 null
-  const isDrawing = useRef(false); // 그림그리고 있는 지 체크
-  const [scale, setScale] = useState<number>(1); //여기도 1체크 <- 중복해서 배율 관리하고 있음
-  const stageRef = useRef<Konva.Stage | null>(null); // ?
-  const [image, imageStatus] = useImage(imageSrc); // useImage ?
-
+  const [tool, setTool] = useState<'brush' | 'polygon' | 'select' | null>(null);
+  const [isMovingPoints, setIsMovingPoints] = useState(false);
+  const [brushSize, setBrushSize] = useState<number>(30);
+  const [objects, setObjects] = useState<LineObject[]>([]);
+  const [undoStack, setUndoStack] = useState<LineObject[][]>([]);
+  const [redoStack, setRedoStack] = useState<LineObject[][]>([]);
+  const [polygonPoints, setPolygonPoints] = useState<{ x: number; y: number }[]>([]);
+  const [isPolygonComplete, setIsPolygonComplete] = useState(false);
+  const [selectedObjectIndex, setSelectedObjectIndex] = useState<number | null>(null);
+  const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | null>(null);
+  const isDrawing = useRef(false);
+  const [scale, setScale] = useState<number>(1);
+  const stageRef = useRef<Konva.Stage | null>(null);
+  const [image, imageStatus] = useImage(imageSrc);
   const [stageSize, setStageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
-  const [imagePos, setImagePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 }); // 이미지 위치도 {0,0}
-  const [imageSize, setImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 }); // 이미지 크기도 {0,0}
-  const [minImageSize, setMinImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 }); // 이미지 최소 크기?
+  const [imagePos, setImagePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [imageSize, setImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+  const [minImageSize, setMinImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
 
   // 캔버스를 흑백으로 변환
   const convertCanvasToGrayscale = async (imageBase64: string): Promise<string> => {
@@ -184,12 +184,19 @@ const MaskingModal = ({
     }
   };
 
-  // 모달이 열릴 때 스테이지 크기 업데이트
   useEffect(() => {
     if (isModalOpen) {
-      updateStageSize();
+      setTimeout(() => {
+        updateStageSize(); // 모달이 열릴 때 스테이지 크기 업데이트
+      }, 0); // 딜레이를 줘서 렌더링 후에 스테이지 크기 업데이트
     }
-  }, [isModalOpen]);
+  }, [isModalOpen]); // 모달이 열렸을 때만 실행
+
+  useEffect(() => {
+    if (image && isModalOpen) {
+      updateStageSize(); // 이미지가 로드되었을 때 스테이지 크기 업데이트
+    }
+  }, [image]);
 
   useEffect(() => {
     if (image && imageStatus === 'loaded') {
@@ -218,7 +225,7 @@ const MaskingModal = ({
       const centerY = (stageSize.height - newHeight) / 2;
       setImagePos({ x: centerX, y: centerY }); // 이미지 위치 설정
     }
-  }, [image, imageStatus, stageSize]);
+  }, [image, imageSrc, imageStatus, stageSize]);
 
   const updateStageSize = () => {
     const modalElement = document.querySelector('.ant-modal-body');
@@ -474,43 +481,34 @@ const MaskingModal = ({
 
   return (
     <Modal
-      key={imageSrc}
       open={isModalOpen}
       footer={null}
       onCancel={closeModal}
       closable={false}
       centered
-      styles={{ body: { height: '80vh' } }}
+      styles={{ body: { height: '90vh' } }}
       width="100%"
       className="max-w-screen-sm w-full md:max-w-screen-md lg:max-w-screen-lg"
     >
-      <div>
-        {mousePosition && (
-          <p>
-            Mouse Position: X: {mousePosition.x}, Y: {mousePosition.y}
-          </p>
-        )}
-        {rgbColor && <p>RGB: {rgbColor}</p>}
-      </div>
-      <div className="flex items-center space-x-4 mt-3">
-        <Slider
-          min={1} // 최소 확대 배율
-          max={3} // 최대 확대 배율
-          step={0.05} // 슬라이더 단위
-          value={scale} // 현재 scale 상태와 연결
-          onChange={(newScale) => setScale(newScale)} // 슬라이더 값 변경 시 scale 상태 업데이트
-          style={{ width: '150px' }}
-        />
-        <InputNumber
-          min={1}
-          max={3}
-          step={0.05}
-          value={scale}
-          onChange={(newScale) => setScale(newScale ?? 1)} // 숫자 입력으로도 확대/축소 가능
-          className="w-[60px]"
-        />
-      </div>
       <div className="flex flex-col h-full w-full justify-center">
+        <div className="flex flex-col space-y-3">
+          {/* 마우스 위치 및 RGB 정보 표시 */}
+          {mousePosition && (
+            <div className="flex items-center space-x-2 text-sm">
+              <FaMousePointer /> {/* 마우스 포인터 아이콘 */}
+              <p>
+                Mouse Position: X: {mousePosition.x}, Y: {mousePosition.y}
+              </p>
+            </div>
+          )}
+          {rgbColor && (
+            <div className="flex items-center space-x-2 text-sm">
+              <FaPalette /> {/* 색상 팔레트 아이콘 */}
+              <p>RGB: {rgbColor}</p>
+            </div>
+          )}
+        </div>
+
         <div className="flex justify-center items-center w-full h-[80%]">
           <Stage
             ref={stageRef}
