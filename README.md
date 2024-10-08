@@ -1,8 +1,4 @@
-<style>h1,h2,h3,h4 { border-bottom: 0; } </style>
-
 # 🌟 삼성 청년 SW 아카데미 11기 SDC 1팀 **폼행폼사** 🌟
-
----
 
 # 🌳 프로젝트 개요
 
@@ -11,15 +7,12 @@
 |  팀장  |  팀원  |  팀원  |  팀원  |  팀원  |  팀원  |
 | :----: | :----: | :----: | :----: | :----: | :----: |
 | 정현수 | 김경대 | 김가람 | 박수진 | 장재훈 | 김범수 |
-|        |        |        |        |        |        |
 |   FE   |   FE   |   BE   |   BE   |   AI   |   AI   |
 
 ## 📅 기간
 
 - 기획 및 설계 : 2024.08.19 - 2024.08.23
 - 개발 : 2024.08.26 - 2024.10.10
-
----
 
 <br>
 
@@ -56,12 +49,6 @@
 - 이전 생성한 이미지에 대한 **History 기록**
 
 - **Token 관리 및 통계** 제공
-
-- Settings을 통한 사용할 **GPU 서버 선택**
-
----
-
-<br>
 
 # 🔨 Tech Stack 🔨
 
@@ -111,7 +98,7 @@
 
 ### Architecture
 
-<img src="./readme/architecture.png">
+![DD](./readme/architecture.png)
 
 <br>
 
@@ -121,7 +108,7 @@
 
 # 🌍 서비스 기능
 
-## 🎯 Generation 영역
+## 🎯 Generation
 
 ### 📌 Text To Image
 
@@ -151,3 +138,45 @@ Advance 모드에서는 세부적인 Parameter들을 입력할 수 있습니다.
 ### 📌 Remove Background
 
 [생성 이미지]
+
+## 🎯 Training
+
+[ 훈련 이미지 ]
+
+## 🎯 History
+
+[기록물 이미지]
+
+## 🎯 Settings
+
+[세팅 이미지]
+
+## 🎯Token
+
+### 📌 Token 발행
+
+### 📌 Token 분배
+
+### 📌 Statistics
+
+## 🎯 회원
+
+### 📌 회원가입 & 이메일 인증
+
+### 📌 회원관리
+
+---
+
+# 🔆 기술
+
+## 🖥️ Front End
+
+## 🌐 Back End
+
+## 🎓 AI
+
+## 💻 Infra
+
+---
+
+# 자료
