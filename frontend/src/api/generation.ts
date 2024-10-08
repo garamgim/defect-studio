@@ -165,7 +165,7 @@ export const postRemoveBgGeneration = async (gpu_env: RemoveBgDataType['gpu_env'
           formData.append(key, file);
         });
       } else {
-        formData.append(key, value);
+        formData.append(key, typeof value === 'number' ? String(value) : value);
       }
     });
 
@@ -192,12 +192,13 @@ export const postCleanupGeneration = async (gpu_env: CleanupDataType['gpu_env'],
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
+      console.log(key, data);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
         });
       } else {
-        formData.append(key, value);
+        formData.append(key, typeof value === 'number' ? String(value) : value);
       }
     });
 

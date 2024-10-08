@@ -33,7 +33,8 @@ const TrainingStatusTab = () => {
       return {
         taskId: taskId,
         status: data.task_status,
-        resultData: data.task_status === 'STARTED' ? data.result_data : null
+        resultData: data.task_status === 'STARTED' ? data.result_data : null,
+        message: data.message
       };
     } catch (error) {
       message.error(`Error fetching training status for ${taskId}`);
@@ -48,9 +49,9 @@ const TrainingStatusTab = () => {
         intervalIdsRef.current[taskId] = setInterval(async () => {
           const progressData = await fetchTrainingStatus(taskId);
 
-          if (progressData?.resultData) {
+          if (progressData && progressData.resultData) {
             // 학습 중일 때 상태 업데이트
-            if (progressData.status === 'STARTED' && progressData.resultData) {
+            if (progressData.status === 'STARTED') {
               setChartDataMap((prev) => ({
                 ...prev,
                 [taskId]: {
@@ -82,13 +83,22 @@ const TrainingStatusTab = () => {
             clearInterval(intervalIdsRef.current[taskId]); // interval 제거
             delete intervalIdsRef.current[taskId];
 
-            // 완료된 taskId를 completedTaskIds에 추가
-            setCompletedTaskIds((prev) => [taskId, ...prev]);
+            if (
+              progressData &&
+              progressData.status === 'SUCCESS' &&
+              chartDataMap[taskId] &&
+              chartDataMap[taskId].datasets[0].data.length === 0
+            ) {
+              alert(`Model training failed: ${progressData.message || 'Unknown error'}`);
+            } else {
+              // 차트 데이터가 비어 있지 않은 경우에만 completedTaskIds에 추가
+              setCompletedTaskIds((prev) => [taskId, ...prev]);
+            }
 
             // Redux에서 taskId 제거
             dispatch(removeTaskId(taskId));
           }
-        }, 1000);
+        }, 5000);
       }
     });
 
@@ -96,7 +106,7 @@ const TrainingStatusTab = () => {
       // 컴포넌트가 unmount될 때 모든 interval 제거
       Object.values(intervalIdsRef.current).forEach(clearInterval);
     };
-  }, [dispatch, taskIds]);
+  }, [chartDataMap, dispatch, taskIds]);
 
   const toggleChartVisibility = (taskId: string) => {
     setVisibleCharts((prevState) => ({

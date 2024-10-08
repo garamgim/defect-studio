@@ -41,7 +41,21 @@ const RemoveBgSidebar = () => {
 
   return (
     <div className="w-full h-full mr-6">
+<<<<<<< Updated upstream
       <div className="w-full h-[calc(100%-80px)] overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
+=======
+      <div className="relative w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
+        {/* GPU 버튼은 항상 표시 */}
+        <div className="absolute top-[22px] right-0 mr-6">
+          <Tooltip title="Enter GPU Number">
+            <MdMemory
+              className="text-[22px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+              onClick={showGpuModal}
+            />
+          </Tooltip>
+        </div>
+
+>>>>>>> Stashed changes
         {/* 이미지 업로드 */}
         <UploadImage
           handleImageUpload={handleImageUpload}
