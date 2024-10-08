@@ -492,15 +492,36 @@ const MaskingModal = ({
     >
       <div className="flex flex-col h-full w-full justify-center">
         <div className="flex flex-col space-y-3">
-          {/* 마우스 위치 및 RGB 정보 표시 */}
-          {mousePosition && (
-            <div className="flex items-center space-x-2 text-sm">
-              <FaMousePointer /> {/* 마우스 포인터 아이콘 */}
-              <p>
-                Mouse Position: X: {mousePosition.x}, Y: {mousePosition.y}
-              </p>
+          <div className="flex justify-between">
+            {/* 마우스 위치 및 RGB 정보 표시 */}
+            {mousePosition && (
+              <div className="flex items-center space-x-2 text-sm">
+                <FaMousePointer /> {/* 마우스 포인터 아이콘 */}
+                <p>
+                  Mouse Position: X: {mousePosition.x}, Y: {mousePosition.y}
+                </p>
+              </div>
+            )}
+            <div className="flex items-center space-x-4 mt-3">
+              <Slider
+                min={1} // 최소 확대 배율
+                max={3} // 최대 확대 배율
+                step={0.05} // 슬라이더 단위
+                value={scale} // 현재 scale 상태와 연결
+                onChange={(newScale) => setScale(newScale)} // 슬라이더 값 변경 시 scale 상태 업데이트
+                style={{ width: '150px' }}
+              />
+              <InputNumber
+                min={1}
+                max={3}
+                step={0.05}
+                value={scale}
+                onChange={(newScale) => setScale(newScale ?? 1)} // 숫자 입력으로도 확대/축소 가능
+                className="w-[60px]"
+              />
             </div>
-          )}
+          </div>
+
           {rgbColor && (
             <div className="flex items-center space-x-2 text-sm">
               <FaPalette /> {/* 색상 팔레트 아이콘 */}
