@@ -119,15 +119,35 @@
 
 <br>
 
-# 서비스 기능
+# 🌍 서비스 기능
 
-## Generation 영역
+## 🎯 Generation 영역
 
-### Text To Image
+### 📌 Text To Image
 
 [생성 이미지]
 
 Text Prompt를 통해서 원하는 이미지를 생성할 수 있습니다.  
 이를 통해서 다양한 불량 이미지를 생성할 수 있습니다.
 
-Basic 모드에서는 Text 입력을 통해 간단하게 입력을 할 수 있고
+Basic 모드에서는 Text 입력을 통해 간단하게 입력을 할 수 있고  
+Advance 모드에서는 세부적인 Parameter들을 입력할 수 있습니다.
+
+### 📌 Image To Image
+
+[생성 이미지]
+
+기존에 생성한 이미지를 업로드. 혹은 다른 파트에서 생성한 이미지를  
+바로 가져와서 해당 이미지 바탕으로 또다른 이미지를 생성할 수 있습니다!
+
+### 📌 Inpainting
+
+[생성 이미지]
+
+### 📌 Clean Up
+
+[생성 이미지]
+
+### 📌 Remove Background
+
+[생성 이미지]
