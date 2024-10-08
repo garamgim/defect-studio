@@ -177,10 +177,10 @@ const MaskingModal = ({
     } catch (error) {
       console.error('Error saving images:', error);
     } finally {
+      closeModal();
       // 원래 스케일로 복원
       stage.scale({ x: originalScaleX, y: originalScaleY });
       stage.batchDraw(); // 스테이지 다시 그리기
-      closeModal();
     }
   };
 
