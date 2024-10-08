@@ -26,7 +26,7 @@ const CleanupSidebar = () => {
     updateCombinedImg
   } = useCleanupParams();
 
-  const [showModal, setShowModal] = useState(false);
+  const [isMaskingOpen, setIsMaskingOpen] = useState(false);
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
@@ -54,8 +54,8 @@ const CleanupSidebar = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
+  const closeMasking = () => {
+    setIsMaskingOpen(false);
   };
 
   return (
@@ -83,7 +83,7 @@ const CleanupSidebar = () => {
               <Button
                 type="primary"
                 icon={<FormatPainterOutlined />}
-                onClick={() => setShowModal(true)} // 버튼 클릭 시 모달 열기
+                onClick={() => setIsMaskingOpen(true)} // 버튼 클릭 시 모달 열기
                 className="w-full mt-2"
               >
                 Start Masking
@@ -101,15 +101,14 @@ const CleanupSidebar = () => {
       </div>
 
       {/* Masking 모달 창 */}
-      {showModal && initImageList[0] && (
-        <MaskingModal
-          imageSrc={initImageList[0]}
-          onClose={handleCloseModal}
-          updateInitImageList={updateInitImageList}
-          updateMaskImageList={updateMaskImageList}
-          updateCombinedImg={updateCombinedImg}
-        />
-      )}
+      <MaskingModal
+        isModalOpen={isMaskingOpen}
+        imageSrc={initImageList[0]}
+        closeModal={closeMasking}
+        updateInitImageList={updateInitImageList}
+        updateMaskImageList={updateMaskImageList}
+        updateCombinedImg={updateCombinedImg}
+      />
     </div>
   );
 };
