@@ -93,7 +93,7 @@ const Sidebar = () => {
     <div className="w-full h-full mr-6">
       <div className="relative w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {level === 'Advanced' && (
-          <div className="absolute top-6 right-0 mr-6">
+          <div className="absolute top-[24px] right-0 mr-[45px]">
             <div className="flex">
               <Tooltip title="Reset Parameters">
                 <UndoOutlined
@@ -115,16 +115,19 @@ const Sidebar = () => {
                   className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
                 />
               </Tooltip>
-
-              <Tooltip title="Enter GPU Number">
-                <MdMemory
-                  className="text-[22px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
-                  onClick={showGpuModal}
-                />
-              </Tooltip>
             </div>
           </div>
         )}
+
+        {/* GPU 버튼은 항상 표시 */}
+        <div className="absolute top-[22px] right-0 mr-6">
+          <Tooltip title="Enter GPU Number">
+            <MdMemory
+              className="text-[22px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+              onClick={showGpuModal}
+            />
+          </Tooltip>
+        </div>
 
         {/* 모델 */}
         <ModelParam modelParams={modelParams} updateModelParams={updateModelParams} />
