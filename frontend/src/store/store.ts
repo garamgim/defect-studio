@@ -12,7 +12,7 @@ import trainingSlice from './slices/training/trainingSlice';
 import settingsSlice from './slices/settings/settingsSlice';
 import historySlice from './slices/history/historySlice';
 import trainingOutputSlice from './slices/training/outputSlice';
-import modelSlice from './slices/training/outputSlice';
+import modelSlice from './slices/model/modelSlice';
 
 const store = configureStore({
   reducer: {

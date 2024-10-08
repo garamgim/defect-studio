@@ -73,7 +73,7 @@ const RemoveBgSidebar = () => {
 
   return (
     <div className="w-full h-full mr-6">
-      <div className="relative w-full h-[calc(100%-80px)] overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
+      <div className="relative w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {/* GPU 버튼은 항상 표시 */}
         <div className="absolute top-[22px] right-0 mr-6">
           <Tooltip title="Enter GPU Number">

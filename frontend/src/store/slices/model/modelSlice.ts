@@ -1,12 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ModelState {
-  isLoading: boolean;
   taskId: string[];
 }
 
 const initialState: ModelState = {
-  isLoading: false,
   taskId: []
 };
 
@@ -14,18 +12,18 @@ const modelSlice = createSlice({
   name: 'modelOutput',
   initialState,
   reducers: {
-    setIsLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
-    },
     addTaskId: (state, action: PayloadAction<string>) => {
       state.taskId.push(action.payload);
+      console.log('Task ID added:', state.taskId); // 상태가 제대로 변경되는지 확인
     },
     removeTaskId: (state, action: PayloadAction<string>) => {
       state.taskId = state.taskId.filter((id) => id !== action.payload);
+      console.log('Task ID removed:', state.taskId); // 상태가 제대로 변경되는지 확인
     }
   }
 });
 
-export const { setIsLoading, addTaskId, removeTaskId } = outputSlice.actions;
+
+export const { addTaskId, removeTaskId } = modelSlice.actions;
 
 export default modelSlice.reducer;
