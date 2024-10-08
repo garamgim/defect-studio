@@ -55,17 +55,28 @@ const Settings = () => {
     register,
     handleSubmit,
     formState: { isSubmitting, isValid },
-    setValue
-  } = useForm<gpuServerType>({ mode: 'onChange', defaultValues: { device_num: -1 } });
+    setValue,
+    trigger
+  } = useForm<gpuServerType>({ mode: 'all', defaultValues: { device_num: -1 } });
 
   const [isRefreshEnable, setIsRefreshEnable] = useState(true);
 
-  const onSubmit = (data: { device_num: number }) => {
-    dispatch(setGpuNum(data.device_num));
+  const onSubmit = async (data: { device_num: number }) => {
+    try {
+      await dispatch(setGpuNum(data.device_num));
+      showToastSuccess(<span>Successfully changed the GPU server.</span>);
+    } catch (error) {
+      console.error(error);
+      showToastError(<span>error?.message || 'Failed to change the GPU server.'</span>);
+    }
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setValue('device_num', Number(event.target.value)); // 선택된 값 설정
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { value } = e.target;
+    // 선택된 device_num 값을 업데이트
+    await setValue('device_num', Number(value));
+    // device_num 필드의 유효성 검사를 트리거하여 isValid 상태 업데이트
+    await trigger('device_num');
   };
 
   return (
@@ -137,7 +148,7 @@ const Settings = () => {
 
           <div>
             <h4 className="text-[16px] mb-2 font-bold text-gray-800 dark:text-gray-200">Current Gpu Device</h4>
-            <div>{gpuNum}</div>
+            <div className="text-[14px] mb-2 font-bold text-gray-800 dark:text-gray-200">{gpuNum}</div>
           </div>
 
           {/* 사용사 서버 선택 */}
