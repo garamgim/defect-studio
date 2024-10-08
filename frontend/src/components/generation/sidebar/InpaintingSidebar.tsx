@@ -62,8 +62,6 @@ const InpaintingSidebar = () => {
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 
-  const [showModal, setShowModal] = useState(false);
-
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -91,24 +89,20 @@ const InpaintingSidebar = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
   const [isCreatePresetOpen, setIsCreatePresetOpen] = useState(false);
   const [isLoadPresetOpen, setIsLoadPresetOpen] = useState(false);
+  const [isMaskingOpen, setIsMaskingOpen] = useState(false);
 
-  const showCreatePreset = () => {
-    setIsCreatePresetOpen(true);
-  };
   const closeCreatePreset = () => {
     setIsCreatePresetOpen(false);
   };
-  const showLoadPreset = () => {
-    setIsLoadPresetOpen(true);
-  };
+
   const closeLoadPreset = () => {
     setIsLoadPresetOpen(false);
+  };
+
+  const closeMasking = () => {
+    setIsMaskingOpen(false);
   };
 
   const handleReset = () => {
@@ -144,7 +138,7 @@ const InpaintingSidebar = () => {
     <div className="w-full h-full mr-6">
       <div className="relative w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
         {level === 'Advanced' && (
-          <div className="absolute top-6 right-0 mr-6">
+          <div className="absolute top-[24px] right-0 mr-[45px]">
             <div className="flex">
               <Tooltip title="Reset Parameters">
                 <UndoOutlined
@@ -155,27 +149,30 @@ const InpaintingSidebar = () => {
 
               <Tooltip title="Create Preset">
                 <FileAddOutlined
-                  onClick={showCreatePreset}
+                  onClick={() => setIsCreatePresetOpen(true)}
                   className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
                 />
               </Tooltip>
 
               <Tooltip title="Load Preset">
                 <FileSearchOutlined
-                  onClick={showLoadPreset}
+                  onClick={() => setIsLoadPresetOpen(true)}
                   className="mr-[16px] text-[18px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
-                />
-              </Tooltip>
-
-              <Tooltip title="Enter GPU Number">
-                <MdMemory
-                  className="text-[22px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
-                  onClick={showGpuModal}
                 />
               </Tooltip>
             </div>
           </div>
         )}
+
+        {/* GPU 버튼은 항상 표시 */}
+        <div className="absolute top-[22px] right-0 mr-6">
+          <Tooltip title="Enter GPU Number">
+            <MdMemory
+              className="text-[22px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+              onClick={showGpuModal}
+            />
+          </Tooltip>
+        </div>
 
         {/* 모델 */}
         <ModelParam modelParams={modelParams} updateModelParams={updateModelParams} />
@@ -204,7 +201,7 @@ const InpaintingSidebar = () => {
               <Button
                 type="primary"
                 icon={<FormatPainterOutlined />}
-                onClick={() => setShowModal(true)} // 버튼 클릭 시 모달 열기
+                onClick={() => setIsMaskingOpen(true)}
                 className="w-full mt-2"
               >
                 Start Masking
@@ -253,15 +250,14 @@ const InpaintingSidebar = () => {
       </div>
 
       {/* Masking 모달 창 */}
-      {showModal && initImageList[0] && (
-        <MaskingModal
-          imageSrc={initImageList[0]}
-          onClose={handleCloseModal}
-          updateInitImageList={updateInitImageList}
-          updateMaskImageList={updateMaskImageList}
-          updateCombinedImg={updateCombinedImg}
-        />
-      )}
+      <MaskingModal
+        isModalOpen={isMaskingOpen}
+        imageSrc={initImageList[0]}
+        closeModal={closeMasking}
+        updateInitImageList={updateInitImageList}
+        updateMaskImageList={updateMaskImageList}
+        updateCombinedImg={updateCombinedImg}
+      />
 
       {/* gpu 선택 모달 */}
       <Modal open={isGpuModalVisible} closable={false} onOk={handleGpuModalOk} onCancel={handleGpuModalCancel}>

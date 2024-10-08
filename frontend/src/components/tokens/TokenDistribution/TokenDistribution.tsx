@@ -9,6 +9,7 @@ import TokenDistributionInput from './TokenDistributionInput';
 import { TableTokenUsageType } from './SearchDepartmentUsageToken';
 import { distributeTokenRequest } from './../../../api/token';
 import { useGetMyInfo } from '@hooks/user/useGetMyInfo';
+import { upDateMyInfo } from '@/api/user';
 
 type departmentType = {
   department_id: number;
@@ -61,9 +62,10 @@ const TokenDistribution = () => {
       queryClient.refetchQueries({
         queryKey: ['department_tokenUsage']
       });
+      upDateMyInfo();
     },
-    onError: () => {
-      message.error('Token distribution failed.');
+    onError: (error) => {
+      message.error(error?.message || 'Token distribution failed.');
     }
   });
 

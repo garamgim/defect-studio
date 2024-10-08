@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
+import Loading from '../../../assets/loading2.gif';
 
 interface PromptParamsProps {
   prompt: string;
@@ -129,9 +130,7 @@ const PromptParams = ({
       >
         <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Prompt Helper</div>
         <div className="flex flex-wrap gap-2">
-          {isClipLoading ? (
-            <p>Loading...</p>
-          ) : clipPhrases.length > 0 ? (
+          {clipPhrases.length > 0 ? (
             clipPhrases.map((phrase, index) => (
               <Button
                 key={index}
@@ -142,7 +141,15 @@ const PromptParams = ({
               </Button>
             ))
           ) : (
-            <p>No clip data</p>
+            <div className="flex justify-center items-center min-h-[100px] w-full">
+              <img className="w-[80px]" src={Loading} alt="Loading" />
+              <div className="ml-4 text-[18px] text-blue-700 dark:text-white animate-pulse">
+                <span className="loading-text">Loading</span>
+                <span className="dot-1">.</span>
+                <span className="dot-2">.</span>
+                <span className="dot-3">.</span>
+              </div>
+            </div>
           )}
         </div>
 
