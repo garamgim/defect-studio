@@ -139,7 +139,6 @@ const Img2ImgLayout = () => {
     let intervalId: NodeJS.Timeout | undefined;
 
     const fetchTaskStatus = async () => {
-      console.log(clipIsLoading, clipTaskId);
       if (clipIsLoading && clipTaskId) {
         try {
           const response = await getTaskStatus(clipTaskId);
