@@ -1,12 +1,17 @@
 import { useState } from 'react';
-import { Button } from 'antd';
+import { Button, Tooltip, Modal, InputNumber } from 'antd';
 import { FormatPainterOutlined } from '@ant-design/icons';
 import MaskingModal from '../masking/MaskingModal';
 import { useCleanupParams } from '../../../hooks/generation/params/useCleanupParams';
 import { setCombinedImg } from '../../../store/slices/generation/inpaintingSlice';
 import UploadImgWithMaskingParams from '../params/UploadImgWithMaskingParams';
+import { MdMemory } from 'react-icons/md';
+import { useDispatch } from 'react-redux';
+import { setGpuNum } from '../../../store/slices/generation/cleanupSlice';
 
 const CleanupSidebar = () => {
+  const dispatch = useDispatch();
+
   // useSelector와 useCallback으로 처리하는 부분을 커스텀 훅으로 분리
   const {
     mode,
@@ -26,7 +31,7 @@ const CleanupSidebar = () => {
     updateCombinedImg
   } = useCleanupParams();
 
-  const [showModal, setShowModal] = useState(false);
+  const [isMaskingOpen, setIsMaskingOpen] = useState(false);
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
@@ -54,13 +59,48 @@ const CleanupSidebar = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
+  const closeMasking = () => {
+    setIsMaskingOpen(false);
+  };
+
+  // GPU 선택
+  const [gpuNumer, setGpuNumer] = useState(0);
+  const [isGpuModalVisible, setIsGpuModalVisible] = useState(false);
+
+  const showGpuModal = () => {
+    setIsGpuModalVisible(true);
+  };
+
+  const handleGpuInputChange = (gpuNumer: number | null) => {
+    if (gpuNumer) {
+      setGpuNumer(gpuNumer);
+    }
+  };
+
+  const handleGpuModalOk = () => {
+    if (gpuNumer !== null) {
+      dispatch(setGpuNum(gpuNumer));
+    }
+    setIsGpuModalVisible(false);
+  };
+
+  const handleGpuModalCancel = () => {
+    setIsGpuModalVisible(false);
   };
 
   return (
     <div className="w-full h-full mr-6">
-      <div className="w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
+      <div className="relative w-full h-full overflow-y-auto custom-scrollbar rounded-[15px] bg-white shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none">
+        {/* GPU 버튼은 항상 표시 */}
+        <div className="absolute top-[22px] right-0 mr-6">
+          <Tooltip title="Enter GPU Number">
+            <MdMemory
+              className="text-[22px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
+              onClick={showGpuModal}
+            />
+          </Tooltip>
+        </div>
+
         {/* 이미지 업로드 */}
         <UploadImgWithMaskingParams
           handleImageUpload={handleImageUpload}
@@ -83,7 +123,7 @@ const CleanupSidebar = () => {
               <Button
                 type="primary"
                 icon={<FormatPainterOutlined />}
-                onClick={() => setShowModal(true)} // 버튼 클릭 시 모달 열기
+                onClick={() => setIsMaskingOpen(true)} // 버튼 클릭 시 모달 열기
                 className="w-full mt-2"
               >
                 Start Masking
@@ -101,15 +141,20 @@ const CleanupSidebar = () => {
       </div>
 
       {/* Masking 모달 창 */}
-      {showModal && initImageList[0] && (
-        <MaskingModal
-          imageSrc={initImageList[0]}
-          onClose={handleCloseModal}
-          updateInitImageList={updateInitImageList}
-          updateMaskImageList={updateMaskImageList}
-          updateCombinedImg={updateCombinedImg}
-        />
-      )}
+      <MaskingModal
+        isModalOpen={isMaskingOpen}
+        imageSrc={initImageList[0]}
+        closeModal={closeMasking}
+        updateInitImageList={updateInitImageList}
+        updateMaskImageList={updateMaskImageList}
+        updateCombinedImg={updateCombinedImg}
+      />
+
+      {/* gpu 선택 모달 */}
+      <Modal open={isGpuModalVisible} closable={false} onOk={handleGpuModalOk} onCancel={handleGpuModalCancel}>
+        <div className="text-[20px] mb-[20px] font-semibold dark:text-gray-300">Input the GPU number you want</div>
+        <InputNumber min={0} onChange={handleGpuInputChange} />
+      </Modal>
     </div>
   );
 };
