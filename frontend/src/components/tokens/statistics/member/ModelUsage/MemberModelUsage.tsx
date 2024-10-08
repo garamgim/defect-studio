@@ -19,8 +19,8 @@ const MemberModelUsage = ({ member_id }: MemberModelUsageProps) => {
     queryKey: ['ModelUsage', 'person', member_id],
     queryFn: () => getModelFrequency(member_id),
     select: (response) =>
-      response.data.filter((item) => {
-        return !!item.model && item.model.length > 0 && item.usage > 0;
+      response.data.filter((item, index) => {
+        return !!item.model && item.model.length > 0 && item.usage > 0 && index < 10;
       }),
     staleTime,
     gcTime
