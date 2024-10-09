@@ -97,7 +97,7 @@ html.dark .custom-scrollbar3::-webkit-scrollbar-thumb:hover {
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none; 
+  display: none;
 }
 
 /* dark mode */
@@ -315,19 +315,13 @@ html.dark .ant-input .ant-input-outlined {
   @apply bg-gray-700;
 }
 
-
 .loading-text {
   display: inline-block;
 }
 
 @keyframes blink {
-  0%,
-  100% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
 }
 
 .dot-1 {

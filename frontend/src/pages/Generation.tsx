@@ -77,8 +77,12 @@ const Generation = () => {
             } else if (response.detail && response.detail.task_status === 'FAILURE') {
               dispatch(setIsLoading({ tab: tabName, value: false }));
               dispatch(setTaskId({ tab: tabName, value: null }));
-              console.error('Image generation failed:', response.detail.result_data || 'Unknown error');
-              alert(`Image generation failed: ${response.detail.result_data || 'Unknown error'}`);
+
+              window.electron.showMessageBox({
+                type: 'error',
+                title: 'Image Generation Error',
+                message: `${response.detail.result_data || 'Unknown error'}`
+              });
             } else if (response.task_status === 'PENDING') {
               dispatch(setIsLoading({ tab: tabName, value: false }));
               dispatch(setTaskId({ tab: tabName, value: null }));

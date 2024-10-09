@@ -32,7 +32,7 @@ const TokenIssurance = () => {
       message.success('Token issuance was successful.');
     },
     onError: () => {
-      alert('Token issuance failed.');
+      message.error('Token issuance failed.');
     }
   });
   return (

@@ -31,5 +31,9 @@ contextBridge.exposeInMainWorld('electron', {
 
   // 이미지 저장 API (ZIP 파일로 압축해서 저장)
   saveImgsWithZip: (images: string[], folderPath: string, format: string, isZipDownload: boolean) =>
-    ipcRenderer.invoke('save-images-with-zip', { images, folderPath, format, isZipDownload })
+    ipcRenderer.invoke('save-images-with-zip', { images, folderPath, format, isZipDownload }),
+
+  // 메시지 박스 표시 (alert 대체)
+  showMessageBox: (options: { type: string; title: string; message: string }) =>
+    ipcRenderer.invoke('show-message-box', options)
 });

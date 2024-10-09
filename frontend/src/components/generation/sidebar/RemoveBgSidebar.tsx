@@ -1,7 +1,7 @@
 import UploadImage from '../params/UploadImgParams';
 import { useRemoveBgParams } from '../../../hooks/generation/params/useRemoveBgParams';
 import { MdMemory } from 'react-icons/md';
-import { Tooltip, Modal, InputNumber } from 'antd';
+import { Tooltip, Modal, InputNumber, message } from 'antd';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setGpuNum } from '../../../store/slices/generation/removeBgSlice';
@@ -29,19 +29,23 @@ const RemoveBgSidebar = () => {
       img.onload = () => {
         // 이미지 크기 제한 (2024x2024 이하)
         if (img.width > 2024 || img.height > 2024) {
-          alert('The image is too large. Please upload an image with a size less than or equal to 2024x2024.');
+          window.electron.showMessageBox({
+            type: 'warning',
+            title: 'Image Size Warning',
+            message: 'The image is too large. Please upload an image with a size less than or equal to 2024x2024.',
+          });
           return;
         }
         updateImageList([base64String]);
       };
 
       img.onerror = () => {
-        alert('Failed to load the image. Please try again.');
+        message.error('Failed to load the image. Please try again.');
       };
       img.src = base64String;
     };
     reader.onerror = () => {
-      alert('Failed to read the file. Please try again.');
+      message.error('Failed to read the file. Please try again.');
     };
     reader.readAsDataURL(file);
   };

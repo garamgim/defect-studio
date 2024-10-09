@@ -16,7 +16,7 @@ import { RootState } from '../../../store/store';
 import { useDispatch } from 'react-redux';
 import { MdMemory } from 'react-icons/md';
 import { resetParams, setGpuNum } from '../../../store/slices/generation/img2ImgSlice';
-import { Modal, InputNumber, Tooltip } from 'antd';
+import { Modal, InputNumber, Tooltip, message } from 'antd';
 
 const Img2ImgSidebar = () => {
   const dispatch = useDispatch();
@@ -63,7 +63,11 @@ const Img2ImgSidebar = () => {
       img.onload = () => {
         // 이미지 크기 제한 (2024x2024 이하)
         if (img.width > 2024 || img.height > 2024) {
-          alert('The image is too large. Please upload an image with a size less than or equal to 2024x2024.');
+          window.electron.showMessageBox({
+            type: 'warning',
+            title: 'Image Size Warning',
+            message: 'The image is too large. Please upload an image with a size less than or equal to 2024x2024.'
+          });
           return;
         }
         updateClipData([]);
@@ -71,12 +75,16 @@ const Img2ImgSidebar = () => {
       };
 
       img.onerror = () => {
-        alert('Failed to load the image. Please try again.');
+        window.electron.showMessageBox({
+          type: 'warning',
+          title: 'Image Size Warning',
+          message: 'The image is too large. Please upload an image with a size less than or equal to 2024x2024.'
+        });
       };
       img.src = base64String;
     };
     reader.onerror = () => {
-      alert('Failed to read the file. Please try again.');
+      message.error('Failed to read the file. Please try again.');
     };
     reader.readAsDataURL(file);
   };

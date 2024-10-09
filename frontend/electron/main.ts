@@ -203,6 +203,17 @@ ipcMain.handle('get-files-in-folder', async (_, folderPath) => {
   }
 });
 
+ipcMain.handle('show-message-box', async (_, { type, title, message }) => {
+  const options = {
+    type: type || 'info', // 기본 값은 'info'
+    buttons: ['OK'],
+    title: title || 'Alert',
+    message: message || 'This is a default message'
+  };
+
+  await dialog.showMessageBox(options);
+});
+
 ipcMain.handle('save-images-with-zip', async (_, { images, folderPath, format, isZipDownload }) => {
   try {
     // 폴더 경로가 유효한지 확인
