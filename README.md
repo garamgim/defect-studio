@@ -113,7 +113,7 @@
 
 ### 📌 Text To Image
 
-[생성 이미지]
+![text_to_image](./readme/text_to_image.gif)
 
 Text Prompt를 통해서 원하는 이미지를 생성할 수 있습니다.  
 이를 통해서 다양한 불량 이미지를 생성할 수 있습니다.
@@ -123,32 +123,32 @@ Advance 모드에서는 세부적인 Parameter들을 입력할 수 있습니다.
 
 ### 📌 Image To Image
 
-[생성 이미지]
+![image_to_image](./readme/image_to_image.gif)
 
 기존에 생성한 이미지를 업로드. 혹은 다른 파트에서 생성한 이미지를  
 바로 가져와서 해당 이미지 바탕으로 또다른 이미지를 생성할 수 있습니다!
 
 ### 📌 Inpainting
 
-[생성 이미지]
+![image_to_image](./readme/inpaint.gif)
 
 ### 📌 Clean Up
 
-[생성 이미지]
+![cleanup](./readme/cleanup.gif)
 
 ### 📌 Remove Background
 
-[생성 이미지]
+![remove-bg]()
 
 ### 공통적인 요소
 
 **Preset**
 
-[생성 이미지]
+![preset](./readme/general_preset.gif)
 
 **Batch Mode**
 
-[생성 이미지]
+![batch](./readme/batch_mode.gif)
 
 ## 🎯 Training
 
