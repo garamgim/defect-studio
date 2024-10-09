@@ -25,8 +25,7 @@ const options: ChartOptions<'line'> = {
   spanGaps: true, // null 데이터가 있어도 선을 연결
   responsive: true, // 반응형
   interaction: {
-    intersect: false, // 정확한 위치에 hover 해야 데이터 표시
-    mode: 'index'
+    intersect: false // 정확한 위치에 hover 해야 데이터 표시
   },
   scales: {
     y: {
