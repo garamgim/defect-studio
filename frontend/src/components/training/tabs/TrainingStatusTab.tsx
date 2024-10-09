@@ -84,10 +84,11 @@ const TrainingStatusTab = () => {
             delete intervalIdsRef.current[taskId];
 
             if (
-              progressData &&
-              progressData.status === 'SUCCESS' &&
-              chartDataMap[taskId] &&
-              chartDataMap[taskId].datasets[0].data.length === 0
+              (progressData &&
+                progressData.status === 'SUCCESS' &&
+                chartDataMap[taskId] &&
+                chartDataMap[taskId].datasets[0].data.length === 0) ||
+              (progressData && !chartDataMap[taskId])
             ) {
               alert(`Model training failed: ${progressData.message || 'Unknown error'}`);
             } else {
@@ -98,7 +99,7 @@ const TrainingStatusTab = () => {
             // Redux에서 taskId 제거
             dispatch(removeTaskId(taskId));
           }
-        }, 5000);
+        }, 1000);
       }
     });
 
@@ -132,7 +133,7 @@ const TrainingStatusTab = () => {
   return (
     <div className="h-full bg-white rounded-lg p-6 shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none overflow-y-auto custom-scrollbar">
       <h3 className="text-lg font-bold mb-4 dark:text-gray-300">Training Progress Overview</h3>
-      <div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] lg:grid-cols-[repeat(3,minmax(200px,1fr))]">
+      <div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] lg:grid-cols-2">
         {/* 진행 중인 학습 상태 표시 */}
         {taskIds.map((taskId) => (
           <div

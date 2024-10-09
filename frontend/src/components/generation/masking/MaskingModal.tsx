@@ -579,7 +579,7 @@ const MaskingModal = ({
                     closed={obj.tool === 'polygon'}
                     fill={obj.tool === 'polygon' ? obj.fill : undefined}
                     lineCap="round"
-                    tension={0.5}
+                    tension={obj.tool === 'polygon' ? 0 : 0.5}
                     onClick={() => handleObjectSelect(objIndex)}
                   />
                   {isMovingPoints &&

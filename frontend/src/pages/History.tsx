@@ -28,6 +28,12 @@ const History = () => {
     queryFn: getImgsList
   });
 
+  useEffect(() => {
+    if (error) {
+      message.error(`Error loading the image folder list: ${error.message}`);
+    }
+  }, [error]);
+
   // 폴더 삭제 mutation
   const { mutate: deleteFolder } = useMutation({
     mutationFn: deleteImgsFolder,
@@ -58,7 +64,6 @@ const History = () => {
   };
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading data</div>;
 
   // 필터링된 폴더 목록
   const filteredFolders = folders.filter((folder: FolderListDataType) => {
@@ -75,7 +80,7 @@ const History = () => {
   });
 
   return (
-    <div className="flex flex-col items-start h-[calc(100vh-60px)] bg-gray-100 p-8 overflow-auto dark:bg-gray-800">
+    <div className="flex flex-col items-start h-[calc(100vh-60px)] bg-gray-100 p-8  overflow-auto dark:bg-gray-800">
       <SearchFilter
         searchId={searchId}
         setSearchId={setSearchId}

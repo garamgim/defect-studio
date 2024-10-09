@@ -3,6 +3,8 @@ import React, { useEffect } from 'react';
 import { getModelList } from '../../../api/generation';
 import { useQuery } from '@tanstack/react-query';
 import { ModelParamsType } from '../../../types/generation';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 
 interface ModelParamProps {
   modelParams: ModelParamsType;
@@ -10,19 +12,20 @@ interface ModelParamProps {
 }
 
 const ModelParam = ({ modelParams, updateModelParams }: ModelParamProps) => {
+  // const memberId = useSelector((state: RootState) => state.userInfo.member_id);
+  const memberId = 1;
+
   const handleChange = (model: string) => {
     updateModelParams(model);
   };
-
-  const member_id = 1;
 
   const {
     data: modelList,
     isLoading,
     error
   } = useQuery<string[], Error>({
-    queryKey: ['models', member_id],
-    queryFn: () => getModelList(member_id)
+    queryKey: ['models', memberId],
+    queryFn: () => getModelList(memberId)
   });
 
   // 기본 모델 리스트

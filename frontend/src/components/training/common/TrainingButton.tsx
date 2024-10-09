@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button, message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { postTraining } from '../../../api/training';
@@ -7,6 +8,8 @@ import { addTaskId } from '../../../store/slices/training/outputSlice';
 
 const TrainingButton = () => {
   const dispatch = useDispatch();
+
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false); // 버튼 비활성화 상태 관리
 
   const newGpuNum = useSelector((state: RootState) => state.settings.gpuNum);
   const { gpuNum, params } = useSelector((state: RootState) => state.training);
@@ -47,6 +50,9 @@ const TrainingButton = () => {
 
   const handleTrainingStart = async () => {
     try {
+      setIsButtonDisabled(true); // 버튼 비활성화
+      message.success('Model training has started successfully');
+
       const instanceImageListFiles: File[] = [];
       const classImageListFiles: File[] = [];
 
@@ -120,19 +126,24 @@ const TrainingButton = () => {
         ...mandatoryFields,
         ...cleanedOptionalFields
       };
+      // 1초 후에 버튼 다시 활성화
+      setTimeout(() => {
+        setIsButtonDisabled(false);
+      }, 1000);
 
       const newTaskId = await postTraining('remote', fullTrainingData as TrainingParams);
-      // 3초 후에 addTaskId 실행
+      // 2초 후에 addTaskId 실행
       setTimeout(() => {
         dispatch(addTaskId(newTaskId));
-      }, 3000);
+      }, 1000);
     } catch (error) {
       message.error(`Error during training: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setIsButtonDisabled(false);
     }
   };
 
   return (
-    <Button type="primary" onClick={handleTrainingStart}>
+    <Button type="primary" onClick={handleTrainingStart} disabled={isButtonDisabled}>
       Start Training
     </Button>
   );

@@ -6,7 +6,6 @@ export const getImgsList = async () => {
     const response = await axiosInstance.get('/generation/log');
 
     if (response.status === 200) {
-      console.log(response.data);
       return response.data;
     } else {
       throw new Error('Failed to get imgs-list');

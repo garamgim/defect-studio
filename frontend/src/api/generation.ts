@@ -57,7 +57,6 @@ export const postImg2ImgGeneration = async (gpu_env: Img2ImgDataType['gpu_env'],
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
-      console.log(key, value);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
@@ -93,7 +92,6 @@ export const postInpaintingGeneration = async (
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
-      console.log(key, value, typeof value);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
@@ -126,7 +124,6 @@ export const getClip = async (data: ClipDataType) => {
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
-      console.log(key, value);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
@@ -159,7 +156,6 @@ export const postRemoveBgGeneration = async (gpu_env: RemoveBgDataType['gpu_env'
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
-      console.log(key, value);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
@@ -192,7 +188,6 @@ export const postCleanupGeneration = async (gpu_env: CleanupDataType['gpu_env'],
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
-      console.log(key, data);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
@@ -221,7 +216,6 @@ export const postCleanupGeneration = async (gpu_env: CleanupDataType['gpu_env'],
 
 // 프리셋 생성 함수
 export const postPreset = async (preset: PresetDataType) => {
-  console.log(preset);
   try {
     const response = await axiosInstance.post('/generation/presets', preset);
 
@@ -258,7 +252,6 @@ export const getPresetDetail = async (preset_id: string) => {
     const response = await axiosInstance.get(`/generation/presets/${preset_id}`);
 
     if (response.status === 200) {
-      console.log('preset: ', response.data);
       return response.data;
     } else {
       throw new Error('Failed to get preset-detail');

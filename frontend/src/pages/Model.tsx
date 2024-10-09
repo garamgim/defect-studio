@@ -1,68 +1,121 @@
-import { message } from 'antd';
+import { useState, useEffect, useRef } from 'react';
+import { Input, message } from 'antd';
 import { getModelDownload, getTaskStatus } from '../api/model';
-import { useEffect, useRef } from 'react';
+import { getModelList } from '../api/generation';
+import { useDispatch, useSelector } from 'react-redux';
 import { addTaskId, removeTaskId } from '../store/slices/model/modelSlice';
-import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
+import { useQuery } from '@tanstack/react-query';
 
 const Model = () => {
   const dispatch = useDispatch();
-  const taskIds = useSelector((state: RootState) => state.model.taskId); // Redux에서 taskIds 가져오기
-  const intervalIdsRef = useRef<{ [key: string]: NodeJS.Timeout }>({}); // taskId 별 interval 추적
+  const taskIds = useSelector((state: RootState) => state.model.taskId);
+  const intervalIdsRef = useRef<{ [key: string]: NodeJS.Timeout }>({});
+  const memberId = 1;
 
-  const handleGenerate = async () => {
+  const {
+    data: modelList,
+    isLoading,
+    error
+  } = useQuery<string[], Error>({
+    queryKey: ['models', memberId],
+    queryFn: () => getModelList(memberId)
+  });
+
+  useEffect(() => {
+    if (error) {
+      message.error(`Error loading the model list: ${error.message}`);
+    }
+  }, [error]);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredModels, setFilteredModels] = useState<string[]>([]);
+
+  const handleGenerate = async (modelName: string) => {
     try {
-      const newTaskId = await getModelDownload('metal_nut_model_1'); // 모델 다운로드 요청
-      console.log(`New Task ID: ${newTaskId}`);
-      dispatch(addTaskId(newTaskId)); // 새로운 taskId Redux에 저장
-      console.log('Task ID dispatched');
-      console.log(taskIds, 'check');
+      const newTaskId = await getModelDownload(modelName);
+      dispatch(addTaskId(newTaskId));
+      message.success(`Started downloading model: ${modelName}`);
     } catch (error) {
-      message.error(`Error model download: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      message.error(`Error downloading model: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   useEffect(() => {
-    console.log(taskIds, 'taskIds updated'); // taskIds가 변경될 때마다 이 로그가 출력됨
+    if (modelList) {
+      const filtered = modelList.filter((model) => model.toLowerCase().includes(searchTerm.toLowerCase()));
+      setFilteredModels(filtered);
+    }
+  }, [modelList, searchTerm]);
 
+  useEffect(() => {
     taskIds.forEach((taskId) => {
-      // 이미 interval이 설정된 taskId에 대해 중복 설정을 방지
       if (taskId && !intervalIdsRef.current[taskId]) {
         intervalIdsRef.current[taskId] = setInterval(async () => {
           try {
-            const statusResponse = await getTaskStatus(taskId); // 상태 확인 API 호출
-            console.log(`Task ID: ${taskId}, Status:`, statusResponse);
-
-            if (!statusResponse) {
-              // 작업이 완료되었을 때
-              clearInterval(intervalIdsRef.current[taskId]); // Interval 제거
-              delete intervalIdsRef.current[taskId]; // Interval 추적 객체에서 제거
-              message.success(`Model download completed for Task ID: ${taskId}`);
-
-              // Redux에서 해당 taskId 제거
-              // dispatch(removeTaskId(taskId));
-            } else if (statusResponse && statusResponse.return_code !== 0) {
-              console.log(`Task ${taskId} still in progress.`);
+            const statusResponse = await getTaskStatus(taskId);
+            if (!statusResponse || statusResponse.task_status === 'PENDING') {
+              clearInterval(intervalIdsRef.current[taskId]);
+              delete intervalIdsRef.current[taskId];
+              dispatch(removeTaskId(taskId));
+            } else if (statusResponse.task_status === 'STARTED') {
+              console.log('진행중');
             }
           } catch (error) {
             console.error(`Error fetching task status for Task ID ${taskId}:`, error);
           }
-        }, 1000); // 1초마다 상태 확인
+        }, 10000);
       }
     });
 
-    // 컴포넌트 언마운트 시 모든 interval 제거
     return () => {
       Object.values(intervalIdsRef.current).forEach(clearInterval);
-      intervalIdsRef.current = {}; // 초기화
+      intervalIdsRef.current = {};
     };
-  }, [dispatch, taskIds]); // taskIds가 변경될 때마다 실행
+  }, [taskIds, dispatch]);
 
   return (
-    <div className="flex justify-center items-center h-[calc(100vh-60px)] bg-gray-100 p-4 overflow-hidden dark:bg-gray-800">
-      <button onClick={handleGenerate} className="w-[300px] h-[100px] bg-red-500 text-white">
-        Download Model
-      </button>
+    <div className="flex flex-col items-start h-[calc(100vh-60px)] bg-gray-100 p-8 overflow-auto dark:bg-gray-800">
+      {/* 검색 바 */}
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search by Model Name</label>
+      <Input
+        placeholder="Search model"
+        size="large"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="mb-8 w-full max-w-lg"
+      />
+
+      <h1 className="text-[24px] font-semibold mb-6 text-dark dark:text-white">
+        Click on the model you want to download
+      </h1>
+
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 w-full">
+          {filteredModels.length > 0 ? (
+            filteredModels.map((model) => (
+              <div
+                key={model}
+                className="p-4 border border-gray-300 dark:border-none bg-white dark:bg-gray-700 rounded-lg shadow-lg flex justify-between items-center w-full hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+                style={{ minHeight: '100px' }}
+                onClick={() => handleGenerate(model)}
+              >
+                <h2
+                  className="text-[16px] dark:text-gray-100 truncate"
+                  style={{ maxWidth: '80%', wordBreak: 'break-word' }}
+                  title={model}
+                >
+                  {model}
+                </h2>
+              </div>
+            ))
+          ) : (
+            <p>No models found.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };

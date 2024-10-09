@@ -31,7 +31,6 @@ const SignupForm = ({ signupForm, setSignupForm, setSignUpPage }: SignupFormProp
     async (name: string, email: string) => {
       try {
         await sendEmailVerifyCode(name, email).catch((error) => {
-          console.log('abcd', error.response.data);
           message.error(error.response.data.message);
         });
         setSignUpPage('Verifying Page');

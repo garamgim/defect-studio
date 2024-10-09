@@ -1,11 +1,9 @@
 import axiosInstance from '../api/token/axiosInstance';
 
-// model export 함수 (1)
+// model export 함수 (1단계 - taskId얻기)
 export const getModelDownload = async (modelName: string) => {
   try {
     const response = await axiosInstance.get(`/model/${modelName}/download`);
-
-    console.log(response, '1');
 
     if (response.status === 200) {
       return response.data.task_id;
@@ -18,7 +16,7 @@ export const getModelDownload = async (modelName: string) => {
   }
 };
 
-// model export 함수 (2)
+// model export 함수 (2단계)
 export const getTaskStatus = async (task_id: string) => {
   try {
     const response = await axiosInstance.get(`/model/tasks/${task_id}`);

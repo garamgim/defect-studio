@@ -126,7 +126,6 @@ const OutputToolbar = ({ type }: OutputToolbarProps) => {
           return;
       }
 
-      console.log('Dispatched successfully');
       goToPage(route);
       setIsModalVisible(false);
     } catch (error) {
