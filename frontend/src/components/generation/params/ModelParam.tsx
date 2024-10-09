@@ -12,8 +12,7 @@ interface ModelParamProps {
 }
 
 const ModelParam = ({ modelParams, updateModelParams }: ModelParamProps) => {
-  // const memberId = useSelector((state: RootState) => state.userInfo.member_id);
-  const memberId = 1;
+  const memberId = useSelector((state: RootState) => state.userInfo.member_id);
 
   const handleChange = (model: string) => {
     updateModelParams(model);

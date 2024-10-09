@@ -11,7 +11,7 @@ const Model = () => {
   const dispatch = useDispatch();
   const taskIds = useSelector((state: RootState) => state.model.taskId);
   const intervalIdsRef = useRef<{ [key: string]: NodeJS.Timeout }>({});
-  const memberId = 1;
+  const memberId = useSelector((state: RootState) => state.userInfo.member_id);
 
   const {
     data: modelList,
