@@ -9,6 +9,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { message } from 'antd';
+import Loading from '../components/common/LoadingIndicator';
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
@@ -63,7 +64,7 @@ const History = () => {
     deleteFolder(id);
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loading />;
 
   // 필터링된 폴더 목록
   const filteredFolders = folders.filter((folder: FolderListDataType) => {

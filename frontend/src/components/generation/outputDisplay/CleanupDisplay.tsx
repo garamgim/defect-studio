@@ -2,8 +2,7 @@ import { useDispatch } from 'react-redux';
 import { setSelectedImgs } from '../../../store/slices/generation/outputSlice';
 import { useCleanupOutputs } from '../../../hooks/generation/outputs/useCleanupOutputs';
 import { useEffect, useState } from 'react';
-import { Modal, message } from 'antd';
-import { FaRegCopy } from 'react-icons/fa6';
+import { Modal } from 'antd';
 import styled from 'styled-components';
 import Loading from '../../../assets/hourglass.gif';
 
@@ -54,20 +53,13 @@ const CleanupDisplay = () => {
   // 선택된 이미지 배열에서 마지막 이미지를 가져오기
   const lastSelectedImage = selectedImgs.length > 0 ? selectedImgs[selectedImgs.length - 1] : null;
 
-  // 프롬프트 복사 함수
-  const handleCopy = (prompt: string) => {
-    navigator.clipboard.writeText(prompt).then(() => {
-      message.success('Prompt copied to clipboard!');
-    });
-  };
-
   return (
     <div className="h-full image-display grid gap-4 overflow-y-auto custom-scrollbar2">
       {isLoading ? (
         <div
           className="grid gap-4 mr-[16px]"
           style={{
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))'
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))'
           }}
         >
           {Array.from({ length: output.imgsCnt }).map((_, index) => (
@@ -122,7 +114,7 @@ const CleanupDisplay = () => {
         <div
           className="grid gap-4 mr-[16px]"
           style={{
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))'
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))'
           }}
         >
           {allOutputs.outputsInfo.map((outputInfo) =>
@@ -166,24 +158,7 @@ const CleanupDisplay = () => {
       >
         {lastSelectedImage ? (
           <div className="mb-[8px]">
-            <div className="mb-3 flex gap-[18px] items-center">
-              <span className="text-[20px] dark:text-gray-300 font-semibold">Prompt</span>
-              <div
-                className="flex items-center text-[14px] text-[#222] hover:text-blue-500 dark:text-gray-300 dark:hover:text-white cursor-pointer transition-transform transform hover:scale-110"
-                onClick={() =>
-                  handleCopy(
-                    allOutputs.outputsInfo.find((output) => output.imgsUrl.includes(lastSelectedImage))?.prompt || ''
-                  )
-                }
-              >
-                <FaRegCopy className="mr-1" />
-                <span>Copy</span>
-              </div>
-            </div>
-            <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-[16px] leading-relaxed">
-              {allOutputs.outputsInfo.find((output) => output.imgsUrl.includes(lastSelectedImage))?.prompt ||
-                'No prompt available'}
-            </div>
+            <img className="rounded-lg mb-4" src={lastSelectedImage} alt="selected Image" />
           </div>
         ) : (
           <p>No image selected.</p>

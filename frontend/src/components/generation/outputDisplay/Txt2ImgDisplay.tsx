@@ -36,6 +36,7 @@ const Txt2ImgDisplay = () => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.key === 'p' && selectedImgs.length > 0) {
+        console.log(lastSelectedImage);
         setIsModalOpen(true);
       }
     };
@@ -67,7 +68,7 @@ const Txt2ImgDisplay = () => {
         <div
           className="grid gap-4 mr-[16px]"
           style={{
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))'
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))'
           }}
         >
           {Array.from({ length: output.imgsCnt }).map((_, index) => (
@@ -122,7 +123,7 @@ const Txt2ImgDisplay = () => {
         <div
           className="grid gap-4 mr-[16px]"
           style={{
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))'
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))'
           }}
         >
           {allOutputs.outputsInfo.map((outputInfo) =>
@@ -180,6 +181,9 @@ const Txt2ImgDisplay = () => {
                 <span>Copy</span>
               </div>
             </div>
+
+            <img className="rounded-lg mb-4" src={lastSelectedImage} alt="selected Image" />
+
             <div className="p-4 bg-gray-100 dark:bg-[#5a6472] rounded-lg text-[16px] leading-relaxed">
               {allOutputs.outputsInfo.find((output) => output.imgsUrl.includes(lastSelectedImage))?.prompt ||
                 'No prompt available'}
