@@ -79,6 +79,9 @@ const Generation = () => {
               dispatch(setTaskId({ tab: tabName, value: null }));
               console.error('Image generation failed:', response.detail.result_data || 'Unknown error');
               alert(`Image generation failed: ${response.detail.result_data || 'Unknown error'}`);
+            } else if (response.task_status === 'PENDING') {
+              dispatch(setIsLoading({ tab: tabName, value: false }));
+              dispatch(setTaskId({ tab: tabName, value: null }));
             }
           } catch (error) {
             console.error(`Failed to get task status for ${tabName}:`, error);
