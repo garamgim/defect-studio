@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Tooltip, Modal, InputNumber } from 'antd';
+import { Button, Tooltip, Modal, InputNumber, message } from 'antd';
 import { FormatPainterOutlined } from '@ant-design/icons';
 import MaskingModal from '../masking/MaskingModal';
 import { useCleanupParams } from '../../../hooks/generation/params/useCleanupParams';
@@ -41,7 +41,11 @@ const CleanupSidebar = () => {
       img.onload = async () => {
         // 이미지 크기 제한 (2024x2024 이하)
         if (img.width > 2024 || img.height > 2024) {
-          alert('The image is too large. Please upload an image with a size less than or equal to 2024x2024.');
+          window.electron.showMessageBox({
+            type: 'warning',
+            title: 'Image Size Warning',
+            message: 'The image is too large. Please upload an image with a size less than or equal to 2024x2024.',
+          });
           return;
         }
         updateInitImageList([base64String]);
@@ -49,12 +53,12 @@ const CleanupSidebar = () => {
       };
 
       img.onerror = () => {
-        alert('Failed to load the image. Please try again.');
+        message.error('Failed to load the image. Please try again.');
       };
       img.src = base64String;
     };
     reader.onerror = () => {
-      alert('Failed to read the file. Please try again.');
+      message.error('Failed to read the file. Please try again.');
     };
     reader.readAsDataURL(file);
   };

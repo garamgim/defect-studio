@@ -92,7 +92,11 @@ const TrainingStatusTab = () => {
               chartDataMap[taskId] &&
               chartDataMap[taskId].datasets[0].data.length === 0
             ) {
-              alert(`Model training failed: ${progressData.message || 'Unknown error'}`);
+              window.electron.showMessageBox({
+                type: 'error',
+                title: 'Training Error',
+                message: `${progressData.message || 'Unknown error'}`
+              });
             } else {
               // 차트 데이터가 비어 있지 않은 경우에만 completedTaskIds에 추가
               setCompletedTaskIds((prev) => [taskId, ...prev]);

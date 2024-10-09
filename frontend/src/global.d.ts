@@ -23,6 +23,7 @@ declare global {
     saveImgs: (selectedImgs: string[], folderPath: string, format: string) => Promise<saveImgsResponse>;
     selectFolder: () => Promise<string | null>;
     getFilesInFolder: (folderPath: string) => Promise<FileData[]>;
+    showMessageBox: (options: { type: string; title: string; message: string }) => Promise<void>;
   }
 
   interface Window {

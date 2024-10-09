@@ -78,7 +78,7 @@ html.dark .custom-scrollbar2::-webkit-scrollbar-thumb {
 }
 
 html.dark .custom-scrollbar3::-webkit-scrollbar-thumb {
-  background-color: rgba(3, 7, 18, 0.2); 
+  background-color: rgba(3, 7, 18, 0.2);
   border-radius: 5px;
 }
 
@@ -88,7 +88,7 @@ html.dark .custom-scrollbar3::-webkit-scrollbar-thumb {
   transition: all 0.2s;
 }
 html.dark .custom-scrollbar3::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(3, 7, 18, 0.3); 
+  background-color: rgba(3, 7, 18, 0.3);
   transition: all 0.2s;
 }
 
@@ -97,7 +97,7 @@ html.dark .custom-scrollbar3::-webkit-scrollbar-thumb:hover {
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none; 
+  display: none;
 }
 
 /* dark mode */
@@ -236,7 +236,6 @@ html.dark .ant-modal-content {
   height: 100%;
 }
 
-
 /* antd Table dark mode 색  */
 html.dark .ant-table {
   @apply bg-gray-800;
@@ -316,5 +315,28 @@ html.dark .ant-input .ant-input-outlined {
   @apply bg-gray-700;
 }
 
+.loading-text {
+  display: inline-block;
+}
 
+@keyframes blink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
 
+.dot-1 {
+  animation: blink 1s infinite;
+}
+
+.dot-2 {
+  animation: blink 1s infinite 0.2s;
+}
+
+.dot-3 {
+  animation: blink 1s infinite 0.4s;
+}
+
+/* antd Collapse 컴포넌트  - training image parameter*/
+.ant-collapse-content-box {
+  @apply bg-white dark:bg-gray-800;
+}

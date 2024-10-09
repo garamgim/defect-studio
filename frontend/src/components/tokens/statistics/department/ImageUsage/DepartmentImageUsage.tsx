@@ -3,7 +3,6 @@ import { getDepartmentMemberImageCount } from '@/api/statistic_department';
 import { useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
 import DepartmentImageUsageGraph from './DepartmentImageUsageGraph';
-import { staleTime, gcTime } from '../../common/constance';
 
 interface DepartmentImageUsageProps {
   department_id: number;
@@ -18,9 +17,7 @@ const DepartmentImageUsage = ({ department_id }: DepartmentImageUsageProps) => {
   >({
     queryKey: ['departmentMemberImageCount', department_id],
     queryFn: () => getDepartmentMemberImageCount(department_id),
-    select: (response) => response.data,
-    staleTime,
-    gcTime
+    select: (response) => response.data
   });
 
   return (

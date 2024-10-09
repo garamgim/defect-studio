@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Modal, InputNumber, Tooltip } from 'antd';
+import { Button, Modal, InputNumber, Tooltip, message } from 'antd';
 import { FormatPainterOutlined, FileAddOutlined, FileSearchOutlined, UndoOutlined } from '@ant-design/icons';
 import ModelParam from '../params/InpaintingModelParam';
 import MaskingModal from '../masking/MaskingModal';
@@ -70,7 +70,11 @@ const InpaintingSidebar = () => {
       img.onload = async () => {
         // 이미지 크기 제한 (2024x2024 이하)
         if (img.width > 2024 || img.height > 2024) {
-          alert('The image is too large. Please upload an image with a size less than or equal to 2024x2024.');
+          window.electron.showMessageBox({
+            type: 'warning',
+            title: 'Image Size Warning',
+            message: 'The image is too large. Please upload an image with a size less than or equal to 2024x2024.'
+          });
           return;
         }
         updateClipData([]);
@@ -79,12 +83,12 @@ const InpaintingSidebar = () => {
       };
 
       img.onerror = () => {
-        alert('Failed to load the image. Please try again.');
+        message.error('Failed to load the image. Please try again.');
       };
       img.src = base64String;
     };
     reader.onerror = () => {
-      alert('Failed to read the file. Please try again.');
+      message.error('Failed to read the file. Please try again.');
     };
     reader.readAsDataURL(file);
   };

@@ -1,7 +1,6 @@
 import { DepartmentMemberTokenUsage } from '@/types/statistics';
 import { getDepartmentMembersTokenUsage } from '@api/statistic_department';
 import { useQuery } from '@tanstack/react-query';
-import { staleTime, gcTime } from '../../common/constance';
 import { AxiosResponse } from 'axios';
 import TokenUsageGraph from './TokenUsageGraph';
 interface TokenUsageProps {
@@ -17,9 +16,7 @@ const TokenUsage = ({ department_id }: TokenUsageProps) => {
   >({
     queryKey: ['departmentMembersTokenUsage', department_id],
     queryFn: () => getDepartmentMembersTokenUsage(department_id),
-    select: (response) => response.data,
-    staleTime,
-    gcTime
+    select: (response) => response.data
   });
   return (
     <div className="flex flex-col text-black dark:text-white">
