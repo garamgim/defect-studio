@@ -4,7 +4,6 @@ import { getTokenUsage } from '@api/statistic_person'; // API
 import { TokenUsage } from '@/types/statistics'; // Response Type
 import { calculateTotal } from '@/utils/MemberTokenUsageTotalCalculator'; // Total 계산
 import MemberTokenUsageGraph from './MemberTokenUsageGraph';
-import { staleTime, gcTime } from '../../common/constance';
 
 interface MemberTokenUsageProps {
   member_id: number;
@@ -27,9 +26,7 @@ const MemberTokenUsage = ({ member_id }: MemberTokenUsageProps) => {
         if (a.usage_date > b.usage_date) return 1;
         return 0;
       });
-    },
-    staleTime,
-    gcTime
+    }
   });
   return (
     <div>
