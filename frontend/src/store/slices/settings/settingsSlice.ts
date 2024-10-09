@@ -6,7 +6,7 @@ interface SettingsState {
 }
 
 const initialState: SettingsState = {
-  gpuNum: 0,
+  gpuNum: 3,
   maxImgsNum: 100
 };
 

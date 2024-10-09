@@ -7,6 +7,7 @@ export const postTraining = async (gpu_env: TrainingDataType['gpu_env'], data: T
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
+      console.log(key, value);
       if (key === 'concept_list') {
         formData.append(key, JSON.stringify(value));
       } else if (Array.isArray(value)) {

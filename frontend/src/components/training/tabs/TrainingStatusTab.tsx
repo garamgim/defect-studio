@@ -133,20 +133,20 @@ const TrainingStatusTab = () => {
   return (
     <div className="h-full bg-white rounded-lg p-6 shadow-lg border border-gray-300 dark:bg-gray-600 dark:border-none overflow-y-auto custom-scrollbar">
       <h3 className="text-lg font-bold mb-4 dark:text-gray-300">Training Progress Overview</h3>
-      <div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] lg:grid-cols-2">
+      <div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] lg:grid-cols-1">
         {/* 진행 중인 학습 상태 표시 */}
         {taskIds.map((taskId) => (
           <div
             key={taskId}
             className={`p-4 border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-none transition-all duration-300 overflow-hidden`}
-            style={{ minHeight: '150px', height: visibleCharts[taskId] ? 'auto' : '150px', maxHeight: '500px' }}
+            style={{ minHeight: '150px', height: visibleCharts[taskId] ? 'auto' : '150px', maxHeight: '800px' }}
           >
             <p className="font-medium mb-2 dark:text-gray-300">Id: {taskId}</p>
             <Progress percent={chartDataMap[taskId]?.progress || 0} />
 
             {/* 학습 진행 상황 차트 */}
             {visibleCharts[taskId] && (
-              <div style={{ marginTop: '20px', height: '300px', overflowY: 'auto' }}>
+              <div style={{ marginTop: '20px', height: '400px', overflowY: 'auto' }}>
                 {chartDataMap[taskId] ? (
                   <Line data={chartDataMap[taskId]} options={chartOptions} />
                 ) : (
@@ -172,13 +172,13 @@ const TrainingStatusTab = () => {
             <div
               key={taskId}
               className={`p-4 border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-none transition-all duration-300 overflow-hidden`}
-              style={{ minHeight: '150px', height: visibleCharts[taskId] ? 'auto' : '150px', maxHeight: '500px' }}
+              style={{ minHeight: '150px', height: visibleCharts[taskId] ? 'auto' : '150px', maxHeight: '600px' }}
             >
               <p className="font-medium mb-2 dark:text-gray-300">Id: {taskId} (Completed)</p>
               <Progress percent={100} /> {/* 완료된 학습은 progress 100% */}
               {/* 학습 진행 상황 차트 */}
               {visibleCharts[taskId] && (
-                <div style={{ marginTop: '20px', height: '300px', overflowY: 'auto' }}>
+                <div style={{ marginTop: '20px', height: '400px', overflowY: 'auto' }}>
                   {chartDataMap[taskId] ? (
                     <Line data={chartDataMap[taskId]} options={chartOptions} />
                   ) : (

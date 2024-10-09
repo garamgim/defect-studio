@@ -7,6 +7,7 @@ import { addTaskId, removeTaskId } from '../store/slices/model/modelSlice';
 import { RootState } from '@/store/store';
 import { useQuery } from '@tanstack/react-query';
 import { useGetMyInfo } from '@/hooks/user/useGetMyInfo';
+import Loading from '../components/common/LoadingIndicator';
 
 const Model = () => {
   const dispatch = useDispatch();
@@ -76,6 +77,8 @@ const Model = () => {
     };
   }, [taskIds, dispatch]);
 
+  if (isLoading) return <Loading />;
+
   return (
     <div className="flex flex-col items-start h-[calc(100vh-60px)] bg-gray-100 p-8 overflow-auto dark:bg-gray-800">
       {/* 검색 바 */}
@@ -92,32 +95,28 @@ const Model = () => {
         Click on the model you want to download
       </h1>
 
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : (
-        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 w-full">
-          {filteredModels.length > 0 ? (
-            filteredModels.map((model) => (
-              <div
-                key={model}
-                className="p-4 border border-gray-300 dark:border-none bg-white dark:bg-gray-700 rounded-lg shadow-lg flex justify-between items-center w-full hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
-                style={{ minHeight: '100px' }}
-                onClick={() => handleGenerate(model)}
+      <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 w-full">
+        {filteredModels.length > 0 ? (
+          filteredModels.map((model) => (
+            <div
+              key={model}
+              className="p-4 border border-gray-300 dark:border-none bg-white dark:bg-gray-700 rounded-lg shadow-lg flex justify-between items-center w-full hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+              style={{ minHeight: '100px' }}
+              onClick={() => handleGenerate(model)}
+            >
+              <h2
+                className="text-[16px] dark:text-gray-100 truncate"
+                style={{ maxWidth: '80%', wordBreak: 'break-word' }}
+                title={model}
               >
-                <h2
-                  className="text-[16px] dark:text-gray-100 truncate"
-                  style={{ maxWidth: '80%', wordBreak: 'break-word' }}
-                  title={model}
-                >
-                  {model}
-                </h2>
-              </div>
-            ))
-          ) : (
-            <p>No models found.</p>
-          )}
-        </div>
-      )}
+                {model}
+              </h2>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-400 dark:text-gray-500">No models found.</p>
+        )}
+      </div>
     </div>
   );
 };

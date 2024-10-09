@@ -57,6 +57,7 @@ export const postImg2ImgGeneration = async (gpu_env: Img2ImgDataType['gpu_env'],
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
+      console.log(key, value);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
