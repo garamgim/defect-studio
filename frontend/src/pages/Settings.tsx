@@ -8,7 +8,6 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { setGpuNum } from '@/store/slices/settings/settingsSlice';
-import { InputNumber } from 'antd';
 
 type queryKeyType = 'deviceHealth' | 'deviceCudaAvailable' | 'deviceCudaUsage';
 
