@@ -8,7 +8,6 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { setGpuNum } from '@/store/slices/settings/settingsSlice';
-import { InputNumber } from 'antd';
 
 type queryKeyType = 'deviceHealth' | 'deviceCudaAvailable' | 'deviceCudaUsage';
 
@@ -193,12 +192,12 @@ const Settings = () => {
           </section>
         </main>
 
-        <div className="mt-12 mb-4">
+        {/* <div className="mt-12 mb-4">
           <h1 className="text-[24px] font-semibold mb-6 text-dark dark:text-white">
             Limit the number of images to be created
           </h1>
           <InputNumber min={1} max={2048} className="w-full" />
-        </div>
+        </div> */}
 
         {/* <Form layout="vertical" onFinish={handleSave}>
           <Form.Item
