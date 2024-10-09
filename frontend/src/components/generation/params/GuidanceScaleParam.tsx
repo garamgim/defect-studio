@@ -23,7 +23,7 @@ const ControlParams = ({ guidanceParams, updateGuidanceParams }: GuidanceScalePa
             <Col span={16}>
               <Slider
                 min={1.0}
-                max={30.0}
+                max={20.0}
                 step={0.1}
                 value={guidanceParams.guidanceScale}
                 onChange={handleGuidanceScaleChange}
@@ -33,7 +33,7 @@ const ControlParams = ({ guidanceParams, updateGuidanceParams }: GuidanceScalePa
             <Col span={8}>
               <InputNumber
                 min={1.0}
-                max={30.0}
+                max={20.0}
                 step={0.1}
                 value={guidanceParams.guidanceScale}
                 onChange={handleGuidanceScaleChange}

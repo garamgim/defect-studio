@@ -38,7 +38,6 @@ export async function login(user: loginData) {
 export const getUserInfo = async (): Promise<AxiosResponse<userInfoType, AxiosError>> => {
   try {
     const response = await axiosInstance.get('/members');
-    console.log('response Data ' + response);
     return response;
   } catch (error) {
     if ((error as AxiosError).status === 401) {
