@@ -135,7 +135,7 @@ const TrainingButton = () => {
       // 2초 후에 addTaskId 실행
       setTimeout(() => {
         dispatch(addTaskId(newTaskId));
-      }, 1000);
+      }, 2000);
     } catch (error) {
       message.error(`Error during training: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setIsButtonDisabled(false);

@@ -87,11 +87,10 @@ const TrainingStatusTab = () => {
             delete intervalIdsRef.current[taskId];
 
             if (
-              (progressData &&
-                progressData.status === 'SUCCESS' &&
-                chartDataMap[taskId] &&
-                chartDataMap[taskId].datasets[0].data.length === 0) ||
-              (progressData && !chartDataMap[taskId])
+              progressData &&
+              progressData.status === 'SUCCESS' &&
+              chartDataMap[taskId] &&
+              chartDataMap[taskId].datasets[0].data.length === 0
             ) {
               alert(`Model training failed: ${progressData.message || 'Unknown error'}`);
             } else {

@@ -15,7 +15,6 @@ export type userInfo = {
 export const getUserInfo = async (): Promise<AxiosResponse<userInfo, AxiosError>> => {
   try {
     const response = await axiosInstance.get('/members');
-    console.log('response Data ' + response);
     return response;
   } catch (error) {
     if ((error as AxiosError).status === 401) {
