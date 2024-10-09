@@ -124,7 +124,6 @@ const Img2ImgLayout = () => {
           const newClipId = await getClip(clipData);
           dispatch(setIsLoading({ tab: 'clip', value: true }));
           dispatch(setTaskId({ tab: 'clip', value: newClipId }));
-          console.log('clip 갱신: ', newClipId);
         } else {
           console.error('No image available for clip generation');
         }

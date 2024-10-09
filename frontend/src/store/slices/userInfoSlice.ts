@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export type userStatus = {
-  member_pk: number;
+  member_id: number;
   login_id: string;
   nickname: string;
   email: string;
@@ -12,7 +12,7 @@ export type userStatus = {
 };
 
 const initialState: userStatus = {
-  member_pk: -1,
+  member_id: -1,
   login_id: '',
   nickname: '',
   email: '',
@@ -27,7 +27,7 @@ const userInfoSlice = createSlice({
   initialState,
   reducers: {
     setUserInfo(state, action: PayloadAction<userStatus>) {
-      state.member_pk = action.payload.member_pk;
+      state.member_id = action.payload.member_id;
       state.login_id = action.payload.login_id;
       state.nickname = action.payload.nickname;
       state.email = action.payload.email;
@@ -37,7 +37,7 @@ const userInfoSlice = createSlice({
       state.token_quantity = action.payload.token_quantity;
     },
     removeUserInfo(state) {
-      state.member_pk = initialState.member_pk;
+      state.member_id = initialState.member_id;
       state.login_id = initialState.login_id;
       state.nickname = initialState.nickname;
       state.email = initialState.email;

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, MenuItemConstructorOptions, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, Menu, MenuItemConstructorOptions, ipcMain, dialog, globalShortcut } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import fs from 'fs';
@@ -38,6 +38,16 @@ app.on('ready', () => {
     show: false // 준비가 완료되면 보이도록 설정
   });
 
+  // 메뉴를 완전히 숨기기
+  Menu.setApplicationMenu(null); // 모든 메뉴 숨김
+
+  // 전체화면 토글 단축키 (F11) 등록
+  globalShortcut.register('F11', () => {
+    const isFullScreen = win.isFullScreen();
+    win.setFullScreen(!isFullScreen); // 전체화면 토글
+    win.setMenuBarVisibility(false); // 전체화면일 때 메뉴바 숨기기
+  });
+
   // 메뉴 바를 숨긴 상태에서 단축키만 설정
   const menuTemplate: MenuItemConstructorOptions[] = [
     {
@@ -67,6 +77,15 @@ app.on('ready', () => {
         {
           role: 'toggleDevTools',
           accelerator: 'CmdOrCtrl+Shift+I' // 개발자 도구 열기/닫기
+        },
+        {
+          label: 'Toggle Full Screen',
+          accelerator: 'F11', // 전체화면 전환 단축키
+          click: () => {
+            const isFullScreen = win.isFullScreen();
+            win.setFullScreen(!isFullScreen);
+            win.setMenuBarVisibility(!isFullScreen); // 전체화면 모드에서 메뉴바 숨기기
+          }
         }
       ]
     }
@@ -92,84 +111,7 @@ app.on('ready', () => {
     splash.destroy();
     win.show();
   });
-
-  // createWindow();
 });
-
-// // Electron 창을 생성하는 함수
-// function createWindow() {
-//   win = new BrowserWindow({
-//     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
-//     autoHideMenuBar: true, // 메뉴 바 숨기기
-//     webPreferences: {
-//       preload: path.join(MAIN_DIST, 'preload.mjs'), // preload 경로 수정
-//       contextIsolation: true, // context isolation을 추가하여 보안 강화
-//       nodeIntegration: false // nodeIntegration을 꺼서 보안 강화
-//     },
-//     minWidth: 800,
-//     minHeight: 600,
-//     show: false // 준비가 완료되면 보이도록 설정
-//   });
-
-//   // 메뉴 바를 숨긴 상태에서 단축키만 설정
-//   const menuTemplate: MenuItemConstructorOptions[] = [
-//     {
-//       label: 'Edit',
-//       submenu: [
-//         {
-//           role: 'zoomIn',
-//           accelerator: 'CmdOrCtrl+=' // 줌 인
-//         },
-//         {
-//           role: 'zoomOut',
-//           accelerator: 'CmdOrCtrl+-' // 줌 아웃
-//         }
-//       ]
-//     },
-//     {
-//       label: 'View',
-//       submenu: [
-//         {
-//           role: 'reload',
-//           accelerator: 'CmdOrCtrl+R' // 새로고침
-//         },
-//         {
-//           role: 'forceReload',
-//           accelerator: 'CmdOrCtrl+Shift+R' // 강력 새로고침
-//         },
-//         {
-//           role: 'toggleDevTools',
-//           accelerator: 'CmdOrCtrl+Shift+I' // 개발자 도구 열기/닫기
-//         }
-//       ]
-//     }
-//   ];
-
-//   // 메뉴 설정 및 숨기기
-//   const menu = Menu.buildFromTemplate(menuTemplate);
-//   Menu.setApplicationMenu(menu);
-
-//   // Test active push message to Renderer-process.
-//   win.webContents.on('did-finish-load', () => {
-//     win?.webContents.send('main-process-message', new Date().toLocaleString());
-//   });
-
-//   if (VITE_DEV_SERVER_URL) {
-//     win.loadURL(VITE_DEV_SERVER_URL);
-//   } else {
-//     win.loadFile(path.join(RENDERER_DIST, '../dist/index.html'));
-//   }
-// }
-
-// app.on('activate', () => {
-//   // On OS X it's common to re-create a window in the app when the
-//   // dock icon is clicked and there are no other windows open.
-//   if (BrowserWindow.getAllWindows().length === 0) {
-//     createWindow();
-//   }
-// });
-
-// app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

@@ -24,7 +24,6 @@ export async function login(user: loginData) {
     if (authorizationHeader) {
       const token = authorizationHeader.split(' ')[1]; // 토큰만 저장
       localStorage.setItem('accessToken', token);
-      console.log('Login successful, token:', token);
       return { token };
     } else {
       throw new Error('Login failed: No token found in response headers');
@@ -64,11 +63,9 @@ export async function logout() {
     queryClient.removeQueries({
       queryKey: ['myInfo']
     });
-    console.log('Logout successful');
     return true;
   } catch (error) {
     console.error('Error logging out:', error);
-
     return false;
   }
 }

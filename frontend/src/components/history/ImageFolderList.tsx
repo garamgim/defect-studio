@@ -62,7 +62,7 @@ const ImageFolderList: React.FC<ImageFolderListProps> = ({ folders, handleDetail
       {folders.map((folder) => (
         <div
           key={folder.id}
-          className="relative bg-white rounded-lg shadow-lg p-4 flex flex-col justify-between dark:bg-gray-700 border border-gray-300 dark:border-none hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-300 h-[180px]"
+          className="relative bg-white rounded-lg shadow-lg p-4 flex flex-col justify-between dark:bg-gray-700 border border-gray-300 dark:border-none hover:bg-gray-100 dark:hover:bg-gray-600 h-[180px]"
         >
           <div className="cursor-pointer" onClick={() => handleDetailClick(folder)}>
             <div className="flex justify-between items-center mb-2">

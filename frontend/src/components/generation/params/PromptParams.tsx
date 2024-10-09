@@ -32,7 +32,7 @@ const PromptParams = ({
   const location = useLocation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [clipPhrases, setClipPhrases] = useState<string[]>([]);
-  const [isClipLoading, setIsClipLoading] = useState(false);
+  const [, setIsClipLoading] = useState(false);
 
   const level = useSelector((state: RootState) => state.level) as 'Basic' | 'Advanced';
 

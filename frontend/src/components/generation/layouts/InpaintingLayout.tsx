@@ -141,7 +141,6 @@ const InpaintingLayout = () => {
           const newClipId = await getClip(clipData);
           dispatch(setIsLoading({ tab: 'clip', value: true }));
           dispatch(setTaskId({ tab: 'clip', value: newClipId }));
-          console.log('clip 갱신: ', newClipId);
         } else {
           console.error('No image available for clip generation');
         }
@@ -161,7 +160,6 @@ const InpaintingLayout = () => {
     let intervalId: NodeJS.Timeout | undefined;
 
     const fetchTaskStatus = async () => {
-      console.log(clipIsLoading, clipTaskId);
       if (clipIsLoading && clipTaskId) {
         try {
           const response = await getTaskStatus(clipTaskId);
