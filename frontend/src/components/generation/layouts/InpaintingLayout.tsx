@@ -14,6 +14,7 @@ import { useEffect, useCallback } from 'react';
 import OutputToolbar from '../outputTool/OutputToolbar';
 import { useInpaintingOutputs } from '../../../hooks/generation/outputs/useInpaintingOutputs';
 import { useClipOutputs } from '../../../hooks/generation/outputs/useClipOutputs';
+import { upDateMyInfo } from '@/api/user';
 
 const InpaintingLayout = () => {
   const dispatch = useDispatch();
@@ -169,6 +170,7 @@ const InpaintingLayout = () => {
 
             dispatch(setIsLoading({ tab: 'clip', value: false }));
             dispatch(setTaskId({ tab: 'clip', value: null }));
+            upDateMyInfo();
           }
         } catch (error) {
           console.error('Failed to get task status:', error);

@@ -15,6 +15,7 @@ import { getTrainingStatus } from '../../../api/training';
 import { RootState } from '../../../store/store';
 import { useSelector, useDispatch } from 'react-redux';
 import { removeTaskId } from '../../../store/slices/training/outputSlice';
+import { upDateMyInfo } from '@/api/user';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -30,6 +31,7 @@ const TrainingStatusTab = () => {
   const fetchTrainingStatus = async (taskId: string) => {
     try {
       const data = await getTrainingStatus(taskId);
+      console.log('data: ', data);
       return {
         taskId: taskId,
         status: data.task_status,
@@ -48,6 +50,7 @@ const TrainingStatusTab = () => {
       if (taskId) {
         intervalIdsRef.current[taskId] = setInterval(async () => {
           const progressData = await fetchTrainingStatus(taskId);
+          console.log('11:', progressData);
 
           if (progressData && progressData.resultData) {
             // 학습 중일 때 상태 업데이트
@@ -94,6 +97,7 @@ const TrainingStatusTab = () => {
             } else {
               // 차트 데이터가 비어 있지 않은 경우에만 completedTaskIds에 추가
               setCompletedTaskIds((prev) => [taskId, ...prev]);
+              upDateMyInfo();
             }
 
             // Redux에서 taskId 제거

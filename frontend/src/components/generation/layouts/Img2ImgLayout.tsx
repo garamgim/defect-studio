@@ -14,6 +14,7 @@ import OutputToolbar from '../outputTool/OutputToolbar';
 import { useImg2ImgOutputs } from '../../../hooks/generation/outputs/useImg2ImgOutputs';
 import { useEffect, useCallback } from 'react';
 import { useClipOutputs } from '@/hooks/generation/outputs/useClipOutputs';
+import { upDateMyInfo } from '@/api/user';
 
 const Img2ImgLayout = () => {
   const dispatch = useDispatch();
@@ -147,6 +148,7 @@ const Img2ImgLayout = () => {
 
             dispatch(setIsLoading({ tab: 'clip', value: false }));
             dispatch(setTaskId({ tab: 'clip', value: null }));
+            upDateMyInfo();
           }
         } catch (error) {
           console.error('Failed to get task status:', error);
