@@ -1,5 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../api/user';
+import { useDispatch } from 'react-redux';
+import { resetOutputs } from '../../store/slices/generation/outputSlice';
+
 interface miniProfilePropsType {
   nickname: string;
   department_name: string;
@@ -8,6 +11,15 @@ interface miniProfilePropsType {
 
 const MiniProfile = ({ nickname, department_name, email }: miniProfilePropsType) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const onResetOutput = () => {
+    dispatch(resetOutputs('txt2Img'));
+    dispatch(resetOutputs('img2Img'));
+    dispatch(resetOutputs('inpainting'));
+    dispatch(resetOutputs('removeBg'));
+    dispatch(resetOutputs('cleanup'));
+  };
 
   return (
     <>
@@ -23,6 +35,7 @@ const MiniProfile = ({ nickname, department_name, email }: miniProfilePropsType)
           <div className="flex flex-row justify-between ">
             <button
               onClick={() => {
+                onResetOutput;
                 logout();
                 navigate('/login');
               }}

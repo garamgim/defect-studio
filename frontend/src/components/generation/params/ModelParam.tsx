@@ -3,8 +3,7 @@ import React, { useEffect } from 'react';
 import { getModelList } from '../../../api/generation';
 import { useQuery } from '@tanstack/react-query';
 import { ModelParamsType } from '../../../types/generation';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../store/store';
+import { useGetMyInfo } from '@/hooks/user/useGetMyInfo';
 
 interface ModelParamProps {
   modelParams: ModelParamsType;
@@ -12,7 +11,8 @@ interface ModelParamProps {
 }
 
 const ModelParam = ({ modelParams, updateModelParams }: ModelParamProps) => {
-  const memberId = useSelector((state: RootState) => state.userInfo.member_id);
+  const { myInfo } = useGetMyInfo({ isLoggedIn: !!localStorage.getItem('accessToken') });
+  const memberId = myInfo?.member_id as number;
 
   const handleChange = (model: string) => {
     updateModelParams(model);

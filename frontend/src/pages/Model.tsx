@@ -6,12 +6,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addTaskId, removeTaskId } from '../store/slices/model/modelSlice';
 import { RootState } from '@/store/store';
 import { useQuery } from '@tanstack/react-query';
+import { useGetMyInfo } from '@/hooks/user/useGetMyInfo';
 
 const Model = () => {
   const dispatch = useDispatch();
   const taskIds = useSelector((state: RootState) => state.model.taskId);
   const intervalIdsRef = useRef<{ [key: string]: NodeJS.Timeout }>({});
-  const memberId = useSelector((state: RootState) => state.userInfo.member_id);
+  const { myInfo } = useGetMyInfo({ isLoggedIn: !!localStorage.getItem('accessToken') });
+  const memberId = myInfo?.member_id as number;
 
   const {
     data: modelList,
