@@ -186,15 +186,27 @@ AI 생성 및 훈련에 대해서 많은 컴퓨터 자원을 소모합니다. �
 
 ### 📌 Token 발행
 
+![token_issue](./readme/token_issue.png)
+
 ### 📌 Token 분배
 
+![token_distribute](./readme/token_distribution.png)
+
 ### 📌 Statistics
+
+![token_statictics](./readme/token_statistics.png)
 
 ## 🎯 회원
 
 ### 📌 회원가입 & 이메일 인증
 
+![signup](./readme/signup.png)
+
+![email_verify](./readme/email_verify.png)
+
 ### 📌 회원관리
+
+![user_management](./readme/user_management.png)
 
 ---
 
