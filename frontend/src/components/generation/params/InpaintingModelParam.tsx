@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { getModelList } from '../../../api/generation';
 import { useQuery } from '@tanstack/react-query';
 import { ModelParamsType } from '../../../types/generation';
+import { useGetMyInfo } from '@/hooks/user/useGetMyInfo';
 
 interface InpaintingModelParamsProps {
   modelParams: ModelParamsType;
@@ -14,15 +15,16 @@ const InpaintingModelParam = ({ modelParams, updateModelParams }: InpaintingMode
     updateModelParams(model);
   };
 
-  const member_id = 1;
+  const { myInfo } = useGetMyInfo({ isLoggedIn: !!localStorage.getItem('accessToken') });
+  const memberId = myInfo?.member_id as number;
 
   const {
     data: modelList,
     isLoading,
     error
   } = useQuery<string[], Error>({
-    queryKey: ['models', member_id],
-    queryFn: () => getModelList(member_id)
+    queryKey: ['models', memberId],
+    queryFn: () => getModelList(memberId)
   });
 
   // 기본 모델 리스트

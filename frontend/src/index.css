@@ -92,6 +92,14 @@ html.dark .custom-scrollbar3::-webkit-scrollbar-thumb:hover {
   transition: all 0.2s;
 }
 
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox에서 스크롤바 숨기기 */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; 
+}
+
 /* dark mode */
 /* 다크 모드에서만 적용되는 Select 박스 스타일 */
 html.dark .ant-select {
@@ -307,9 +315,6 @@ html.dark .ant-input .ant-input-outlined {
   @apply bg-gray-700;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 .loading-text {
   display: inline-block;
