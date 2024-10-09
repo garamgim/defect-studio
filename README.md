@@ -132,13 +132,19 @@ Advance 모드에서는 세부적인 Parameter들을 입력할 수 있습니다.
 
 ![image_to_image](./readme/inpaint.gif)
 
+특정 영역을 선택해서, 이에 관한 프롬프트를 입력하여 원하는 이미지를 생성 할 수 있습니다.
+
 ### 📌 Clean Up
 
 ![cleanup](./readme/cleanup.gif)
 
+불필요한 요소들을 AI가 스스로 파악해서 없애서 이미지를 깔끔하게 만들어 줍니다!
+
 ### 📌 Remove Background
 
 ![remove-bg]()
+
+배경화면 부분을 알아서 없애 줍니다!
 
 ### 공통적인 요소
 
@@ -146,9 +152,20 @@ Advance 모드에서는 세부적인 Parameter들을 입력할 수 있습니다.
 
 ![preset](./readme/general_preset.gif)
 
+각각 파트에서 자기가 원하는 Prompt 글 및 여러가지 Parameter 설정값을 저장할 수 있습니다.  
+이를 통해 쉽게 여러가지 parameter 및 프롬프트를 불러 올 수 있습니다.
+
 **Batch Mode**
 
 ![batch](./readme/batch_mode.gif)
+
+여러장의 이미지에 대해서 업로드 하지 않고, 파일 경로만 지정하면 알아서 이미지를 읽어와서  
+관련된 처리를 손쉽게 할 수 있습니다!
+
+**Side Bar**
+
+![sidebar](./readme/general_sidebar.gif)
+사이드를 통해서 이미지 선택, 다운로드, 작업물 삭제 등을 손쉽게 할 수 있습니다
 
 ## 🎯 Training
 
