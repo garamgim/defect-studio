@@ -3,7 +3,6 @@ import { getDailyImageCount } from '@api/statistic_person'; // API Function
 import { useQuery } from '@tanstack/react-query'; // React Query
 import { AxiosResponse } from 'axios'; // Axios Response Type
 import MemberImageUsageGraph from './MeberImageUsageGraph';
-import { staleTime, gcTime } from '../../common/constance';
 
 interface MemberImageUsageProps {
   member_id: number;
@@ -18,9 +17,7 @@ const MemberImageUsage = ({ member_id }: MemberImageUsageProps) => {
   >({
     queryKey: ['dailyImageCount', 'person', member_id],
     queryFn: () => getDailyImageCount(member_id),
-    select: (response) => response.data,
-    staleTime,
-    gcTime
+    select: (response) => response.data
   });
 
   return (

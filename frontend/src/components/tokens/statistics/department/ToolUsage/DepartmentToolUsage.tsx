@@ -3,7 +3,6 @@ import { AxiosResponse } from 'axios'; // Axios Response Type
 import { getDepartmentToolFrequency } from '@/api/statistic_department'; // API Call
 import { ToolFrequency } from '@/types/statistics'; // Type
 import DepartmentToolUsageGraph from './DepartmentToolUsageGraph';
-import { staleTime, gcTime } from '../../common/constance';
 
 interface DepartmentToolUsageProps {
   department_id: number;
@@ -18,9 +17,7 @@ const DepartmentToolUsage = ({ department_id }: DepartmentToolUsageProps) => {
   >({
     queryKey: ['ToolUsage', 'department', department_id],
     queryFn: () => getDepartmentToolFrequency(department_id),
-    select: (response) => response.data,
-    staleTime,
-    gcTime
+    select: (response) => response.data
   });
   return (
     <div className="flex flex-col text-black dark:text-white">
