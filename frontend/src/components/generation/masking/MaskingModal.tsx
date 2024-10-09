@@ -105,6 +105,7 @@ const MaskingModal = ({
       };
     });
   };
+
   const handlesaveImgs = async () => {
     if (!stageRef.current) {
       return;

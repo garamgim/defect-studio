@@ -50,7 +50,7 @@ const History = () => {
   // useEffect로 데이터를 상태로 업데이트
   useEffect(() => {
     if (data) {
-      setFolders(data.logs); // 가져온 데이터를 상태에 저장
+      setFolders(data.logs.reverse()); // 가져온 데이터를 상태에 저장
     }
   }, [data]);
 

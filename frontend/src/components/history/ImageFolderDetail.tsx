@@ -26,6 +26,10 @@ interface FolderDetailsModalProps {
 const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClose }) => {
   const carouselRef = useRef<CarouselRef>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const thumbnailsRef = useRef<HTMLDivElement>(null); // 썸네일 컨테이너 참조
+  const isDragging = useRef(false); // 드래그 여부 확인
+  const startX = useRef(0); // 드래그 시작 X 좌표
+  const scrollLeft = useRef(0); // 드래그 시작 시 스크롤 위치
 
   const {
     data: folderDetails,
@@ -48,9 +52,6 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
       });
   };
 
-  if (isLoading) return <Spin />;
-  if (isError) return <p>Error loading folder details</p>;
-
   // 썸네일 클릭 시 해당 슬라이드로 이동하는 함수
   const handleThumbnailClick = (index: number) => {
     setSelectedImageIndex(index);
@@ -58,6 +59,32 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
       carouselRef.current.goTo(index);
     }
   };
+
+  // 마우스 드래그 시작 시 호출
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (thumbnailsRef.current) {
+      isDragging.current = true;
+      startX.current = e.pageX - thumbnailsRef.current.offsetLeft;
+      scrollLeft.current = thumbnailsRef.current.scrollLeft;
+    }
+  };
+
+  // 마우스 드래그 이동 시 호출
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !thumbnailsRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - thumbnailsRef.current.offsetLeft;
+    const walk = (x - startX.current) * 2; // 드래그 속도 조절
+    thumbnailsRef.current.scrollLeft = scrollLeft.current - walk;
+  };
+
+  // 마우스 드래그 종료 시 호출
+  const handleMouseUpOrLeave = () => {
+    isDragging.current = false;
+  };
+
+  if (isLoading) return <Spin />;
+  if (isError) return <p>Error loading folder details</p>;
 
   return (
     <CustomModal
@@ -90,7 +117,15 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
             </Carousel>
 
             {/* 썸네일 영역 */}
-            <div className="flex justify-center gap-2">
+            <div
+              ref={thumbnailsRef}
+              className="flex gap-2 overflow-x-auto cursor-grab scrollbar-hide"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUpOrLeave}
+              onMouseLeave={handleMouseUpOrLeave}
+              style={{ userSelect: 'none' }} // 드래그 시 텍스트 선택 방지
+            >
               {folderDetails.image_url_list.map((url: string, index: number) => (
                 <img
                   key={index}
@@ -178,31 +213,14 @@ const ImageFolderDetail: React.FC<FolderDetailsModalProps> = ({ folderId, onClos
               </div>
 
               <div className="flex flex-col">
-                <span className="text-gray-400 mb-1">Base Model</span>
+                <span className="text-gray-400 mb-1">Model</span>
                 <span className="font-medium mb-2">{folderDetails.model}</span>
-              </div>
-
-              <div className="flex flex-col">
-                <span className="text-gray-400 mb-1">Sampling Steps</span>
-                <span className="font-medium mb-2">{folderDetails.num_inference_steps}</span>
-              </div>
-
-              <div className="flex flex-col">
-                <span className="text-gray-400 mb-1">Guidance Scale</span>
-                <span className="font-medium mb-2">{folderDetails.guidance_scale}</span>
               </div>
 
               <div className="flex flex-col">
                 <span className="text-gray-400 mb-1">Scheduler</span>
                 <span className="font-medium mb-2">{folderDetails.scheduler}</span>
               </div>
-
-              {folderDetails.generation_type !== 'text_to_image' && (
-                <div className="flex flex-col">
-                  <span className="text-gray-400 mb-1">Strength</span>
-                  <span className="font-medium mb-2">{folderDetails.strength}</span>
-                </div>
-              )}
             </div>
           </div>
         </div>
