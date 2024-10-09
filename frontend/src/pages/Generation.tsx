@@ -42,6 +42,46 @@ const Generation = () => {
   // generatedOutput에서 각 탭의 상태 가져오기
   const tabsState = useSelector((state: RootState) => tabs.map((tab) => state.generatedOutput[tab]));
 
+  async function replaceTransparentWithWhite(imageUrl: string) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.src = imageUrl;
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        const ctx = canvas.getContext('2d');
+
+        if (!ctx) {
+          reject(new Error('Canvas rendering context is not available.'));
+          return;
+        }
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i + 3] === 0) {
+            data[i] = 255;
+            data[i + 1] = 255;
+            data[i + 2] = 255;
+            data[i + 3] = 255;
+          }
+        }
+        ctx.putImageData(imageData, 0, 0);
+        resolve(canvas.toDataURL());
+      };
+
+      img.onerror = (error) => {
+        reject(error);
+      };
+    });
+  }
   useEffect(() => {
     const fetchTaskStatusForTabs = async () => {
       for (let index = 0; index < tabsState.length; index++) {
@@ -58,13 +98,18 @@ const Generation = () => {
             const response = await getTaskStatus(taskId);
 
             if (response.task_status === 'SUCCESS') {
-              dispatch(setOutputImgsUrl({ tab: tabName, value: response.result_data }));
+              // 투명 배경을 흰색으로 변환하는 작업 추가
+              const processedImages = await Promise.all(
+                response.result_data.map((url: string) => replaceTransparentWithWhite(url))
+              );
+
+              dispatch(setOutputImgsUrl({ tab: tabName, value: processedImages }));
 
               const outputsCnt = allOutputs.outputsCnt + output.imgsCnt;
               const outputsInfo = [
                 {
                   id: response.result_data_log.id,
-                  imgsUrl: response.result_data,
+                  imgsUrl: processedImages,
                   prompt: response.result_data_log.prompt
                 },
                 ...allOutputs.outputsInfo
@@ -97,8 +142,7 @@ const Generation = () => {
 
     const intervalId = setInterval(fetchTaskStatusForTabs, 1000); // 주기적으로 각 탭의 상태 확인
 
-    // 컴포넌트 언마운트 시 clearInterval 호출
-    return () => clearInterval(intervalId);
+    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 clearInterval 호출
   }, [dispatch, tabsState]); // 모든 탭 상태를 의존성으로 추가
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
