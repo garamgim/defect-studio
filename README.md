@@ -165,6 +165,7 @@ Advance 모드에서는 세부적인 Parameter들을 입력할 수 있습니다.
 **Side Bar**
 
 ![sidebar](./readme/general_sidebar.gif)
+
 사이드를 통해서 이미지 선택, 다운로드, 작업물 삭제 등을 손쉽게 할 수 있습니다
 
 ## 🎯 Training
@@ -180,6 +181,8 @@ Advance 모드에서는 세부적인 Parameter들을 입력할 수 있습니다.
 [세팅 이미지]
 
 ## 🎯Token
+
+AI 생성 및 훈련에 대해서 많은 컴퓨터 자원을 소모합니다. 따라서 이용자들이 무작정 사용하는 것을 막기 위해
 
 ### 📌 Token 발행
 
@@ -206,5 +209,7 @@ Advance 모드에서는 세부적인 Parameter들을 입력할 수 있습니다.
 ## 💻 Infra
 
 ---
+
+# 기대효과
 
 # 자료
