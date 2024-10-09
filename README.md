@@ -59,7 +59,7 @@
 ![Vite Badge](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=fff&style=for-the-badge)
 ![Electron Badge](https://img.shields.io/badge/Electron-47848F?logo=electron&logoColor=fff&style=for-the-badge)
 ![React Router Badge](https://img.shields.io/badge/React%20Router-CA4245?logo=reactrouter&logoColor=fff&style=for-the-badge)
-![Redux Badge](https://img.shields.io/badge/Redux-764ABC?logo=redux&logoColor=fff&style=for-the-badge)
+![Redux Badge](https://img.shields.io/badge/Redux%20ToolKit-764ABC?logo=redux&logoColor=fff&style=for-the-badge)
 ![React Query Badge](https://img.shields.io/badge/React%20Query-FF4154?logo=reactquery&logoColor=fff&style=for-the-badge)
 
 ![HTML5 Badge](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=fff&style=for-the-badge)
@@ -74,6 +74,7 @@
 
 ![PyTorch Badge](https://img.shields.io/badge/PyTorch-EE4C2C?logo=pytorch&logoColor=fff&style=for-the-badge)
 ![Stable Diffusion](https://img.shields.io/badge/Stable%20Diffusion-D24939?logoColor=fff&style=for-the-badge)
+![DreamBooth Badge](https://img.shields.io/badge/DreamBooth-50A901?logoColor=fff&style=for-the-badge)
 
 ### DB
 
@@ -136,6 +137,16 @@ Advance 모드에서는 세부적인 Parameter들을 입력할 수 있습니다.
 [생성 이미지]
 
 ### 📌 Remove Background
+
+[생성 이미지]
+
+### 공통적인 요소
+
+**Preset**
+
+[생성 이미지]
+
+**Batch Mode**
 
 [생성 이미지]
 
