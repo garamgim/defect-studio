@@ -32,14 +32,14 @@ const columns: TableColumnsType<TableTokenUsageType> = [
     dataIndex: 'endDate',
     key: 'endDate',
     sorter: (a, b) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime(),
-    sortDirections: ['ascend']
+    sortDirections: ['ascend', 'descend']
   },
   {
     title: 'Remaining Quantity',
     dataIndex: 'remainingQuantity',
     key: 'remainingQuantity',
     sorter: (a, b) => a.remainingQuantity - b.remainingQuantity,
-    sortDirections: ['descend']
+    sortDirections: ['descend', 'ascend']
   }
 ];
 const SearchDepartmentUsageToken = ({ departmentsId, setSelectedDepartmentTokenUsage }: PropsDataType) => {
