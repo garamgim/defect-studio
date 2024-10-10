@@ -10,12 +10,23 @@ import {
   Title,
   Tooltip,
   Legend,
-  ChartOptions
+  ChartOptions,
+  LogarithmicScale
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import { backgroundColorList } from '../../common/constance';
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  TimeScale,
+  LogarithmicScale
+);
 
 interface MemberTokenUsageGraphProps {
   data: TokenUsage[];
@@ -29,6 +40,7 @@ const options: ChartOptions<'line'> = {
   },
   scales: {
     y: {
+      type: 'logarithmic',
       grid: {
         display: false // y축 그리드 제거
       },
