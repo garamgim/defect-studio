@@ -12,7 +12,8 @@ interface MemberModelUsageGraphProps {
 const options: ChartOptions<'doughnut'> = {
   responsive: true, // 반응형
   interaction: {
-    intersect: false // 정확한 위치에 hover 해야 데이터 표시
+    intersect: false, // 정확한 위치에 hover 해야 데이터 표시
+    mode: 'y' // 가장 가까운 데이터 표시
   },
   scales: {
     x: {

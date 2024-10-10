@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'; // React Query
 import { AxiosResponse } from 'axios'; // Axios Response Type
 import { getTokenUsage } from '@api/statistic_person'; // API
 import { TokenUsage } from '@/types/statistics'; // Response Type
-import { calculateTotal } from '@/utils/MemberTokenUsageTotalCalculator'; // Total 계산
+import { aggregateTokenUsage, calculateTotal } from '@/utils/MemberTokenUsageTotalCalculator'; // Total 계산
 import MemberTokenUsageGraph from './MemberTokenUsageGraph';
 
 interface MemberTokenUsageProps {
@@ -19,9 +19,10 @@ const MemberTokenUsage = ({ member_id }: MemberTokenUsageProps) => {
     queryKey: ['TokenUsage', 'person', member_id],
     queryFn: () => getTokenUsage(member_id),
     select: (response) => {
-      const totalRes = calculateTotal(response.data); // Total 계산
+      const preprocessedData = aggregateTokenUsage(response.data); // 도구별로 사용량 합산
+      const totalRes = calculateTotal(preprocessedData); // Total 계산
       // 날짜 순으로 정렬
-      return [...response.data, ...totalRes].sort((a, b) => {
+      return [...preprocessedData, ...totalRes].sort((a, b) => {
         if (a.usage_date < b.usage_date) return -1;
         if (a.usage_date > b.usage_date) return 1;
         return 0;

@@ -23,3 +23,20 @@ export const calculateTotal = (data: TokenUsage[]): TokenUsage[] => {
   }));
   return totalData;
 };
+
+// 중복된 데이터를 합쳐주는 것 - MemberTokenUsage.tsx에서 사용
+export const aggregateTokenUsage = (data: TokenUsage[]): TokenUsage[] => {
+  const aggregatedData: { [key: string]: TokenUsage } = {};
+
+  data.forEach((item) => {
+    const uniqueKey = `${item.usage_date}-${item.use_type}`;
+
+    if (aggregatedData[uniqueKey]) {
+      aggregatedData[uniqueKey].token_quantity += item.token_quantity;
+    } else {
+      aggregatedData[uniqueKey] = { ...item };
+    }
+  });
+
+  return Object.values(aggregatedData);
+};
