@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { TokenDistribution } from '@/types/statistics'; // Response Type
 import { AxiosResponse } from 'axios';
 import DistributeStateGraph from './DistributeStateGraph';
+import { aggregateDepartmentTokenDistribution } from '@/utils/departmentDistributionCalculator';
 
 interface DistributeStateProps {
   department_id: number;
@@ -17,8 +18,14 @@ const DistributeState = ({ department_id }: DistributeStateProps) => {
   >({
     queryKey: ['departmentDistributeState', department_id],
     queryFn: () => getDepartmentTokenDistributionState(department_id),
-    select: (response) =>
-      response.data.sort((a, b) => new Date(a.distribute_date).getTime() - new Date(b.distribute_date).getTime())
+    select: (response) => {
+      // 중복 데이터 제거
+      const preprocessedData = aggregateDepartmentTokenDistribution(response.data);
+      // 시간순정렬
+      return preprocessedData.sort(
+        (a, b) => new Date(a.distribute_date).getTime() - new Date(b.distribute_date).getTime()
+      );
+    }
   });
   return (
     <div className="flex flex-col text-black dark:text-white">
