@@ -5,7 +5,7 @@ labels: 🚚Chore✏️
 assignees: ""
 ---
 
-## 🤷‍♂️ Description
+## ✏️ Description
 
 <!-- 수정사항에 대해 작성해 주세요. -->
 

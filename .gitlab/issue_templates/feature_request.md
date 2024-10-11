@@ -5,7 +5,7 @@ labels: ✨Feature✨
 assignees: ""
 ---
 
-## 🤷‍♂️ Description
+## ✨ Description
 
 <!-- 어떤 것을 구현할지 설명해주세요. -->
 
