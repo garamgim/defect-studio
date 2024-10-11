@@ -285,7 +285,7 @@ Electron 프레임워크를 활용하여 React 환경에서도 데스크톱 애�
 
 이러한 기능은 Eletron의 IPC 개념을 활용하였습니다.
 
-![electron-ipc-img](https://kdydesign.github.io/2020/12/23/electron-ipc-communication/ipc-process.png)
+![electron-ipc-img](https://kdydesign.github.io/2020/12/23/electron-ipc-communication/ipc-process.png)(https://kdydesign.github.io/2020/12/23/electron-ipc-communication/)
 
 ## 🌐 Back End
 
