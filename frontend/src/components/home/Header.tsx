@@ -1,4 +1,5 @@
 import HomeImg from '../../assets/homeImg.png';
+import { RiSparkling2Fill } from 'react-icons/ri';
 
 const Header = () => {
   return (
@@ -23,7 +24,7 @@ const Header = () => {
           <div className="bg-white rounded-[20px] h-16 flex items-center justify-center w-full">
             <div className="relative flex justify-end items-center w-full h-full pr-5">
               <div className="bg-blue-700 rounded-full w-[134px] h-10 flex items-center justify-center absolute right-4">
-                <img src={'./src/assets/sparkling.png'} alt="Sparkling" className="w-4 h-4 mr-2" />
+                <RiSparkling2Fill className="w-4 h-4 mr-2" />
                 <p className="text-white font-bold">Generate</p>
               </div>
             </div>

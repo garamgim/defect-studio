@@ -27,7 +27,7 @@ interface InpaintingState {
 }
 
 const initialState: InpaintingState = {
-  gpuNum: null,
+  gpuNum: 1, // null
   params: {
     modelParams: {
       model: 'stable-diffusion-2-inpainting'

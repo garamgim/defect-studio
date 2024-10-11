@@ -93,6 +93,7 @@ export const postInpaintingGeneration = async (
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
+      console.log(key, value);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
