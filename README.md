@@ -144,9 +144,9 @@ Advance 모드에서는 세부적인 Parameter들을 입력할 수 있습니다.
 
 ### 📌 Remove Background
 
-![remove-bg]()
+![remove-bg](./readme/remove-bg.gif)
 
-배경화면 부분을 알아서 없애 줍니다!
+배경화면 부분을 알아서 없애 주어 손쉽게 투명 이미지를 만들 수 있습니다.
 
 ### 공통적인 요소
 
@@ -178,6 +178,8 @@ Advance 모드에서는 세부적인 Parameter들을 입력할 수 있습니다.
 해당 부분에서 다양한 파라미터 및 기본 Model 선택. 학습 이미지가 담긴 경로 선택 등을 할 수 있습니다.
 
 학습 중에는 실시간으로 학습 상황에 대한 통계를 볼 수 있습니다.
+
+![training_status](./readme/training_status.png)
 
 ## 🎯 History
 
@@ -214,6 +216,13 @@ AI 생성 및 훈련에 대해서 많은 컴퓨터 자원을 소모합니다. �
 
 ![token_statictics](./readme/token_statistics.png)
 
+부서 (super_admin, department_admin 만 가능) 및 자기자신에 대한  
+다양한 사용 통계를 알 수 있습니다.
+
+- 모델 사용 빈도
+- 토큰 사용량, 이미지 생성량
+- Tool 사용 빈도 통계
+
 ## 🎯 회원
 
 ### 📌 회원가입 & 이메일 인증
@@ -222,9 +231,21 @@ AI 생성 및 훈련에 대해서 많은 컴퓨터 자원을 소모합니다. �
 
 ![email_verify](./readme/email_verify.png)
 
+회원 가입 시 해당 이메일이 유효한 이메일인지 확인하기 위해서  
+확인 코드를 요구합니다.
+
+실제 이메일에 전송된 코드를 입력할 경우 "임시 회원" 으로서 승인이 되고  
+정식으로 승인이 되기 위해서는 관리자의 [회원관리](user_management)를 통해서  
+승인이 되어야 합니다.
+
 ### 📌 회원관리
 
 ![user_management](./readme/user_management.png)
+
+본 기능은 **super_admin** 만 가능한 기능입니다.
+
+기존 회원들에 대한 계정 권한 정보 수정, 계정 삭제 (강제 탈퇴) 등이 가능하며,  
+임시 회원에 대한 승인,거절 선택을 할 수 있습니다.
 
 ---
 
