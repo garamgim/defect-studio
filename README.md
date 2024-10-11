@@ -1,4 +1,4 @@
-# 🌟 삼성 청년 SW 아카데미 11기 SDC 1팀 **픔행제로** 🌟
+# 🌟 삼성 청년 SW 아카데미 11기 SDC 1팀 **품행제로** 🌟
 
 # 🌳 프로젝트 개요
 
@@ -287,6 +287,20 @@ Electron 프레임워크를 활용하여 React 환경에서도 데스크톱 애�
 
 ![electron-ipc-img](https://kdydesign.github.io/2020/12/23/electron-ipc-communication/ipc-process.png)(https://kdydesign.github.io/2020/12/23/electron-ipc-communication/)
 
+기본적으로 `preload.ts` 에서 React 프로젝트 안에서 실행시킬 코드를 작성하고
+`main.ts` 에서 관련된 처리하는 코드를 작성하는 방식으로 진행됩니다.
+
+### Lazy Loading
+
+`.exe` 파일로 실행되는 것이라 해도 기본적으로 React 의 환경을 바탕을 두고 있습니다.
+따라서 React의 CSR (Client Side Rendering)을 따르고 있습니다.
+
+기본적으로 CSR은 처음 FCP (First contentful paint) 가 느리다는 단점을 가지고 있습니다.  
+그 이유는 CSR 특징은 기본적으로 SPA (Signe Plage Applicaton)을 따르기 때문에  
+모든 JS 파일을 다 다운을 받아야 웹이 실행되는 특징 때문입니다.
+
+하지만 굳이 처음에 다 받지 않고 **필요 할 때** 만
+
 ## 🌐 Back End
 
 ### FastAPI
@@ -303,8 +317,4 @@ Redis와 Celery를 이용하여 비동기 처리를 구현했습니다.
 
 ## 🎓 AI
 
-## 💻 Infra
-
----
-
-# 성능 & 결과
+Diffusion 및 다양한 AI 모델을 통해 이미지 및 텍스트 등을 생성할 수 있습니다. 특히 diffusers, transformers를 활용해 다양한 Generation AI를 활용하고, DreamBooth 기반의 학습, 모델 Management 등 여러 기능을 제공합니다.
