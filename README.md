@@ -64,6 +64,7 @@
 
 ![HTML5 Badge](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=fff&style=for-the-badge)
 ![Tailwind CSS Badge](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?logo=tailwindcss&logoColor=fff&style=for-the-badge)
+![Styled Components](https://img.shields.io/badge/StyledComponents-DB7093?logo=styled-components&logoColor=fff&style=for-the-badge)
 
 ### Back End
 
@@ -266,8 +267,16 @@ AI 생성 및 훈련에 대해서 많은 컴퓨터 자원을 소모합니다. �
 
 ### Electon
 
-Electron 이라는 프레임 워크를 이용하여서 React 환경에서도 마치 프로그램을  
-개발 할 수 있었습니다.
+Electron 프레임워크를 활용하여 React 환경에서도 데스크톱 애플리케이션처럼 프로그램을 개발할 수 있습니다.
+
+또한 Web 환경에서는 불가능 한 것들에 대한 설정도 가능했습니다.
+
+- 지정한 파일 경로에 있는 이미지들을 읽어오기
+- 커스텀 단축키 설정
+
+이러한 기능은 Eletron의 IPC 개념을 활용하였습니다.
+
+![electron-ipc-img](https://kdydesign.github.io/2020/12/23/electron-ipc-communication/ipc-process.png)
 
 ## 🌐 Back End
 
@@ -289,4 +298,4 @@ Redis와 Celery를 이용하여 비동기 처리를 구현했습니다.
 
 ---
 
-# 기대효과
+# 성능 & 결과
