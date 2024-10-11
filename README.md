@@ -171,6 +171,15 @@ Advance 모드에서는 세부적인 Parameter들을 입력할 수 있습니다.
 
 사이드를 통해서 이미지 선택, 다운로드, 작업물 삭제 등을 손쉽게 할 수 있습니다
 
+### Clip
+
+> 해당 기능은 `image-to-image`, `inpainting` 에만 가능합니다.
+
+![clip](./readme/clip.gif)
+
+해당 기능은 업로드한 이미지에 대해서 AI가 자동으로 분석하여 알맞는 프롬프트를 추천합니다.  
+사용자는 제시된 여러 프롬프트들 중 몇가지 선택하여 실제 프롬프트에 반영 할 수 있습니다.
+
 ## 🎯 Training
 
 ![training](./readme/training.gif)
@@ -252,9 +261,9 @@ AI 생성 및 훈련에 대해서 많은 컴퓨터 자원을 소모합니다. �
 
 ### 📌 회원관리
 
-![user_management](./readme/user_management.png)
+> 본 기능은 **super_admin** 만 가능한 기능입니다.
 
-본 기능은 **super_admin** 만 가능한 기능입니다.
+![user_management](./readme/user_management.png)
 
 기존 회원들에 대한 계정 권한 정보 수정, 계정 삭제 (강제 탈퇴) 등이 가능하며,  
 임시 회원에 대한 승인,거절 선택을 할 수 있습니다.
