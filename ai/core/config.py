@@ -6,12 +6,11 @@ class Settings(BaseSettings):
     )
 
     # ENVIRONMENT
+    DOWNLOAD_TEMP_DIR: str
     OUTPUT_DIR: str
     DIFFUSERS_TRAIN_PATH: str
     BASE_MODEL_NAME: str
-
-    # LOGGER
-    SENTRY_DSN: str
+    MULTI_CONCEPT_TRAIN_PATH: str
 
     # REDIS
     REDIS_HOST: str

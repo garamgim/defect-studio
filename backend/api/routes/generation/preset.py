@@ -15,7 +15,12 @@ router = APIRouter(
 async def get_preset_list(
         member: Member = Depends(get_current_user)
 ):
-    presets = await GenerationPreset.find(GenerationPreset.member_id == member.member_id).to_list()
+    presets = await (
+        GenerationPreset.find(GenerationPreset.member_id == member.member_id)
+        .sort("-date")
+        .to_list()
+    )
+
     data = {
         "presets": presets
     }

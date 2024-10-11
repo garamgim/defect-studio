@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 
-from utils.tasks import inpainting_task
+from workers.tasks.generation import inpainting_task
 
 router = APIRouter(
     prefix="/inpainting",

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 
-from utils.tasks import text_to_image_task
+from workers.tasks.generation import text_to_image_task
 
 router = APIRouter(
     prefix="/txt-to-img",

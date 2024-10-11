@@ -1,4 +1,4 @@
-import datetime
+import asyncio
 import time
 from io import BytesIO
 from typing import List
@@ -77,6 +77,10 @@ def delete_file(s3_client, key: str):
 async def upload_files_async(image_list: List[BytesIO], formatted_date: str, formatted_time: str) -> List[str]:
     start_time = time.time()
     print("s3 async upload started")
+
+    batch_size = 400 if len(image_list) > 400 else len(image_list)
+    print("Batch size:", batch_size)
+
     s3_urls = []
     session = aioboto3.Session()
     async with session.client(
@@ -85,13 +89,16 @@ async def upload_files_async(image_list: List[BytesIO], formatted_date: str, for
         aws_secret_access_key=settings.AWS_S3_SECRET_KEY
     ) as s3_client:
 
-        for index, image_stream in enumerate(image_list):
-            image_key = f"{formatted_date}/{formatted_time}/{index + 1}"
-            image_stream.seek(0)
+        for i in range(0, len(image_list), batch_size):
+            batch = image_list[i:i + batch_size]
+            tasks = []
+            for index, image_stream in enumerate(batch):
+                image_key = f"{formatted_date}/{formatted_time}/{i + index + 1}"
+                image_stream.seek(0)
+                tasks.append(upload_file_async(s3_client, image_stream, image_key))
+            batch_urls = await asyncio.gather(*tasks)
+            s3_urls.extend(batch_urls)
 
-            url = await upload_file_async(s3_client, image_stream, image_key)
-            if url:
-                s3_urls.append(url)
     print(f"Upload completed in {time.time() - start_time} seconds")
     return s3_urls
 

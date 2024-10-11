@@ -5,15 +5,21 @@ from dependencies import get_current_user
 from models import Member
 from schema.logs import *
 from utils.s3 import delete_files_async
+
 router = APIRouter(
     prefix="/log",
 )
+
 
 @router.get("")
 async def get_log_list(
         member: Member = Depends(get_current_user)
 ):
-    logs = await GenerationLog.find(GenerationLog.member_id == member.member_id).to_list()
+    logs = await (
+        GenerationLog.find(GenerationLog.member_id == member.member_id)
+        .sort("-date")
+        .to_list()
+    )
 
     simple_logs = [SimpleGenerationLog.from_orm(log) for log in logs]
 
@@ -21,6 +27,7 @@ async def get_log_list(
         "logs": simple_logs
     }
     return data
+
 
 @router.get("/{log_id}")
 async def get_log_by_id(
@@ -40,6 +47,7 @@ async def get_log_by_id(
         )
 
     return log
+
 
 @router.delete("/{log_id}")
 async def delete_log(
