@@ -271,6 +271,18 @@ Electron 이라는 프레임 워크를 이용하여서 React 환경에서도 마
 
 ## 🌐 Back End
 
+### FastAPI
+
+고성능에 중점을 두고 있는 가장 빠른 마이크로 프레임워크인 FastAPI를 활용하여
+AI 주제에 적합한 BE 프레임워크 활용 역량을 쌓을 수 있었습니다.
+FastAPI의 API 문서화 자동화 기능(swagger), type hint를 사용한 빠르고 안전한 validation, DI(의존성 주입) 중심 설계로 간편한 개발이라는 장점을 적극 활용했습니다.
+
+### Redis & Celery
+
+AI 학습 및 AI Generation 기능 사용과 같이 장시간의 작업이 필요한 기능을 처리하고 시스템 응답성을 유지하기 위해
+Redis와 Celery를 이용하여 비동기 처리를 구현했습니다.
+따라서 Defect Studio에서 AI 모델 학습 중에도 다른 작업들을 처리할 수 있습니다.
+
 ## 🎓 AI
 
 ## 💻 Infra
