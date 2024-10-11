@@ -31,7 +31,6 @@ const TrainingStatusTab = () => {
   const fetchTrainingStatus = async (taskId: string) => {
     try {
       const data = await getTrainingStatus(taskId);
-      console.log('data: ', data);
       return {
         taskId: taskId,
         status: data.task_status,
@@ -50,7 +49,6 @@ const TrainingStatusTab = () => {
       if (taskId) {
         intervalIdsRef.current[taskId] = setInterval(async () => {
           const progressData = await fetchTrainingStatus(taskId);
-          console.log('11:', progressData);
 
           if (progressData && progressData.resultData) {
             // 학습 중일 때 상태 업데이트

@@ -21,7 +21,6 @@ export const getTaskStatus = async (task_id: string) => {
   try {
     const response = await axiosInstance.get(`/model/tasks/${task_id}`);
 
-    console.log(response, '2');
     if (response.status === 200) {
       return response.data;
     } else {
