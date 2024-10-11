@@ -8,7 +8,7 @@ interface RemoveBgState {
   };
 }
 const initialState: RemoveBgState = {
-  gpuNum: null,
+  gpuNum: 1, // null
   params: {
     uploadImgParams: {
       mode: 'manual',

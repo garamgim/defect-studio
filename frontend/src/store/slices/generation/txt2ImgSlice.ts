@@ -23,7 +23,7 @@ export interface Txt2ImgState {
 }
 
 const initialState: Txt2ImgState = {
-  gpuNum: null,
+  gpuNum: 1, // null
   params: {
     modelParams: {
       model: 'stable-diffusion-2'

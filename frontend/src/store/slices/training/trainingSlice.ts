@@ -22,11 +22,11 @@ export interface TrainingState {
 }
 
 const initialState: TrainingState = {
-  gpuNum: null,
+  gpuNum: 3, // null
   params: {
     modelParams: {
-      isInpaint: false,
-      pretrainedModelNameOrPath: '',
+      isInpaint: true, // false
+      pretrainedModelNameOrPath: 'stable-diffusion-2-inpainting', // ''
       trainModelName: '',
       tokenizerName: '',
       revision: ''
@@ -37,8 +37,8 @@ const initialState: TrainingState = {
       centerCrop: false
     },
     trainingParams: {
-      trainBatchSize: 2,
-      numTrainEpochs: 50,
+      trainBatchSize: 1, // 2
+      numTrainEpochs: 100, // 50
       learningRate: 5e-6,
       maxTrainSteps: null,
       gradientAccumulationSteps: null,

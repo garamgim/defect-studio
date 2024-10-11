@@ -9,7 +9,7 @@ interface CleanupState {
 }
 
 const initialState: CleanupState = {
-  gpuNum: null,
+  gpuNum: 1, // null
   params: {
     uploadImgWithMaskingParams: {
       mode: 'manual',
