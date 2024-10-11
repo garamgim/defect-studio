@@ -57,7 +57,6 @@ export const postImg2ImgGeneration = async (gpu_env: Img2ImgDataType['gpu_env'],
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
-      console.log(key, value);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
@@ -93,7 +92,6 @@ export const postInpaintingGeneration = async (
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
-      console.log(key, value);
       if (Array.isArray(value)) {
         value.forEach((file) => {
           formData.append(key, file);
@@ -302,7 +300,6 @@ export const getTaskStatus = async (task_id: string) => {
     const response = await axiosInstance.get(`/generation/tasks/${task_id}`);
 
     if (response.status === 200) {
-      console.log('respone.data', response.data);
       return response.data;
     } else {
       throw new Error('Failed to get task-status');

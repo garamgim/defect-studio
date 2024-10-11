@@ -61,8 +61,6 @@ const Model = () => {
               clearInterval(intervalIdsRef.current[taskId]);
               delete intervalIdsRef.current[taskId];
               dispatch(removeTaskId(taskId));
-            } else if (statusResponse.task_status === 'STARTED') {
-              console.log('진행중');
             }
           } catch (error) {
             console.error(`Error fetching task status for Task ID ${taskId}:`, error);

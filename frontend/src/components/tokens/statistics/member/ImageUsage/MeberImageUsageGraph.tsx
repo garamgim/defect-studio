@@ -98,7 +98,6 @@ const options: ChartOptions<'line'> = {
 };
 
 const MemberImageUsageGraph = ({ data }: MeberImageUsageGraphProps) => {
-  console.log(data);
   const datasets = [
     {
       label: '이미지 사용량',

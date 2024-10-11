@@ -68,7 +68,6 @@ const SearchDepartmentUsageToken = ({ departmentsId, setSelectedDepartmentPeople
     type: 'checkbox',
     selectedRowKeys,
     onChange: (NewselectedRowKeys: React.Key[], selectedRows: RowSelectionType[]) => {
-      console.log(`selectedRowKeys: ${NewselectedRowKeys}`, 'selectedRows: ', selectedRows);
       setSelectedRowKeys(NewselectedRowKeys);
       setSelectedDepartmentPeople(selectedRows.map((row) => row.key));
     },

@@ -22,7 +22,6 @@ export type MemberRead = {
 export const getGuestUserInfo = async (): Promise<AxiosResponse<MemberRead[]>> => {
   try {
     const response = await axiosInstance.get<MemberRead[]>('/members/guests');
-    console.log(response.data);
     return response;
   } catch (error) {
     throw Error('Unexpected error occurred');
@@ -87,7 +86,6 @@ export const rejectUser = async ({ member_id }: RejectGuestUserProps): Promise<A
 export const getUserInfo = async (): Promise<AxiosResponse<MemberRead[]>> => {
   try {
     const response = await axiosInstance.get<MemberRead[]>('/members/all');
-    console.log(response.data);
     return response;
   } catch (error) {
     throw Error('Unexpected error occurred');

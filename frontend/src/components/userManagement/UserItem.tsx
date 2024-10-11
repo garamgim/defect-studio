@@ -72,7 +72,6 @@ const UserItem = ({ userData }: GuestUserItemProps) => {
           <>
             <Button
               onClick={() => {
-                // console.log(guestData, newRole);
                 approveMutate({ member_id: userData.member_id, new_role: newRole });
               }}
               disabled={newRole === 'guest'}
@@ -82,7 +81,6 @@ const UserItem = ({ userData }: GuestUserItemProps) => {
             </Button>
             <Button
               onClick={() => {
-                // console.log(userData, newRole);
                 rejectMutate({ member_id: userData.member_id });
               }}
               className="mx-3 disabled:hidden"
